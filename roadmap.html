@@ -94,9 +94,35 @@
 <div class="page">
   <h1>新卒採用ATS — 開発ロードマップ</h1>
   <div class="meta">
-    <span>v0.1</span>
+    <span>v0.2</span>
     <span>2026-06-04</span>
     <span>要件定義フェーズ</span>
+    <span style="background:#7c83fd;color:#fff;border-radius:10px;padding:2px 10px;font-weight:700;">総開発期間：3ヶ月</span>
+    <span style="background:#1a1a2e;color:#7c83fd;border-radius:10px;padding:2px 10px;font-weight:700;">🤖 AI駆動開発</span>
+  </div>
+
+  <!-- AI駆動開発の前提 -->
+  <div style="background:#1a1a2e;border-radius:12px;padding:20px 24px;margin-bottom:20px;display:grid;grid-template-columns:1fr 1fr 1fr;gap:20px;">
+    <div>
+      <div style="font-size:11px;color:#7c83fd;font-weight:700;margin-bottom:6px;">🤖 AI駆動開発とは</div>
+      <div style="font-size:12px;color:#ccc;line-height:1.8;">
+        Claude Code / GitHub Copilot 等のAIツールを積極活用し、コード生成・設計・レビューをAI補助で進める。通常開発比 <strong style="color:#fff;">1.5〜2倍</strong>のスピードを想定。
+      </div>
+    </div>
+    <div>
+      <div style="font-size:11px;color:#7c83fd;font-weight:700;margin-bottom:6px;">⚡ 3ヶ月でできること</div>
+      <div style="font-size:12px;color:#ccc;line-height:1.8;">
+        <div>Month 1：基盤 + MVP中核機能</div>
+        <div>Month 2：MVP完成 + テスト + リリース</div>
+        <div>Month 3：Phase2 主要機能</div>
+      </div>
+    </div>
+    <div>
+      <div style="font-size:11px;color:#7c83fd;font-weight:700;margin-bottom:6px;">⚠️ AI駆動開発の留意点</div>
+      <div style="font-size:12px;color:#ccc;line-height:1.8;">
+        外部API連携（LINE / SF / Google）は仕様確認が必要なため、AIだけでは進められない。確認事項（U-xx）の早期解決が全体スピードに直結する。
+      </div>
+    </div>
   </div>
 
   <div class="tabs">
@@ -121,7 +147,7 @@
           </div>
           <div class="phase-subtitle">「採用活動を最低限まわせる」状態にする</div>
         </div>
-        <div class="phase-meta">想定工数<br><strong style="font-size:18px;">8〜12週</strong></div>
+        <div class="phase-meta">Month 1〜2<br><strong style="font-size:18px;">〜Week 8</strong></div>
       </div>
       <div class="phase-body">
         <div class="feat-grid">
@@ -149,7 +175,7 @@
           </div>
           <div class="phase-subtitle">「採用活動を効率化・高度化する」機能群</div>
         </div>
-        <div class="phase-meta">想定工数<br><strong style="font-size:18px;">6〜8週</strong></div>
+        <div class="phase-meta">Month 3<br><strong style="font-size:18px;">Week 9〜12</strong></div>
       </div>
       <div class="phase-body">
         <div class="feat-grid">
@@ -176,7 +202,7 @@
           </div>
           <div class="phase-subtitle">「採用活動をデータドリブンにする」高度機能</div>
         </div>
-        <div class="phase-meta">想定工数<br><strong style="font-size:18px;">4〜6週</strong></div>
+        <div class="phase-meta">Month 4〜<br><strong style="font-size:18px;">3ヶ月以降</strong></div>
       </div>
       <div class="phase-body">
         <div class="feat-grid">
@@ -453,69 +479,175 @@
   <!-- ⑥ スケジュール感 -->
   <div id="t-timeline" class="tab-content">
     <div class="section">
-      <h2>スケジュール感（参考）</h2>
-      <div class="warn-box" style="margin-bottom:16px;">
-        ⚠️ 以下は概算です。チーム規模・技術スタック・未確認事項の確定タイミングによって変動します。
+      <h2>3ヶ月スケジュール（AI駆動開発前提）</h2>
+      <div class="info-box" style="margin-bottom:16px;">
+        AI駆動開発により通常比1.5〜2倍の開発速度を想定。ただし外部API連携（LINE/SF/Google/媒体）は仕様確認が必要なため、ヒアリング完了タイミングがクリティカルパスになる。
       </div>
 
-      <div style="margin-bottom:20px;">
-        <div style="display:grid;grid-template-columns:160px repeat(12,1fr);gap:1px;margin-bottom:4px;">
+      <!-- 月別ガント -->
+      <div style="margin-bottom:24px;">
+        <div style="display:grid;grid-template-columns:150px repeat(12,1fr);gap:1px;margin-bottom:6px;align-items:center;">
           <div></div>
-          <div style="font-size:10px;color:#999;text-align:center;">1</div>
-          <div style="font-size:10px;color:#999;text-align:center;">2</div>
-          <div style="font-size:10px;color:#999;text-align:center;">3</div>
-          <div style="font-size:10px;color:#999;text-align:center;">4</div>
-          <div style="font-size:10px;color:#999;text-align:center;">5</div>
-          <div style="font-size:10px;color:#999;text-align:center;">6</div>
-          <div style="font-size:10px;color:#999;text-align:center;">7</div>
-          <div style="font-size:10px;color:#999;text-align:center;">8</div>
-          <div style="font-size:10px;color:#999;text-align:center;">9</div>
-          <div style="font-size:10px;color:#999;text-align:center;">10</div>
-          <div style="font-size:10px;color:#999;text-align:center;">11</div>
-          <div style="font-size:10px;color:#999;text-align:center;">12</div>
+          <div style="font-size:10px;color:#999;text-align:center;grid-column:2/6;background:#fafafa;border-radius:4px;padding:2px 0;">Month 1（Week 1〜4）</div>
+          <div style="font-size:10px;color:#999;text-align:center;grid-column:6/10;background:#fafafa;border-radius:4px;padding:2px 0;">Month 2（Week 5〜8）</div>
+          <div style="font-size:10px;color:#999;text-align:center;grid-column:10/14;background:#fafafa;border-radius:4px;padding:2px 0;">Month 3（Week 9〜12）</div>
+        </div>
+        <div style="display:grid;grid-template-columns:150px repeat(12,1fr);gap:1px;margin-bottom:8px;">
+          <div></div>
+          <div style="font-size:9px;color:#ccc;text-align:center;">W1</div><div style="font-size:9px;color:#ccc;text-align:center;">W2</div>
+          <div style="font-size:9px;color:#ccc;text-align:center;">W3</div><div style="font-size:9px;color:#ccc;text-align:center;">W4</div>
+          <div style="font-size:9px;color:#ccc;text-align:center;">W5</div><div style="font-size:9px;color:#ccc;text-align:center;">W6</div>
+          <div style="font-size:9px;color:#ccc;text-align:center;">W7</div><div style="font-size:9px;color:#ccc;text-align:center;">W8</div>
+          <div style="font-size:9px;color:#ccc;text-align:center;">W9</div><div style="font-size:9px;color:#ccc;text-align:center;">W10</div>
+          <div style="font-size:9px;color:#ccc;text-align:center;">W11</div><div style="font-size:9px;color:#ccc;text-align:center;">W12</div>
         </div>
 
-        <div style="display:flex;flex-direction:column;gap:6px;">
+        <div style="display:flex;flex-direction:column;gap:5px;">
+
           <div class="timeline-row">
-            <div class="timeline-label">要件定義・設計</div>
+            <div class="timeline-label" style="font-size:11px;">🔧 設計・環境構築</div>
             <div class="timeline-bar-wrap">
-              <div class="timeline-bar" style="width:calc(100%*2/12);background:#9e9e9e;">設計</div>
+              <div class="timeline-bar" style="width:calc(100%*2/12);background:#9e9e9e;font-size:10px;">設計確定</div>
             </div>
           </div>
+
           <div class="timeline-row">
-            <div class="timeline-label">MVP開発</div>
+            <div class="timeline-label" style="font-size:11px;">🗄️ DB基盤構築</div>
+            <div class="timeline-bar-wrap">
+              <div class="timeline-bar" style="width:calc(100%*3/12);background:#546e7a;font-size:10px;">Staff→Master→Applicant</div>
+            </div>
+          </div>
+
+          <div class="timeline-row">
+            <div class="timeline-label" style="font-size:11px;">🔐 認証・権限</div>
+            <div class="timeline-bar-wrap">
+              <div style="width:calc(100%*1/12);"></div>
+              <div class="timeline-bar" style="width:calc(100%*2/12);background:#37474f;font-size:10px;">Google OAuth</div>
+            </div>
+          </div>
+
+          <div class="timeline-row">
+            <div class="timeline-label" style="font-size:11px;">👤 学生管理</div>
             <div class="timeline-bar-wrap">
               <div style="width:calc(100%*2/12);"></div>
-              <div class="timeline-bar" style="width:calc(100%*8/12);background:#e53935;">MVP（8〜12週）</div>
+              <div class="timeline-bar" style="width:calc(100%*3/12);background:#7c83fd;font-size:10px;">CRUD・タグ・一覧</div>
             </div>
           </div>
+
           <div class="timeline-row">
-            <div class="timeline-label" style="color:#e53935;font-weight:700;">MVP リリース</div>
+            <div class="timeline-label" style="font-size:11px;">💬 LINE基本連携</div>
             <div class="timeline-bar-wrap">
-              <div style="width:calc(100%*9.5/12);border-right:2px solid #e53935;"></div>
-              <div style="font-size:11px;color:#e53935;padding-left:6px;font-weight:700;">🚀 Week 10〜12</div>
+              <div style="width:calc(100%*3/12);"></div>
+              <div class="timeline-bar" style="width:calc(100%*3/12);background:#06c755;font-size:10px;">友達追加・送信・LIFF</div>
             </div>
           </div>
+
           <div class="timeline-row">
-            <div class="timeline-label">Phase 2開発</div>
+            <div class="timeline-label" style="font-size:11px;">🎯 選考管理</div>
             <div class="timeline-bar-wrap">
-              <div style="width:calc(100%*10/12);"></div>
-              <div class="timeline-bar" style="width:calc(100%*2/12);background:#1976d2;">Phase2→</div>
+              <div style="width:calc(100%*3/12);"></div>
+              <div class="timeline-bar" style="width:calc(100%*3/12);background:#e91e63;font-size:10px;">パイプライン・面接記録</div>
             </div>
           </div>
+
+          <div class="timeline-row">
+            <div class="timeline-label" style="font-size:11px;">📡 媒体CSV取込</div>
+            <div class="timeline-bar-wrap">
+              <div style="width:calc(100%*5/12);"></div>
+              <div class="timeline-bar" style="width:calc(100%*2/12);background:#ff9800;font-size:10px;">4媒体CSV</div>
+            </div>
+          </div>
+
+          <div class="timeline-row">
+            <div class="timeline-label" style="font-size:11px;">📊 基本分析</div>
+            <div class="timeline-bar-wrap">
+              <div style="width:calc(100%*6/12);"></div>
+              <div class="timeline-bar" style="width:calc(100%*2/12);background:#5c6bc0;font-size:10px;">ファネル・一覧</div>
+            </div>
+          </div>
+
+          <div class="timeline-row">
+            <div class="timeline-label" style="color:#e53935;font-weight:700;font-size:11px;">🚀 MVP リリース</div>
+            <div class="timeline-bar-wrap">
+              <div style="width:calc(100%*7.5/12);border-right:2px dashed #e53935;"></div>
+              <div style="font-size:11px;color:#e53935;padding-left:8px;font-weight:700;">Week 8 目標</div>
+            </div>
+          </div>
+
+          <div style="height:1px;background:#e8eaf0;margin:4px 0;"></div>
+
+          <div class="timeline-row">
+            <div class="timeline-label" style="font-size:11px;">🔄 複数フロー</div>
+            <div class="timeline-bar-wrap">
+              <div style="width:calc(100%*8/12);"></div>
+              <div class="timeline-bar" style="width:calc(100%*2/12);background:#1976d2;font-size:10px;">Phase2</div>
+            </div>
+          </div>
+
+          <div class="timeline-row">
+            <div class="timeline-label" style="font-size:11px;">☁️ Salesforce連携</div>
+            <div class="timeline-bar-wrap">
+              <div style="width:calc(100%*8/12);"></div>
+              <div class="timeline-bar" style="width:calc(100%*3/12);background:#1565c0;font-size:10px;">承諾登録・在籍同期</div>
+            </div>
+          </div>
+
+          <div class="timeline-row">
+            <div class="timeline-label" style="font-size:11px;">🎛️ 複数リッチメニュー</div>
+            <div class="timeline-bar-wrap">
+              <div style="width:calc(100%*9/12);"></div>
+              <div class="timeline-bar" style="width:calc(100%*2/12);background:#00897b;font-size:10px;">タグ割当</div>
+            </div>
+          </div>
+
         </div>
-        <div style="font-size:11px;color:#999;margin-top:8px;">※ 横軸は週数（目安）</div>
+        <div style="font-size:11px;color:#999;margin-top:8px;">※ AI駆動開発前提。並行作業により実際の壁打ちは短縮される場合あり</div>
       </div>
 
-      <h3 style="margin-bottom:10px;">ヒアリング完了が必要なもの（スケジュールに影響する）</h3>
+      <!-- Month別サマリー -->
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:20px;">
+        <div style="background:#fff5f5;border:1.5px solid #ffcdd2;border-radius:10px;padding:14px;">
+          <div style="font-size:12px;font-weight:700;color:#c62828;margin-bottom:8px;">Month 1（Week 1〜4）</div>
+          <div style="font-size:12px;line-height:2;color:#555;">
+            <div>✅ ヒアリング最終確定</div>
+            <div>✅ 技術スタック決定</div>
+            <div>✅ DB基盤構築（STEP 0〜2）</div>
+            <div>✅ Google OAuth 実装</div>
+            <div>✅ 学生管理基本機能</div>
+          </div>
+        </div>
+        <div style="background:#fff8e1;border:1.5px solid #ffe082;border-radius:10px;padding:14px;">
+          <div style="font-size:12px;font-weight:700;color:#f57f17;margin-bottom:8px;">Month 2（Week 5〜8）</div>
+          <div style="font-size:12px;line-height:2;color:#555;">
+            <div>✅ LINE連携（友達追加・送信）</div>
+            <div>✅ 選考管理・パイプライン</div>
+            <div>✅ 媒体CSV取込</div>
+            <div>✅ 基本ファネル分析</div>
+            <div>🚀 <strong>MVP リリース（Week 8）</strong></div>
+          </div>
+        </div>
+        <div style="background:#e3f2fd;border:1.5px solid #90caf9;border-radius:10px;padding:14px;">
+          <div style="font-size:12px;font-weight:700;color:#1565c0;margin-bottom:8px;">Month 3（Week 9〜12）</div>
+          <div style="font-size:12px;line-height:2;color:#555;">
+            <div>✅ 複数選考フロー</div>
+            <div>✅ Salesforce連携</div>
+            <div>✅ 複数リッチメニュー</div>
+            <div>✅ 監査ログ</div>
+            <div>📋 実運用フィードバック収集</div>
+          </div>
+        </div>
+      </div>
+
+      <h3 style="margin-bottom:10px;">クリティカルパス（これが遅れると全体が遅れる）</h3>
       <table>
-        <thead><tr><th>確認事項</th><th>影響する機能</th><th>影響度</th><th>期限感</th></tr></thead>
+        <thead><tr><th>確認事項</th><th>影響する機能</th><th>影響度</th><th>必要タイミング</th></tr></thead>
         <tbody>
-          <tr><td>U-11 Google Workspace有無</td><td>カレンダー連携の実装方式が変わる</td><td><span class="badge badge-must">高</span></td><td>Phase2着手前</td></tr>
-          <tr><td>U-05 エージェント利用有無</td><td>カレンダー・FR023のスコープ</td><td><span class="badge badge-should">中</span></td><td>MVP設計中</td></tr>
-          <tr><td>U-03 第二新卒スコープ</td><td>データモデル・媒体連携優先度</td><td><span class="badge badge-should">中</span></td><td>MVP開発前</td></tr>
-          <tr><td>U-06 面接評価項目</td><td>InterviewテーブルとUI設計</td><td><span class="badge badge-should">中</span></td><td>MVP開発中（Week 4〜）</td></tr>
-          <tr><td>SF側オブジェクト設計</td><td>Salesforce連携の実装</td><td><span class="badge badge-should">中</span></td><td>Phase2設計前</td></tr>
+          <tr style="background:#fff5f5;"><td><strong>U-03 第二新卒スコープ</strong></td><td>DBスキーマ・媒体優先度</td><td><span class="badge badge-must">高</span></td><td>Week 2まで（DB設計前）</td></tr>
+          <tr style="background:#fff5f5;"><td><strong>U-06 面接評価項目</strong></td><td>InterviewテーブルとUI</td><td><span class="badge badge-must">高</span></td><td>Week 3まで（選考管理設計前）</td></tr>
+          <tr><td>U-05 エージェント利用有無</td><td>カレンダー・権限スコープ</td><td><span class="badge badge-should">中</span></td><td>Week 4まで（MVP設計中）</td></tr>
+          <tr><td>U-11 Google Workspace有無</td><td>カレンダー連携方式</td><td><span class="badge badge-should">中</span></td><td>Week 8まで（Phase2設計前）</td></tr>
+          <tr><td>SF側オブジェクト設計確定</td><td>Salesforce連携実装</td><td><span class="badge badge-should">中</span></td><td>Week 8まで（Phase2設計前）</td></tr>
+          <tr><td>媒体API利用可否</td><td>CSV→API移行</td><td><span class="badge badge-could">低</span></td><td>Phase3以降でよい</td></tr>
         </tbody>
       </table>
     </div>
