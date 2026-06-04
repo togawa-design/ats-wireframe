@@ -496,12 +496,13 @@
 
   <!-- ③ データモデル -->
   <div id="tab-erd" class="tab-content">
+
+    <!-- Group 1: 応募者 -->
     <div class="section">
-      <h2>エンティティ関係図（ER概要）</h2>
+      <h2>① 応募者（Applicant）</h2>
+      <div class="erd">
 
-      <div class="erd" style="margin-bottom:20px;">
-
-        <div class="entity" style="flex:2;min-width:280px;">
+        <div class="entity" style="flex:2;min-width:260px;">
           <div class="entity-header">👤 Applicant（応募者）</div>
           <div class="entity-field"><span><span class="pk">PK</span> id</span><span class="field-type">UUID</span></div>
           <div class="entity-field"><span>last_name / first_name</span><span class="field-type">VARCHAR</span></div>
@@ -510,6 +511,7 @@
           <div class="entity-field"><span><span class="fk">FK</span> school_id</span><span class="field-type">UUID</span></div>
           <div class="entity-field"><span>department</span><span class="field-type">VARCHAR</span></div>
           <div class="entity-field"><span>graduation_year</span><span class="field-type">INT</span></div>
+          <div class="entity-field" style="background:#e8f5e9;"><span><strong>applicant_type</strong></span><span class="field-type">ENUM</span></div>
           <div class="entity-field" style="background:#fffde7;"><span><strong>line_user_id</strong></span><span class="field-type nullable">VARCHAR | NULL</span></div>
           <div class="entity-field" style="background:#fffde7;"><span>line_linked_at</span><span class="field-type nullable">TIMESTAMP | NULL</span></div>
           <div class="entity-field"><span><span class="fk">FK</span> primary_source_id</span><span class="field-type">UUID</span></div>
@@ -517,103 +519,282 @@
           <div class="entity-field"><span>created_at / updated_at</span><span class="field-type">TIMESTAMP</span></div>
         </div>
 
-        <div style="display:flex;flex-direction:column;gap:12px;min-width:220px;">
-          <div class="entity">
-            <div class="entity-header green">🏫 School（学校マスター）</div>
-            <div class="entity-field"><span><span class="pk">PK</span> id</span><span class="field-type">UUID</span></div>
-            <div class="entity-field"><span>name</span><span class="field-type">VARCHAR</span></div>
-            <div class="entity-field"><span>type</span><span class="field-type">ENUM</span></div>
-            <div class="entity-field"><span><span class="fk">FK</span> sf_account_id</span><span class="field-type nullable">VARCHAR | NULL</span></div>
-          </div>
-
-          <div class="entity">
-            <div class="entity-header orange">📡 ApplicantSource（流入元）</div>
-            <div class="entity-field"><span><span class="pk">PK</span> id</span><span class="field-type">UUID</span></div>
-            <div class="entity-field"><span><span class="fk">FK</span> applicant_id</span><span class="field-type">UUID</span></div>
-            <div class="entity-field"><span><span class="fk">FK</span> media_id</span><span class="field-type nullable">UUID | NULL</span></div>
-            <div class="entity-field"><span><span class="fk">FK</span> qr_code_id</span><span class="field-type nullable">UUID | NULL</span></div>
-            <div class="entity-field"><span>external_applicant_id</span><span class="field-type">VARCHAR</span></div>
-            <div class="entity-field"><span>raw_data</span><span class="field-type">JSONB</span></div>
-          </div>
+        <div style="display:flex;flex-direction:column;justify-content:center;align-items:center;padding:0 8px;font-size:11px;color:#7c83fd;">
+          <div>1</div><div style="width:2px;height:40px;background:#7c83fd;margin:2px 0;"></div><div>N</div>
         </div>
 
-        <div style="display:flex;flex-direction:column;gap:12px;min-width:220px;">
-          <div class="entity">
-            <div class="entity-header pink">🎯 Selection（選考）</div>
-            <div class="entity-field"><span><span class="pk">PK</span> id</span><span class="field-type">UUID</span></div>
-            <div class="entity-field"><span><span class="fk">FK</span> applicant_id</span><span class="field-type">UUID</span></div>
-            <div class="entity-field"><span>status</span><span class="field-type">ENUM</span></div>
-            <div class="entity-field"><span>status_changed_at</span><span class="field-type">TIMESTAMP</span></div>
-            <div class="entity-field"><span><span class="fk">FK</span> assigned_to</span><span class="field-type">UUID</span></div>
-          </div>
-
-          <div class="entity">
-            <div class="entity-header" style="background:#5c6bc0;">📋 Interview（面接）</div>
-            <div class="entity-field"><span><span class="pk">PK</span> id</span><span class="field-type">UUID</span></div>
-            <div class="entity-field"><span><span class="fk">FK</span> selection_id</span><span class="field-type">UUID</span></div>
-            <div class="entity-field"><span>scheduled_at</span><span class="field-type">TIMESTAMP</span></div>
-            <div class="entity-field"><span>type</span><span class="field-type">ENUM</span></div>
-            <div class="entity-field"><span>score</span><span class="field-type">INT</span></div>
-            <div class="entity-field"><span>notes</span><span class="field-type">TEXT</span></div>
-          </div>
+        <div class="entity" style="min-width:220px;">
+          <div class="entity-header orange">📡 ApplicantSource（流入元）</div>
+          <div class="entity-field"><span><span class="pk">PK</span> id</span><span class="field-type">UUID</span></div>
+          <div class="entity-field"><span><span class="fk">FK</span> applicant_id</span><span class="field-type">UUID</span></div>
+          <div class="entity-field"><span><span class="fk">FK</span> media_id</span><span class="field-type nullable">UUID | NULL</span></div>
+          <div class="entity-field"><span><span class="fk">FK</span> qr_code_id</span><span class="field-type nullable">UUID | NULL</span></div>
+          <div class="entity-field"><span>external_applicant_id</span><span class="field-type">VARCHAR</span></div>
+          <div class="entity-field"><span>raw_data</span><span class="field-type">JSONB</span></div>
         </div>
 
-        <div style="display:flex;flex-direction:column;gap:12px;min-width:220px;">
-          <div class="entity">
-            <div class="entity-header gray">🔗 LineRegistrationToken</div>
-            <div class="entity-field"><span><span class="pk">PK</span> token</span><span class="field-type">VARCHAR</span></div>
-            <div class="entity-field"><span><span class="fk">FK</span> applicant_id</span><span class="field-type">UUID</span></div>
-            <div class="entity-field"><span>expires_at</span><span class="field-type">TIMESTAMP</span></div>
-            <div class="entity-field"><span>used_at</span><span class="field-type nullable">TIMESTAMP | NULL</span></div>
-          </div>
+        <div style="display:flex;flex-direction:column;justify-content:center;align-items:center;padding:0 8px;font-size:11px;color:#ccc;">
+          <div>N</div><div style="width:2px;height:40px;background:#ccc;margin:2px 0;"></div><div>1</div>
+        </div>
 
+        <div style="display:flex;flex-direction:column;gap:10px;min-width:200px;">
           <div class="entity">
-            <div class="entity-header gray">📱 Media（媒体）</div>
+            <div class="entity-header gray">📱 Media</div>
             <div class="entity-field"><span><span class="pk">PK</span> id</span><span class="field-type">UUID</span></div>
             <div class="entity-field"><span>name</span><span class="field-type">VARCHAR</span></div>
             <div class="entity-field"><span>field_mapping</span><span class="field-type">JSONB</span></div>
             <div class="entity-field"><span>sync_type</span><span class="field-type">ENUM</span></div>
           </div>
-
           <div class="entity">
-            <div class="entity-header gray">📲 QRCode（QRコード）</div>
+            <div class="entity-header gray">📲 QRCode</div>
             <div class="entity-field"><span><span class="pk">PK</span> id</span><span class="field-type">UUID</span></div>
             <div class="entity-field"><span>label</span><span class="field-type">VARCHAR</span></div>
             <div class="entity-field"><span>liff_url</span><span class="field-type">VARCHAR</span></div>
             <div class="entity-field"><span>auto_tags</span><span class="field-type">JSONB</span></div>
           </div>
+          <div class="entity">
+            <div class="entity-header green">🏫 School</div>
+            <div class="entity-field"><span><span class="pk">PK</span> id</span><span class="field-type">UUID</span></div>
+            <div class="entity-field"><span>name</span><span class="field-type">VARCHAR</span></div>
+            <div class="entity-field"><span>type</span><span class="field-type">ENUM</span></div>
+            <div class="entity-field"><span><span class="fk">FK</span> sf_account_id</span><span class="field-type nullable">VARCHAR | NULL</span></div>
+          </div>
         </div>
 
       </div>
 
-      <div style="background:#f8f9ff;border-radius:10px;padding:16px;">
-        <h3 style="margin-bottom:10px;">custom_fields（JSONB）設計の考え方</h3>
-        <div class="two-col">
-          <div>
-            <div style="font-size:12px;color:#666;margin-bottom:8px;">固定フィールド（全媒体共通）</div>
-            <pre>{
-  <span class="json-key">"name"</span>: <span class="json-str">"田中 一郎"</span>,
-  <span class="json-key">"school"</span>: <span class="json-str">"早稲田大学"</span>,
-  <span class="json-key">"email"</span>: <span class="json-str">"tanaka@example.com"</span>,
-  <span class="json-key">"graduation_year"</span>: <span class="json-num">2026</span>
-}</pre>
+      <!-- applicant_type & custom_fields -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:16px;">
+        <div style="background:#e8f5e9;border-radius:8px;padding:14px;">
+          <div style="font-size:12px;font-weight:700;color:#2e7d32;margin-bottom:8px;">applicant_type ENUM</div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;">
+            <span style="background:#fff;border:1.5px solid #4caf50;border-radius:6px;padding:4px 12px;font-size:12px;font-weight:600;color:#2e7d32;">新卒</span>
+            <span style="background:#fff;border:1.5px solid #ff9800;border-radius:6px;padding:4px 12px;font-size:12px;font-weight:600;color:#e65100;">既卒</span>
+            <span style="background:#fff;border:1.5px solid #9c27b0;border-radius:6px;padding:4px 12px;font-size:12px;font-weight:600;color:#6a1b9a;">第二新卒</span>
           </div>
-          <div>
-            <div style="font-size:12px;color:#666;margin-bottom:8px;">custom_fields（媒体・用途ごとに柔軟）</div>
-            <pre>{
-  <span class="json-key">"mynavi_score"</span>: <span class="json-num">82</span>,
-  <span class="json-key">"club_activity"</span>: <span class="json-str">"サッカー部"</span>,
-  <span class="json-key">"toeic"</span>: <span class="json-num">850</span>,
-  <span class="json-key">"preferred_location"</span>: <span class="json-str">"東京"</span>,
-  <span class="json-key">"intern_history"</span>: [<span class="json-str">"〇〇社"</span>, <span class="json-str">"△△社"</span>]
-}</pre>
+          <div style="font-size:11px;color:#555;margin-top:8px;line-height:1.6;">
+            媒体連携時に自動付与可能（Re就活 → 第二新卒 など）。手動変更も可。
           </div>
         </div>
-        <div class="info-box" style="margin-top:0;">
-          媒体ごとに異なる項目・独自の採用評価項目は全て <strong>custom_fields (JSONB)</strong> に格納。管理画面から項目の追加・表示設定が可能な設計にする。PostgreSQLを前提とすることで検索・インデックスも対応可能。
+        <div style="background:#f3e5f5;border-radius:8px;padding:14px;">
+          <div style="font-size:12px;font-weight:700;color:#6a1b9a;margin-bottom:8px;">custom_fields（JSONB）例</div>
+          <pre style="font-size:11px;padding:8px 10px;">{
+  <span class="json-key">"toeic"</span>: <span class="json-num">850</span>,
+  <span class="json-key">"club"</span>: <span class="json-str">"サッカー部"</span>,
+  <span class="json-key">"prev_company"</span>: <span class="json-str">"〇〇株式会社"</span>,
+  <span class="json-key">"prev_tenure_months"</span>: <span class="json-num">14</span>,
+  <span class="json-key">"reason_for_leaving"</span>: <span class="json-str">"..."</span>
+}</pre>
+          <div style="font-size:11px;color:#555;margin-top:4px;">第二新卒の職歴も custom_fields で柔軟に対応。</div>
         </div>
       </div>
     </div>
+
+    <!-- Group 2: 選考フロー -->
+    <div class="section">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;">
+        <h2 style="margin-bottom:0;">② 選考フロー（SelectionFlow）</h2>
+        <span style="background:#7c83fd;color:#fff;font-size:10px;font-weight:700;border-radius:10px;padding:2px 10px;">複数フロー・自由設計対応</span>
+      </div>
+
+      <div class="erd" style="align-items:flex-start;">
+
+        <!-- Flow -->
+        <div class="entity" style="min-width:200px;">
+          <div class="entity-header" style="background:#e91e63;">🗂️ SelectionFlow（フロー定義）</div>
+          <div class="entity-field"><span><span class="pk">PK</span> id</span><span class="field-type">UUID</span></div>
+          <div class="entity-field"><span>name</span><span class="field-type">VARCHAR</span></div>
+          <div class="entity-field"><span>description</span><span class="field-type">TEXT</span></div>
+          <div class="entity-field"><span>is_default</span><span class="field-type">BOOL</span></div>
+          <div class="entity-field"><span>is_active</span><span class="field-type">BOOL</span></div>
+        </div>
+
+        <div style="display:flex;flex-direction:column;justify-content:center;align-items:center;padding:0 8px;font-size:11px;color:#e91e63;margin-top:20px;">
+          <div>1</div><div style="width:2px;height:40px;background:#e91e63;margin:2px 0;"></div><div>N</div>
+        </div>
+
+        <!-- Stage -->
+        <div class="entity" style="min-width:230px;">
+          <div class="entity-header" style="background:#e91e63;">📌 SelectionStage（ステージ定義）</div>
+          <div class="entity-field"><span><span class="pk">PK</span> id</span><span class="field-type">UUID</span></div>
+          <div class="entity-field"><span><span class="fk">FK</span> flow_id</span><span class="field-type">UUID</span></div>
+          <div class="entity-field"><span>name</span><span class="field-type">VARCHAR</span></div>
+          <div class="entity-field"><span>order</span><span class="field-type">INT</span></div>
+          <div class="entity-field" style="background:#fff9c4;"><span><strong>stage_type</strong></span><span class="field-type">ENUM</span></div>
+        </div>
+
+        <div style="padding:0 16px;margin-top:10px;">
+          <div style="font-size:11px;font-weight:700;color:#f57f17;margin-bottom:8px;">stage_type ENUM（ファネル計算の基準）</div>
+          <div style="display:flex;flex-direction:column;gap:4px;">
+            <div style="display:flex;align-items:center;gap:6px;">
+              <span style="background:#7c83fd;color:#fff;border-radius:4px;padding:2px 8px;font-size:10px;font-weight:700;min-width:24px;text-align:center;">1</span>
+              <span style="font-size:12px;">entry（応募）</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:6px;">
+              <span style="background:#7c83fd;color:#fff;border-radius:4px;padding:2px 8px;font-size:10px;font-weight:700;min-width:24px;text-align:center;">2</span>
+              <span style="font-size:12px;">screening（書類選考）</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:6px;">
+              <span style="background:#7c83fd;color:#fff;border-radius:4px;padding:2px 8px;font-size:10px;font-weight:700;min-width:24px;text-align:center;">3</span>
+              <span style="font-size:12px;">interview_1st（1次面接）</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:6px;">
+              <span style="background:#e91e63;color:#fff;border-radius:4px;padding:2px 8px;font-size:10px;font-weight:700;min-width:24px;text-align:center;">4</span>
+              <span style="font-size:12px;"><strong>interview_2nd（2次面接）</strong></span>
+            </div>
+            <div style="display:flex;align-items:center;gap:6px;">
+              <span style="background:#7c83fd;color:#fff;border-radius:4px;padding:2px 8px;font-size:10px;font-weight:700;min-width:24px;text-align:center;">5</span>
+              <span style="font-size:12px;">interview_final（最終面接）</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:6px;">
+              <span style="background:#7c83fd;color:#fff;border-radius:4px;padding:2px 8px;font-size:10px;font-weight:700;min-width:24px;text-align:center;">6</span>
+              <span style="font-size:12px;">offer（内定）</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:6px;">
+              <span style="background:#4caf50;color:#fff;border-radius:4px;padding:2px 8px;font-size:10px;font-weight:700;min-width:24px;text-align:center;">7</span>
+              <span style="font-size:12px;">acceptance（承諾）</span>
+            </div>
+          </div>
+        </div>
+
+        <div style="display:flex;flex-direction:column;justify-content:center;align-items:center;padding:0 8px;font-size:11px;color:#e91e63;margin-top:20px;">
+          <div>N</div><div style="width:2px;height:40px;background:#e91e63;margin:2px 0;"></div><div>1</div>
+        </div>
+
+        <div style="display:flex;flex-direction:column;gap:10px;min-width:220px;">
+          <!-- Selection -->
+          <div class="entity">
+            <div class="entity-header pink">🎯 Selection（個人の選考記録）</div>
+            <div class="entity-field"><span><span class="pk">PK</span> id</span><span class="field-type">UUID</span></div>
+            <div class="entity-field"><span><span class="fk">FK</span> applicant_id</span><span class="field-type">UUID</span></div>
+            <div class="entity-field"><span><span class="fk">FK</span> flow_id</span><span class="field-type">UUID</span></div>
+            <div class="entity-field" style="background:#fff9c4;"><span><span class="fk">FK</span> <strong>current_stage_id</strong></span><span class="field-type">UUID</span></div>
+            <div class="entity-field"><span>result</span><span class="field-type">ENUM</span></div>
+            <div class="entity-field"><span><span class="fk">FK</span> assigned_to</span><span class="field-type">UUID</span></div>
+          </div>
+          <!-- SelectionHistory -->
+          <div class="entity">
+            <div class="entity-header" style="background:#78909c;">📜 SelectionHistory（遷移ログ）</div>
+            <div class="entity-field"><span><span class="pk">PK</span> id</span><span class="field-type">UUID</span></div>
+            <div class="entity-field"><span><span class="fk">FK</span> selection_id</span><span class="field-type">UUID</span></div>
+            <div class="entity-field"><span><span class="fk">FK</span> from_stage_id</span><span class="field-type nullable">UUID | NULL</span></div>
+            <div class="entity-field"><span><span class="fk">FK</span> to_stage_id</span><span class="field-type">UUID</span></div>
+            <div class="entity-field"><span>changed_at</span><span class="field-type">TIMESTAMP</span></div>
+            <div class="entity-field"><span>changed_by</span><span class="field-type">UUID</span></div>
+          </div>
+          <!-- Interview -->
+          <div class="entity">
+            <div class="entity-header" style="background:#5c6bc0;">📋 Interview（面接記録）</div>
+            <div class="entity-field"><span><span class="pk">PK</span> id</span><span class="field-type">UUID</span></div>
+            <div class="entity-field"><span><span class="fk">FK</span> selection_id</span><span class="field-type">UUID</span></div>
+            <div class="entity-field"><span><span class="fk">FK</span> stage_id</span><span class="field-type">UUID</span></div>
+            <div class="entity-field"><span>scheduled_at</span><span class="field-type">TIMESTAMP</span></div>
+            <div class="entity-field"><span>score</span><span class="field-type">INT</span></div>
+            <div class="entity-field"><span>notes</span><span class="field-type">TEXT</span></div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Funnel bypass logic -->
+      <div style="margin-top:20px;border:2px solid #f57f17;border-radius:10px;overflow:hidden;">
+        <div style="background:#f57f17;color:#fff;padding:10px 16px;font-size:13px;font-weight:700;">📊 統合ファネル計算：バイパスカウントのロジック</div>
+        <div style="padding:16px;display:grid;grid-template-columns:1fr 1fr;gap:20px;">
+          <div>
+            <div style="font-size:12px;font-weight:700;margin-bottom:10px;">フロー設定例</div>
+            <div style="display:flex;gap:16px;">
+              <div style="flex:1;">
+                <div style="background:#e3f2fd;border-radius:6px;padding:8px;font-size:11px;text-align:center;font-weight:700;color:#1565c0;margin-bottom:4px;">フロー1</div>
+                <div style="display:flex;flex-direction:column;gap:2px;align-items:center;">
+                  <div style="background:#7c83fd;color:#fff;border-radius:4px;padding:3px 10px;font-size:11px;">応募 (1)</div>
+                  <div style="color:#ccc;">↓</div>
+                  <div style="background:#7c83fd;color:#fff;border-radius:4px;padding:3px 10px;font-size:11px;">1次 (3)</div>
+                  <div style="color:#ccc;">↓</div>
+                  <div style="background:#e91e63;color:#fff;border-radius:4px;padding:3px 10px;font-size:11px;opacity:0.3;">2次なし</div>
+                  <div style="color:#ccc;">↓</div>
+                  <div style="background:#7c83fd;color:#fff;border-radius:4px;padding:3px 10px;font-size:11px;">最終 (5)</div>
+                </div>
+              </div>
+              <div style="flex:1;">
+                <div style="background:#fce4ec;border-radius:6px;padding:8px;font-size:11px;text-align:center;font-weight:700;color:#880e4f;margin-bottom:4px;">フロー2</div>
+                <div style="display:flex;flex-direction:column;gap:2px;align-items:center;">
+                  <div style="background:#7c83fd;color:#fff;border-radius:4px;padding:3px 10px;font-size:11px;">応募 (1)</div>
+                  <div style="color:#ccc;">↓</div>
+                  <div style="background:#7c83fd;color:#fff;border-radius:4px;padding:3px 10px;font-size:11px;">1次 (3)</div>
+                  <div style="color:#ccc;">↓</div>
+                  <div style="background:#e91e63;color:#fff;border-radius:4px;padding:3px 10px;font-size:11px;">2次 (4)</div>
+                  <div style="color:#ccc;">↓</div>
+                  <div style="background:#7c83fd;color:#fff;border-radius:4px;padding:3px 10px;font-size:11px;">最終 (5)</div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div>
+            <div style="font-size:12px;font-weight:700;margin-bottom:10px;">「2次面接」のファネルカウント計算</div>
+            <div style="display:flex;flex-direction:column;gap:6px;font-size:12px;">
+              <div style="background:#e8f5e9;border-radius:6px;padding:8px 10px;">
+                <span style="color:#2e7d32;font-weight:700;">✅ フロー2の応募者</span><br>
+                current_stage_type <strong>≥ 4</strong> の人をカウント（通常）
+              </div>
+              <div style="background:#e8f5e9;border-radius:6px;padding:8px 10px;">
+                <span style="color:#2e7d32;font-weight:700;">✅ フロー1の応募者（2次なし）</span><br>
+                自フローに stage_type=4 が存在しない かつ<br>
+                current_stage_type <strong>≥ 5</strong>（最終以降）→ <strong>通過扱いでカウント</strong>
+              </div>
+              <div style="background:#ffebee;border-radius:6px;padding:8px 10px;">
+                <span style="color:#c62828;font-weight:700;">❌ フロー1の応募者（1次止まり）</span><br>
+                current_stage_type = 3 → カウントしない
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Group 3: その他 -->
+    <div class="section">
+      <h2>③ その他エンティティ</h2>
+      <div class="erd">
+        <div class="entity" style="min-width:200px;">
+          <div class="entity-header gray">🔗 LineRegistrationToken</div>
+          <div class="entity-field"><span><span class="pk">PK</span> token</span><span class="field-type">VARCHAR</span></div>
+          <div class="entity-field"><span><span class="fk">FK</span> applicant_id</span><span class="field-type">UUID</span></div>
+          <div class="entity-field"><span>expires_at</span><span class="field-type">TIMESTAMP</span></div>
+          <div class="entity-field"><span>used_at</span><span class="field-type nullable">TIMESTAMP | NULL</span></div>
+        </div>
+        <div class="entity" style="min-width:200px;">
+          <div class="entity-header" style="background:#546e7a;">📝 Survey（アンケート）</div>
+          <div class="entity-field"><span><span class="pk">PK</span> id</span><span class="field-type">UUID</span></div>
+          <div class="entity-field"><span>title</span><span class="field-type">VARCHAR</span></div>
+          <div class="entity-field"><span>questions</span><span class="field-type">JSONB</span></div>
+          <div class="entity-field"><span>liff_url</span><span class="field-type">VARCHAR</span></div>
+        </div>
+        <div class="entity" style="min-width:200px;">
+          <div class="entity-header" style="background:#546e7a;">📊 SurveyResponse（回答）</div>
+          <div class="entity-field"><span><span class="pk">PK</span> id</span><span class="field-type">UUID</span></div>
+          <div class="entity-field"><span><span class="fk">FK</span> survey_id</span><span class="field-type">UUID</span></div>
+          <div class="entity-field"><span><span class="fk">FK</span> applicant_id</span><span class="field-type">UUID</span></div>
+          <div class="entity-field"><span>answers</span><span class="field-type">JSONB</span></div>
+          <div class="entity-field"><span>submitted_at</span><span class="field-type">TIMESTAMP</span></div>
+        </div>
+        <div class="entity" style="min-width:200px;">
+          <div class="entity-header" style="background:#546e7a;">📅 CalendarSlot（面接枠）</div>
+          <div class="entity-field"><span><span class="pk">PK</span> id</span><span class="field-type">UUID</span></div>
+          <div class="entity-field"><span><span class="fk">FK</span> owner_id</span><span class="field-type">UUID</span></div>
+          <div class="entity-field"><span>starts_at / ends_at</span><span class="field-type">TIMESTAMP</span></div>
+          <div class="entity-field"><span>type</span><span class="field-type">ENUM</span></div>
+          <div class="entity-field"><span>is_booked</span><span class="field-type">BOOL</span></div>
+        </div>
+        <div class="entity" style="min-width:200px;">
+          <div class="entity-header" style="background:#546e7a;">📄 Document（書類テンプレート）</div>
+          <div class="entity-field"><span><span class="pk">PK</span> id</span><span class="field-type">UUID</span></div>
+          <div class="entity-field"><span>name</span><span class="field-type">VARCHAR</span></div>
+          <div class="entity-field"><span>type</span><span class="field-type">ENUM</span></div>
+          <div class="entity-field"><span>template_body</span><span class="field-type">TEXT</span></div>
+        </div>
+      </div>
+    </div>
+
   </div>
 
   <!-- ④ 媒体連携フロー -->
