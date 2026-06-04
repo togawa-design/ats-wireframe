@@ -1032,83 +1032,301 @@
 
     <!-- ⑨ Analytics -->
     <div id="page-analytics" class="page">
-      <div style="display:flex;gap:8px;margin-bottom:16px;">
-        <select style="width:140px;"><option>2025年度 新卒</option></select>
-        <select style="width:140px;"><option>全媒体</option><option>マイナビ</option></select>
-        <button class="btn btn-secondary btn-sm" style="margin-left:auto;">CSVエクスポート</button>
+
+      <!-- Global filters -->
+      <div style="display:flex;gap:8px;margin-bottom:16px;align-items:center;flex-wrap:wrap;">
+        <select style="width:150px;"><option>2025年度</option><option>2024年度</option></select>
+        <select style="width:130px;"><option>区分：全て</option><option>新卒</option><option>第二新卒</option><option>既卒</option></select>
+        <select style="width:130px;"><option>媒体：全て</option><option>マイナビ</option><option>リクナビ</option><option>OfferBox</option><option>Re就活</option></select>
+        <select style="width:150px;"><option>フロー：全て</option><option>新卒総合職</option><option>第二新卒</option></select>
+        <div style="margin-left:auto;display:flex;gap:8px;">
+          <button class="btn btn-secondary btn-sm">前年比較</button>
+          <button class="btn btn-secondary btn-sm">CSVエクスポート</button>
+        </div>
       </div>
 
-      <div class="analytics-grid">
-        <div class="card">
-          <div class="card-title">ファネル遷移率（統合1フロー）</div>
-          <div>
-            <div class="funnel-row">
-              <div class="funnel-label">エントリー</div>
-              <div class="funnel-bar-wrap">
-                <div class="funnel-bar" style="width:100%;background:#7c83fd;">348名</div>
-              </div><div class="funnel-rate">—</div>
-            </div>
-            <div class="funnel-row">
-              <div class="funnel-label">説明会予約</div>
-              <div class="funnel-bar-wrap">
-                <div class="funnel-bar" style="width:76%;background:#8d7ffd;">264名</div>
-              </div><div class="funnel-rate">76%</div>
-            </div>
-            <div class="funnel-row">
-              <div class="funnel-label">1次面接</div>
-              <div class="funnel-bar-wrap">
-                <div class="funnel-bar" style="width:52%;background:#7c83fd;">182名</div>
-              </div><div class="funnel-rate">69%</div>
-            </div>
-            <div class="funnel-row">
-              <div class="funnel-label">最終面接</div>
-              <div class="funnel-bar-wrap">
-                <div class="funnel-bar" style="width:28%;background:#5c6bc0;">98名</div>
-              </div><div class="funnel-rate">54%</div>
-            </div>
-            <div class="funnel-row">
-              <div class="funnel-label">内定</div>
-              <div class="funnel-bar-wrap">
-                <div class="funnel-bar" style="width:12%;background:#3949ab;">42名</div>
-              </div><div class="funnel-rate">43%</div>
-            </div>
-            <div class="funnel-row">
-              <div class="funnel-label">承諾</div>
-              <div class="funnel-bar-wrap">
-                <div class="funnel-bar" style="width:10%;background:#4caf50;">34名</div>
-              </div><div class="funnel-rate">81%</div>
+      <!-- Summary KPI bar -->
+      <div style="display:grid;grid-template-columns:repeat(6,1fr);gap:10px;margin-bottom:16px;">
+        <div class="kpi-card" style="padding:14px 16px;">
+          <div class="kpi-label">総エントリー</div>
+          <div class="kpi-value" style="font-size:22px;">348</div>
+          <div class="kpi-sub kpi-up">↑ 前年比 +18%</div>
+        </div>
+        <div class="kpi-card" style="padding:14px 16px;">
+          <div class="kpi-label">内定数</div>
+          <div class="kpi-value" style="font-size:22px;">42</div>
+          <div class="kpi-sub">目標 50名</div>
+        </div>
+        <div class="kpi-card" style="padding:14px 16px;">
+          <div class="kpi-label">承諾数</div>
+          <div class="kpi-value" style="font-size:22px;">34</div>
+          <div class="kpi-sub kpi-down">↓ 前年比 -3名</div>
+        </div>
+        <div class="kpi-card" style="padding:14px 16px;">
+          <div class="kpi-label">承諾率</div>
+          <div class="kpi-value" style="font-size:22px;">81%</div>
+          <div class="kpi-sub">業界平均 76%</div>
+        </div>
+        <div class="kpi-card" style="padding:14px 16px;">
+          <div class="kpi-label">平均採用日数</div>
+          <div class="kpi-value" style="font-size:22px;">38<span style="font-size:13px;">日</span></div>
+          <div class="kpi-sub kpi-up">↑ 前年 45日</div>
+        </div>
+        <div class="kpi-card" style="padding:14px 16px;border:1.5px solid #ff9800;">
+          <div class="kpi-label" style="color:#e65100;">辞退リスク者</div>
+          <div class="kpi-value" style="font-size:22px;color:#ff9800;">5</div>
+          <div class="kpi-sub" style="color:#e65100;">要フォロー</div>
+        </div>
+      </div>
+
+      <!-- Analytics tabs -->
+      <div style="background:#fff;border-radius:12px;box-shadow:0 1px 4px rgba(0,0,0,.06);overflow:hidden;">
+        <div style="display:flex;border-bottom:2px solid #f0f2f5;padding:0 8px;">
+          <div class="tab active" onclick="switchAnalyticsTab(this,'atab-funnel')" style="font-size:12px;padding:10px 14px;">📊 ファネル</div>
+          <div class="tab" onclick="switchAnalyticsTab(this,'atab-source')" style="font-size:12px;padding:10px 14px;">📡 流入経路</div>
+          <div class="tab" onclick="switchAnalyticsTab(this,'atab-speed')" style="font-size:12px;padding:10px 14px;">⏱️ 採用スピード</div>
+          <div class="tab" onclick="switchAnalyticsTab(this,'atab-offer')" style="font-size:12px;padding:10px 14px;">🎯 内定・承諾</div>
+          <div class="tab" onclick="switchAnalyticsTab(this,'atab-risk')" style="font-size:12px;padding:10px 14px;">⚠️ 辞退リスク</div>
+          <div class="tab" onclick="switchAnalyticsTab(this,'atab-forecast')" style="font-size:12px;padding:10px 14px;">🔮 予測・目標</div>
+        </div>
+
+        <div style="padding:20px;">
+
+          <!-- ① ファネル -->
+          <div id="atab-funnel" class="tab-content active">
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;">
+              <div>
+                <div class="card-title">統合ファネル遷移率</div>
+                <div style="font-size:11px;color:#999;margin-bottom:10px;">※フローにないステージはバイパス通過としてカウント</div>
+                <div class="funnel-row"><div class="funnel-label">エントリー</div><div class="funnel-bar-wrap"><div class="funnel-bar" style="width:100%;background:#7c83fd;">348名</div></div><div class="funnel-rate" style="font-size:12px;color:#888;">—</div></div>
+                <div class="funnel-row"><div class="funnel-label">説明会</div><div class="funnel-bar-wrap"><div class="funnel-bar" style="width:76%;background:#7c83fd;">264名</div></div><div class="funnel-rate" style="font-size:12px;color:#555;font-weight:600;">76%</div></div>
+                <div class="funnel-row"><div class="funnel-label">1次面接</div><div class="funnel-bar-wrap"><div class="funnel-bar" style="width:52%;background:#6c73ed;">182名</div></div><div class="funnel-rate" style="font-size:12px;color:#555;font-weight:600;">69%</div></div>
+                <div class="funnel-row"><div class="funnel-label">2次面接</div><div class="funnel-bar-wrap"><div class="funnel-bar" style="width:36%;background:#5c63dd;">126名</div></div><div class="funnel-rate" style="font-size:12px;color:#555;font-weight:600;">69%</div></div>
+                <div class="funnel-row"><div class="funnel-label">最終面接</div><div class="funnel-bar-wrap"><div class="funnel-bar" style="width:28%;background:#4c53cd;">98名</div></div><div class="funnel-rate" style="font-size:12px;color:#555;font-weight:600;">78%</div></div>
+                <div class="funnel-row"><div class="funnel-label">内定</div><div class="funnel-bar-wrap"><div class="funnel-bar" style="width:12%;background:#3943a0;">42名</div></div><div class="funnel-rate" style="font-size:12px;color:#555;font-weight:600;">43%</div></div>
+                <div class="funnel-row"><div class="funnel-label">承諾</div><div class="funnel-bar-wrap"><div class="funnel-bar" style="width:10%;background:#4caf50;">34名</div></div><div class="funnel-rate" style="font-size:12px;color:#4caf50;font-weight:700;">81%</div></div>
+                <div style="margin-top:10px;font-size:11px;color:#888;">エントリー→承諾：<strong style="color:#7c83fd;">9.8%</strong></div>
+              </div>
+              <div>
+                <div class="card-title">フロー別 ファネル比較</div>
+                <div style="display:flex;gap:8px;margin-bottom:12px;">
+                  <span style="background:#7c83fd;color:#fff;border-radius:4px;padding:3px 10px;font-size:11px;">新卒総合職</span>
+                  <span style="background:#f0f2f5;color:#555;border-radius:4px;padding:3px 10px;font-size:11px;cursor:pointer;">第二新卒</span>
+                </div>
+                <table style="font-size:12px;">
+                  <thead><tr><th>ステージ</th><th>人数</th><th>前ステージ比</th><th>前年比</th></tr></thead>
+                  <tbody>
+                    <tr><td>エントリー</td><td>348名</td><td>—</td><td style="color:#4caf50;">+18%</td></tr>
+                    <tr><td>説明会</td><td>264名</td><td>76%</td><td style="color:#4caf50;">+5%</td></tr>
+                    <tr><td>1次面接</td><td>182名</td><td>69%</td><td style="color:#ff6b6b;">-4%</td></tr>
+                    <tr><td>2次面接</td><td>126名</td><td>69%</td><td>—</td></tr>
+                    <tr><td>最終面接</td><td>98名</td><td>78%</td><td style="color:#4caf50;">+3%</td></tr>
+                    <tr><td>内定</td><td>42名</td><td>43%</td><td style="color:#ff6b6b;">-7%</td></tr>
+                    <tr><td><strong>承諾</strong></td><td><strong>34名</strong></td><td style="color:#4caf50;font-weight:700;">81%</td><td style="color:#ff6b6b;">-3%</td></tr>
+                  </tbody>
+                </table>
+                <div style="margin-top:12px;background:#fff8e1;border-radius:8px;padding:10px 12px;font-size:12px;color:#e65100;">
+                  ⚠️ <strong>1次面接の通過率が前年比-4%</strong>。担当面接官の評価基準を確認推奨。
+                </div>
+              </div>
             </div>
           </div>
-        </div>
 
-        <div class="card">
-          <div class="card-title">流入経路別 エントリー数</div>
-          <div class="source-bar"><div class="source-label">マイナビ</div><div class="source-bar-wrap"><div class="source-bar-fill" style="width:45%;background:#7c83fd;">45%</div></div><div class="source-count">157名</div></div>
-          <div class="source-bar"><div class="source-label">リクナビ</div><div class="source-bar-wrap"><div class="source-bar-fill" style="width:28%;background:#06c755;">28%</div></div><div class="source-count">97名</div></div>
-          <div class="source-bar"><div class="source-label">OfferBox</div><div class="source-bar-wrap"><div class="source-bar-fill" style="width:12%;background:#ff9800;">12%</div></div><div class="source-count">42名</div></div>
-          <div class="source-bar"><div class="source-label">学校訪問QR</div><div class="source-bar-wrap"><div class="source-bar-fill" style="width:9%;background:#e91e63;">9%</div></div><div class="source-count">31名</div></div>
-          <div class="source-bar"><div class="source-label">その他</div><div class="source-bar-wrap"><div class="source-bar-fill" style="width:6%;background:#ccc;">6%</div></div><div class="source-count">21名</div></div>
-        </div>
+          <!-- ② 流入経路 -->
+          <div id="atab-source" class="tab-content">
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;">
+              <div>
+                <div class="card-title">媒体別 エントリー数・承諾率</div>
+                <table style="font-size:12px;">
+                  <thead><tr><th>媒体</th><th>エントリー</th><th>内定</th><th>承諾</th><th>承諾率</th></tr></thead>
+                  <tbody>
+                    <tr><td><span class="tag tag-blue" style="font-size:10px;">マイナビ</span></td><td>157名</td><td>22名</td><td>18名</td><td style="color:#4caf50;font-weight:700;">82%</td></tr>
+                    <tr><td><span class="tag tag-green" style="font-size:10px;">リクナビ</span></td><td>97名</td><td>11名</td><td>8名</td><td style="color:#ff9800;font-weight:700;">73%</td></tr>
+                    <tr><td><span class="tag tag-orange" style="font-size:10px;">OfferBox</span></td><td>42名</td><td>6名</td><td>6名</td><td style="color:#4caf50;font-weight:700;">100%</td></tr>
+                    <tr><td><span class="tag tag-purple" style="font-size:10px;">Re就活</span></td><td>21名</td><td>2名</td><td>1名</td><td style="color:#ff6b6b;font-weight:700;">50%</td></tr>
+                    <tr><td><span style="font-size:10px;">学校QR</span></td><td>31名</td><td>1名</td><td>1名</td><td style="color:#4caf50;font-weight:700;">100%</td></tr>
+                  </tbody>
+                </table>
+                <div style="margin-top:12px;background:#e8f5e9;border-radius:8px;padding:10px 12px;font-size:12px;color:#2e7d32;">
+                  💡 <strong>OfferBox・学校QRは承諾率100%</strong>。エントリー数は少ないが質が高い。
+                </div>
+              </div>
+              <div>
+                <div class="card-title">学校別 エントリー数 TOP10</div>
+                <div class="source-bar"><div class="source-label" style="width:90px;font-size:11px;">早稲田大</div><div class="source-bar-wrap"><div class="source-bar-fill" style="width:72%;background:#7c83fd;font-size:10px;">28名</div></div></div>
+                <div class="source-bar"><div class="source-label" style="width:90px;font-size:11px;">慶應大</div><div class="source-bar-wrap"><div class="source-bar-fill" style="width:62%;background:#7c83fd;font-size:10px;">24名</div></div></div>
+                <div class="source-bar"><div class="source-label" style="width:90px;font-size:11px;">東京大</div><div class="source-bar-wrap"><div class="source-bar-fill" style="width:51%;background:#5c6bc0;font-size:10px;">20名</div></div></div>
+                <div class="source-bar"><div class="source-label" style="width:90px;font-size:11px;">大阪大</div><div class="source-bar-wrap"><div class="source-bar-fill" style="width:41%;background:#5c6bc0;font-size:10px;">16名</div></div></div>
+                <div class="source-bar"><div class="source-label" style="width:90px;font-size:11px;">明治大</div><div class="source-bar-wrap"><div class="source-bar-fill" style="width:33%;background:#9c88fd;font-size:10px;">13名</div></div></div>
+                <div class="source-bar"><div class="source-label" style="width:90px;font-size:11px;">立命館大</div><div class="source-bar-wrap"><div class="source-bar-fill" style="width:26%;background:#9c88fd;font-size:10px;">10名</div></div></div>
+                <div style="margin-top:10px;font-size:11px;color:#888;">学校訪問ROI：<strong>東京大（訪問済）→ 承諾率88%</strong></div>
+              </div>
+            </div>
+          </div>
 
-        <div class="card">
-          <div class="card-title">内定者一覧</div>
-          <table>
-            <thead><tr><th>氏名</th><th>学校</th><th>ステータス</th><th>期限</th></tr></thead>
-            <tbody>
-              <tr><td>田中 一郎</td><td style="font-size:11px;">早稲田大</td><td><span class="status status-offer">内定</span></td><td style="font-size:11px;color:#ff9800;">11/10</td></tr>
-              <tr><td>伊藤 美咲</td><td style="font-size:11px;">大阪大</td><td><span class="status status-accept">承諾</span></td><td style="font-size:11px;color:#999;">済</td></tr>
-              <tr><td>林 奈々</td><td style="font-size:11px;">名古屋大</td><td><span class="status status-offer">内定</span></td><td style="font-size:11px;color:#ff6b6b;">11/5</td></tr>
-            </tbody>
-          </table>
-          <button class="btn btn-secondary btn-sm" style="margin-top:10px;">全件 CSVエクスポート</button>
-        </div>
+          <!-- ③ 採用スピード -->
+          <div id="atab-speed" class="tab-content">
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;">
+              <div>
+                <div class="card-title">ステージ別 平均滞在日数（ボトルネック）</div>
+                <div style="margin-top:4px;">
+                  <div class="source-bar" style="margin-bottom:10px;">
+                    <div class="source-label" style="width:90px;font-size:11px;">エントリー</div>
+                    <div class="source-bar-wrap"><div class="source-bar-fill" style="width:20%;background:#4caf50;font-size:10px;">3日</div></div>
+                  </div>
+                  <div class="source-bar" style="margin-bottom:10px;">
+                    <div class="source-label" style="width:90px;font-size:11px;">説明会</div>
+                    <div class="source-bar-wrap"><div class="source-bar-fill" style="width:30%;background:#8bc34a;font-size:10px;">5日</div></div>
+                  </div>
+                  <div class="source-bar" style="margin-bottom:10px;">
+                    <div class="source-label" style="width:90px;font-size:11px;">1次面接</div>
+                    <div class="source-bar-wrap"><div class="source-bar-fill" style="width:58%;background:#ff9800;font-size:10px;">9日 ⚠️</div></div>
+                  </div>
+                  <div class="source-bar" style="margin-bottom:10px;">
+                    <div class="source-label" style="width:90px;font-size:11px;">最終面接</div>
+                    <div class="source-bar-wrap"><div class="source-bar-fill" style="width:45%;background:#ff9800;font-size:10px;">7日</div></div>
+                  </div>
+                  <div class="source-bar" style="margin-bottom:10px;">
+                    <div class="source-label" style="width:90px;font-size:11px;">内定→承諾</div>
+                    <div class="source-bar-wrap"><div class="source-bar-fill" style="width:90%;background:#ff5722;font-size:10px;">14日 🔴</div></div>
+                  </div>
+                </div>
+                <div style="background:#fff3e0;border-radius:8px;padding:10px 12px;font-size:12px;color:#e65100;margin-top:8px;">
+                  ⚠️ <strong>「内定→承諾」の14日が最長</strong>。承諾期限の短縮、またはフォローLINE強化を検討。
+                </div>
+              </div>
+              <div>
+                <div class="card-title">面接官別 通過率</div>
+                <table style="font-size:12px;">
+                  <thead><tr><th>面接官</th><th>担当数</th><th>通過率</th><th>平均スコア</th></tr></thead>
+                  <tbody>
+                    <tr><td>山田 太郎</td><td>48名</td><td style="color:#4caf50;font-weight:600;">72%</td><td>3.8 / 5</td></tr>
+                    <tr><td>鈴木 代表</td><td>22名</td><td style="color:#ff9800;font-weight:600;">55%</td><td>3.2 / 5</td></tr>
+                    <tr><td>田中 部長</td><td>31名</td><td style="color:#4caf50;font-weight:600;">68%</td><td>3.6 / 5</td></tr>
+                  </tbody>
+                </table>
+                <div style="margin-top:12px;background:#e8f0fe;border-radius:8px;padding:10px 12px;font-size:12px;color:#3949ab;">
+                  💡 <strong>鈴木代表の通過率55%が最低</strong>。最終面接の評価基準のすり合わせを推奨。
+                </div>
+              </div>
+            </div>
+          </div>
 
-        <div class="card">
-          <div class="card-title">媒体別 承諾率</div>
-          <div class="source-bar"><div class="source-label">OfferBox</div><div class="source-bar-wrap"><div class="source-bar-fill" style="width:91%;background:#7c83fd;">91%</div></div></div>
-          <div class="source-bar"><div class="source-label">マイナビ</div><div class="source-bar-wrap"><div class="source-bar-fill" style="width:83%;background:#5c6bc0;">83%</div></div></div>
-          <div class="source-bar"><div class="source-label">学校訪問QR</div><div class="source-bar-wrap"><div class="source-bar-fill" style="width:78%;background:#3949ab;">78%</div></div></div>
-          <div class="source-bar"><div class="source-label">リクナビ</div><div class="source-bar-wrap"><div class="source-bar-fill" style="width:72%;background:#9c88fd;">72%</div></div></div>
+          <!-- ④ 内定・承諾 -->
+          <div id="atab-offer" class="tab-content">
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;">
+              <div>
+                <div class="card-title">内定者・承諾状況一覧</div>
+                <table style="font-size:12px;">
+                  <thead><tr><th>氏名</th><th>学校</th><th>区分</th><th>ステータス</th><th>期限</th></tr></thead>
+                  <tbody>
+                    <tr><td>田中 一郎</td><td style="font-size:11px;">早稲田大</td><td><span class="tag tag-blue" style="font-size:9px;">新卒</span></td><td><span class="status status-offer">内定</span></td><td style="font-size:11px;color:#ff9800;font-weight:600;">11/10</td></tr>
+                    <tr><td>伊藤 美咲</td><td style="font-size:11px;">大阪大</td><td><span class="tag tag-blue" style="font-size:9px;">新卒</span></td><td><span class="status status-accept">承諾</span></td><td style="font-size:11px;color:#999;">済</td></tr>
+                    <tr><td>林 奈々</td><td style="font-size:11px;">名古屋大</td><td><span class="tag tag-blue" style="font-size:9px;">新卒</span></td><td><span class="status status-offer">内定</span></td><td style="font-size:11px;color:#ff6b6b;font-weight:700;">11/5 🔴</td></tr>
+                    <tr><td>渡辺 拓也</td><td style="font-size:11px;">慶應大</td><td><span class="tag tag-purple" style="font-size:9px;">第二新卒</span></td><td><span class="status status-ng">辞退</span></td><td style="font-size:11px;color:#999;">11/1</td></tr>
+                  </tbody>
+                </table>
+                <button class="btn btn-secondary btn-sm" style="margin-top:10px;">全件 CSVエクスポート</button>
+              </div>
+              <div>
+                <div class="card-title" style="margin-bottom:10px;">辞退理由の内訳</div>
+                <div class="source-bar"><div class="source-label" style="width:110px;font-size:11px;">他社に決めた</div><div class="source-bar-wrap"><div class="source-bar-fill" style="width:52%;background:#ff6b6b;font-size:10px;">52%（7名）</div></div></div>
+                <div class="source-bar"><div class="source-label" style="width:110px;font-size:11px;">条件面</div><div class="source-bar-wrap"><div class="source-bar-fill" style="width:22%;background:#ff9800;font-size:10px;">22%（3名）</div></div></div>
+                <div class="source-bar"><div class="source-label" style="width:110px;font-size:11px;">社風・働き方</div><div class="source-bar-wrap"><div class="source-bar-fill" style="width:15%;background:#ffcc80;font-size:10px;">15%（2名）</div></div></div>
+                <div class="source-bar"><div class="source-label" style="width:110px;font-size:11px;">その他</div><div class="source-bar-wrap"><div class="source-bar-fill" style="width:11%;background:#ccc;font-size:10px;">11%</div></div></div>
+                <div style="margin-top:12px;background:#ffebee;border-radius:8px;padding:10px 12px;font-size:12px;color:#c62828;">
+                  🔴 <strong>他社流出が52%</strong>。内定後のフォローLINEと懸念払拭アンケートの強化を推奨。
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- ⑤ 辞退リスク -->
+          <div id="atab-risk" class="tab-content">
+            <div style="margin-bottom:14px;background:#fff3e0;border:1.5px solid #ffcc80;border-radius:8px;padding:12px 16px;font-size:12px;color:#e65100;">
+              ⚠️ 以下の指標を組み合わせて辞退リスクスコアを算出しています：<strong>アンケート入社意欲スコア・LINEメッセージ開封率・マイページ最終アクセス・承諾期限までの残日数</strong>
+            </div>
+            <table style="font-size:12px;">
+              <thead>
+                <tr>
+                  <th>氏名</th><th>学校</th><th>入社意欲</th><th>LINE開封</th><th>最終アクセス</th><th>期限残</th>
+                  <th>リスクスコア</th><th>アクション</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr style="background:#fff8e1;">
+                  <td style="font-weight:600;">林 奈々</td><td style="font-size:11px;">名古屋大</td>
+                  <td><span style="color:#ff6b6b;font-weight:700;">6/10</span></td>
+                  <td><span style="color:#ff6b6b;">未開封</span></td>
+                  <td style="font-size:11px;color:#ff6b6b;">4日前</td>
+                  <td style="font-size:11px;color:#ff6b6b;font-weight:700;">残1日</td>
+                  <td><span style="background:#ff6b6b;color:#fff;border-radius:10px;padding:2px 10px;font-size:11px;font-weight:700;">高 🔴</span></td>
+                  <td><button class="btn btn-line btn-sm">今すぐLINE</button></td>
+                </tr>
+                <tr style="background:#fffde7;">
+                  <td style="font-weight:600;">田中 一郎</td><td style="font-size:11px;">早稲田大</td>
+                  <td><span style="color:#ff9800;font-weight:700;">7/10</span></td>
+                  <td><span style="color:#ff9800;">2日前</span></td>
+                  <td style="font-size:11px;color:#999;">3日前</td>
+                  <td style="font-size:11px;color:#ff9800;font-weight:600;">残6日</td>
+                  <td><span style="background:#ff9800;color:#fff;border-radius:10px;padding:2px 10px;font-size:11px;font-weight:700;">中 🟡</span></td>
+                  <td><button class="btn btn-secondary btn-sm">アンケート送付</button></td>
+                </tr>
+                <tr>
+                  <td>松本 愛</td><td style="font-size:11px;">慶應大</td>
+                  <td><span style="color:#4caf50;font-weight:700;">9/10</span></td>
+                  <td><span style="color:#4caf50;">本日</span></td>
+                  <td style="font-size:11px;">本日</td>
+                  <td style="font-size:11px;color:#999;">残10日</td>
+                  <td><span style="background:#e8f5e9;color:#2e7d32;border-radius:10px;padding:2px 10px;font-size:11px;font-weight:700;">低 🟢</span></td>
+                  <td style="font-size:11px;color:#999;">対応不要</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- ⑥ 予測・目標 -->
+          <div id="atab-forecast" class="tab-content">
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;">
+              <div>
+                <div class="card-title">採用目標 達成予測</div>
+                <div style="background:#f8f9fc;border-radius:10px;padding:16px;text-align:center;margin-bottom:12px;">
+                  <div style="font-size:11px;color:#888;margin-bottom:4px;">現在の承諾数 / 目標</div>
+                  <div style="font-size:36px;font-weight:700;color:#7c83fd;">34 <span style="font-size:16px;color:#aaa;">/ 50名</span></div>
+                  <div style="margin:12px 0 4px;background:#e8eaf0;border-radius:6px;height:12px;overflow:hidden;">
+                    <div style="width:68%;height:100%;background:linear-gradient(to right,#7c83fd,#4caf50);border-radius:6px;"></div>
+                  </div>
+                  <div style="font-size:12px;color:#555;">達成率 <strong style="color:#7c83fd;">68%</strong></div>
+                </div>
+                <div style="background:#e8f5e9;border-radius:8px;padding:12px 14px;font-size:12px;line-height:2;">
+                  <div>内定中（承諾待ち）：<strong>8名</strong></div>
+                  <div>現ファネル予測：最終面接中 → さらに <strong>+4名</strong> 承諾見込み</div>
+                  <div>予測着地：<strong style="color:#7c83fd;">46名</strong>（目標 50名まであと4名不足）</div>
+                </div>
+                <div style="background:#fff3e0;border-radius:8px;padding:10px 12px;font-size:12px;color:#e65100;margin-top:8px;">
+                  ⚠️ 目標達成には追加エントリー獲得またはOfferBox強化が必要。
+                </div>
+              </div>
+              <div>
+                <div class="card-title">前年比較</div>
+                <table style="font-size:12px;">
+                  <thead><tr><th>指標</th><th>今年度</th><th>昨年度</th><th>差</th></tr></thead>
+                  <tbody>
+                    <tr><td>エントリー数</td><td>348名</td><td>295名</td><td style="color:#4caf50;">+53</td></tr>
+                    <tr><td>承諾数</td><td>34名</td><td>37名</td><td style="color:#ff6b6b;">-3</td></tr>
+                    <tr><td>承諾率</td><td>81%</td><td>84%</td><td style="color:#ff6b6b;">-3%</td></tr>
+                    <tr><td>平均採用日数</td><td>38日</td><td>45日</td><td style="color:#4caf50;">-7日</td></tr>
+                    <tr><td>辞退率</td><td>19%</td><td>16%</td><td style="color:#ff6b6b;">+3%</td></tr>
+                    <tr><td>OfferBox承諾</td><td>6名</td><td>2名</td><td style="color:#4caf50;">+4</td></tr>
+                  </tbody>
+                </table>
+                <div style="margin-top:12px;background:#e8f0fe;border-radius:8px;padding:10px 12px;font-size:12px;color:#3949ab;">
+                  💡 エントリー数は増加も承諾率が低下。<strong>量より質の改善</strong>が今年度の課題。
+                </div>
+              </div>
+            </div>
+          </div>
+
         </div>
       </div>
     </div>
@@ -1286,6 +1504,14 @@ function showPage(name) {
       item.classList.add('active');
     }
   });
+}
+
+function switchAnalyticsTab(el, tabId) {
+  const wrap = el.closest('div').parentElement;
+  wrap.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  wrap.parentElement.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById(tabId).classList.add('active');
 }
 
 function switchStudentTab(el, tabId) {
