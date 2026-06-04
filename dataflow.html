@@ -127,6 +127,15 @@
 </style>
 </head>
 <body>
+
+<!-- Global Nav -->
+<div style="background:#1a1a2e;height:40px;display:flex;align-items:center;padding:0 20px;gap:24px;font-size:12px;">
+  <span style="color:#7c83fd;font-weight:700;letter-spacing:0.5px;">ATS設計ドキュメント</span>
+  <a href="index.html"        style="color:#aaa;text-decoration:none;opacity:.7;">🖥 ワイヤーフレーム</a>
+  <a href="requirements.html" style="color:#aaa;text-decoration:none;opacity:.7;">📋 要件定義書</a>
+  <a href="dataflow.html"     style="color:#fff;text-decoration:none;border-bottom:2px solid #7c83fd;padding-bottom:2px;">🔀 データフロー設計</a>
+</div>
+
 <div class="page">
   <h1>新卒採用ATS — データフロー設計</h1>
   <div class="subtitle">v0.1 / 2026-06-04 / システム要件定義フェーズ</div>
@@ -753,7 +762,70 @@
 
     <!-- Group 3: その他 -->
     <div class="section">
-      <h2>③ その他エンティティ</h2>
+      <h2>③ タグ・担当者</h2>
+      <div class="erd" style="margin-bottom:20px;">
+        <div class="entity" style="min-width:200px;">
+          <div class="entity-header" style="background:#f57f17;">🏷️ Tag（タグマスター）</div>
+          <div class="entity-field"><span><span class="pk">PK</span> id</span><span class="field-type">UUID</span></div>
+          <div class="entity-field"><span>name</span><span class="field-type">VARCHAR</span></div>
+          <div class="entity-field"><span>color</span><span class="field-type">VARCHAR</span></div>
+          <div class="entity-field"><span><span class="fk">FK</span> created_by</span><span class="field-type">UUID</span></div>
+        </div>
+        <div class="entity" style="min-width:200px;">
+          <div class="entity-header" style="background:#f57f17;">🔖 ApplicantTag（中間）</div>
+          <div class="entity-field"><span><span class="pk fk">FK</span> applicant_id</span><span class="field-type">UUID</span></div>
+          <div class="entity-field"><span><span class="pk fk">FK</span> tag_id</span><span class="field-type">UUID</span></div>
+          <div class="entity-field"><span>tagged_at</span><span class="field-type">TIMESTAMP</span></div>
+          <div class="entity-field"><span>tagged_by</span><span class="field-type nullable">UUID | NULL</span></div>
+          <div style="padding:6px 14px;font-size:10px;color:#f57f17;background:#fff8e1;">auto: 媒体連携・QR時に自動付与</div>
+        </div>
+        <div class="entity" style="min-width:220px;">
+          <div class="entity-header" style="background:#37474f;">👔 Staff（担当者）</div>
+          <div class="entity-field"><span><span class="pk">PK</span> id</span><span class="field-type">UUID</span></div>
+          <div class="entity-field"><span>name</span><span class="field-type">VARCHAR</span></div>
+          <div class="entity-field"><span>email</span><span class="field-type">VARCHAR</span></div>
+          <div class="entity-field"><span>role</span><span class="field-type">ENUM</span></div>
+          <div class="entity-field"><span>line_user_id</span><span class="field-type nullable">VARCHAR | NULL</span></div>
+          <div style="padding:6px 14px;font-size:10px;color:#546e7a;background:#f5f5f5;">role: admin / interviewer / viewer</div>
+        </div>
+      </div>
+
+      <h2>④ リッチメニュー</h2>
+      <div class="erd" style="margin-bottom:20px;">
+        <div class="entity" style="min-width:230px;">
+          <div class="entity-header" style="background:#00897b;">🎛️ RichMenu</div>
+          <div class="entity-field"><span><span class="pk">PK</span> id</span><span class="field-type">UUID</span></div>
+          <div class="entity-field"><span>name</span><span class="field-type">VARCHAR</span></div>
+          <div class="entity-field"><span>is_default</span><span class="field-type">BOOL</span></div>
+          <div class="entity-field"><span>status</span><span class="field-type">ENUM</span></div>
+          <div class="entity-field"><span>priority</span><span class="field-type">INT</span></div>
+          <div class="entity-field"><span>buttons</span><span class="field-type">JSONB</span></div>
+          <div class="entity-field"><span>line_menu_id</span><span class="field-type nullable">VARCHAR | NULL</span></div>
+          <div style="padding:6px 14px;font-size:10px;color:#00695c;background:#e0f2f1;">status: published / draft<br>line_menu_id: LINE反映後に保存</div>
+        </div>
+        <div style="display:flex;flex-direction:column;justify-content:center;align-items:center;padding:0 8px;font-size:11px;color:#00897b;">
+          <div>1</div><div style="width:2px;height:40px;background:#00897b;margin:2px 0;"></div><div>N</div>
+        </div>
+        <div class="entity" style="min-width:220px;">
+          <div class="entity-header" style="background:#00897b;">📋 RichMenuRule（割り当てルール）</div>
+          <div class="entity-field"><span><span class="pk">PK</span> id</span><span class="field-type">UUID</span></div>
+          <div class="entity-field"><span><span class="fk">FK</span> rich_menu_id</span><span class="field-type">UUID</span></div>
+          <div class="entity-field"><span><span class="fk">FK</span> tag_id</span><span class="field-type">UUID</span></div>
+          <div class="entity-field"><span>match_type</span><span class="field-type">ENUM</span></div>
+          <div style="padding:6px 14px;font-size:10px;color:#00695c;background:#e0f2f1;">match_type: any（いずれか一致）<br>タグ変更時に自動でメニュー切替</div>
+        </div>
+        <div style="display:flex;flex-direction:column;justify-content:center;padding:0 16px;font-size:12px;color:#555;max-width:220px;">
+          <div style="background:#e0f2f1;border-radius:8px;padding:10px 12px;font-size:11px;line-height:1.8;">
+            <strong>割り当てロジック</strong><br>
+            ① タグ変更時に RichMenuRule を検索<br>
+            ② 一致するルールのうち priority 最小のメニューを選択<br>
+            ③ LINE API でユーザーのメニューを切り替え<br>
+            ④ 一致なし → is_default=true のメニューを適用
+          </div>
+        </div>
+      </div>
+
+      <h2>⑤ その他エンティティ</h2>
       <div class="erd">
         <div class="entity" style="min-width:200px;">
           <div class="entity-header gray">🔗 LineRegistrationToken</div>
@@ -763,14 +835,14 @@
           <div class="entity-field"><span>used_at</span><span class="field-type nullable">TIMESTAMP | NULL</span></div>
         </div>
         <div class="entity" style="min-width:200px;">
-          <div class="entity-header" style="background:#546e7a;">📝 Survey（アンケート）</div>
+          <div class="entity-header" style="background:#546e7a;">📝 Survey</div>
           <div class="entity-field"><span><span class="pk">PK</span> id</span><span class="field-type">UUID</span></div>
           <div class="entity-field"><span>title</span><span class="field-type">VARCHAR</span></div>
           <div class="entity-field"><span>questions</span><span class="field-type">JSONB</span></div>
           <div class="entity-field"><span>liff_url</span><span class="field-type">VARCHAR</span></div>
         </div>
         <div class="entity" style="min-width:200px;">
-          <div class="entity-header" style="background:#546e7a;">📊 SurveyResponse（回答）</div>
+          <div class="entity-header" style="background:#546e7a;">📊 SurveyResponse</div>
           <div class="entity-field"><span><span class="pk">PK</span> id</span><span class="field-type">UUID</span></div>
           <div class="entity-field"><span><span class="fk">FK</span> survey_id</span><span class="field-type">UUID</span></div>
           <div class="entity-field"><span><span class="fk">FK</span> applicant_id</span><span class="field-type">UUID</span></div>
@@ -778,15 +850,15 @@
           <div class="entity-field"><span>submitted_at</span><span class="field-type">TIMESTAMP</span></div>
         </div>
         <div class="entity" style="min-width:200px;">
-          <div class="entity-header" style="background:#546e7a;">📅 CalendarSlot（面接枠）</div>
+          <div class="entity-header" style="background:#546e7a;">📅 CalendarSlot</div>
           <div class="entity-field"><span><span class="pk">PK</span> id</span><span class="field-type">UUID</span></div>
-          <div class="entity-field"><span><span class="fk">FK</span> owner_id</span><span class="field-type">UUID</span></div>
+          <div class="entity-field"><span><span class="fk">FK</span> owner_id → Staff</span><span class="field-type">UUID</span></div>
           <div class="entity-field"><span>starts_at / ends_at</span><span class="field-type">TIMESTAMP</span></div>
           <div class="entity-field"><span>type</span><span class="field-type">ENUM</span></div>
           <div class="entity-field"><span>is_booked</span><span class="field-type">BOOL</span></div>
         </div>
         <div class="entity" style="min-width:200px;">
-          <div class="entity-header" style="background:#546e7a;">📄 Document（書類テンプレート）</div>
+          <div class="entity-header" style="background:#546e7a;">📄 Document</div>
           <div class="entity-field"><span><span class="pk">PK</span> id</span><span class="field-type">UUID</span></div>
           <div class="entity-field"><span>name</span><span class="field-type">VARCHAR</span></div>
           <div class="entity-field"><span>type</span><span class="field-type">ENUM</span></div>

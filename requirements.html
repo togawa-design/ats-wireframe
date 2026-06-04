@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ATS 要件定義書</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Hiragino Sans', sans-serif; background: #f0f2f5; color: #1a1a2e; }
+  .page { max-width: 1100px; margin: 0 auto; padding: 32px 24px; }
+  h1 { font-size: 22px; font-weight: 700; margin-bottom: 4px; }
+  h2 { font-size: 15px; font-weight: 700; color: #1a1a2e; margin-bottom: 14px; padding-left: 12px; border-left: 4px solid #7c83fd; }
+  h3 { font-size: 13px; font-weight: 700; color: #555; margin-bottom: 10px; }
+  .meta { font-size: 12px; color: #999; margin-bottom: 28px; display:flex; gap:16px; }
+  .section { background: #fff; border-radius: 12px; padding: 22px 24px; margin-bottom: 20px; box-shadow: 0 1px 4px rgba(0,0,0,.06); }
+
+  /* Tabs */
+  .tabs { display:flex; gap:0; border-bottom:2px solid #e8eaf0; margin-bottom:22px; flex-wrap:wrap; }
+  .tab { padding:10px 18px; font-size:13px; cursor:pointer; color:#888; border-bottom:2px solid transparent; margin-bottom:-2px; transition:all .15s; white-space:nowrap; }
+  .tab.active { color:#7c83fd; border-bottom-color:#7c83fd; font-weight:600; }
+  .tab-content { display:none; }
+  .tab-content.active { display:block; }
+
+  /* Table */
+  table { width:100%; border-collapse:collapse; font-size:13px; }
+  th { background:#f8f9fc; padding:9px 12px; text-align:left; font-weight:600; color:#555; font-size:12px; border-bottom:1px solid #e8eaf0; }
+  td { padding:10px 12px; border-bottom:1px solid #f0f2f5; vertical-align:top; line-height:1.6; }
+  tr:last-child td { border-bottom:none; }
+  tr:hover td { background:#fafbff; }
+
+  /* Badges */
+  .badge { display:inline-block; padding:2px 8px; border-radius:10px; font-size:10px; font-weight:700; white-space:nowrap; }
+  .badge-done   { background:#4caf50; color:#fff; }
+  .badge-open   { background:#ff9800; color:#fff; }
+  .badge-risk   { background:#ff6b6b; color:#fff; }
+  .badge-high   { background:#ff6b6b; color:#fff; }
+  .badge-mid    { background:#ff9800; color:#fff; }
+  .badge-low    { background:#9e9e9e; color:#fff; }
+  .badge-new    { background:#7c83fd; color:#fff; }
+  .badge-update { background:#00897b; color:#fff; }
+
+  /* FR ID */
+  .fr-id { font-family:monospace; font-size:11px; color:#7c83fd; font-weight:700; white-space:nowrap; }
+  .fr-cat { font-size:11px; color:#aaa; }
+
+  /* Info / warn boxes */
+  .info-box { background:#f0f0ff; border:1px solid #c5cae9; border-radius:8px; padding:10px 14px; font-size:12px; color:#3949ab; margin-top:10px; }
+  .warn-box  { background:#fff8e1; border:1px solid #ffcc80; border-radius:8px; padding:10px 14px; font-size:12px; color:#e65100; margin-top:10px; }
+  .ok-box    { background:#e8f5e9; border:1px solid #a5d6a7; border-radius:8px; padding:10px 14px; font-size:12px; color:#2e7d32; margin-top:10px; }
+
+  /* Summary cards */
+  .summary-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:12px; margin-bottom:20px; }
+  .summary-card { background:#fff; border-radius:10px; padding:14px 16px; box-shadow:0 1px 4px rgba(0,0,0,.06); text-align:center; }
+  .summary-num  { font-size:28px; font-weight:700; }
+  .summary-label{ font-size:11px; color:#888; margin-top:4px; }
+
+  /* Category header */
+  .cat-header { background:#f8f9fc; border-radius:8px; padding:8px 14px; font-size:12px; font-weight:700; color:#555; margin:14px 0 8px; border-left:3px solid #7c83fd; }
+
+  /* Two col */
+  .two-col { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+
+  /* Cost table */
+  .cost-total { background:#1a1a2e; color:#fff; border-radius:8px; padding:14px 18px; font-size:14px; font-weight:700; margin-top:12px; display:flex; justify-content:space-between; align-items:center; }
+</style>
+</head>
+<body>
+
+<!-- Global Nav -->
+<div style="background:#1a1a2e;height:40px;display:flex;align-items:center;padding:0 20px;gap:24px;font-size:12px;">
+  <span style="color:#7c83fd;font-weight:700;letter-spacing:0.5px;">ATS設計ドキュメント</span>
+  <a href="index.html"        style="color:#aaa;text-decoration:none;opacity:.7;">🖥 ワイヤーフレーム</a>
+  <a href="requirements.html" style="color:#fff;text-decoration:none;border-bottom:2px solid #7c83fd;padding-bottom:2px;">📋 要件定義書</a>
+  <a href="dataflow.html"     style="color:#aaa;text-decoration:none;opacity:.7;">🔀 データフロー設計</a>
+</div>
+
+<div class="page">
+  <h1>新卒採用管理システム（ATS）要件定義書</h1>
+  <div class="meta">
+    <span>v0.3</span>
+    <span>2026-06-04</span>
+    <span>ステータス：ヒアリング中</span>
+    <span style="color:#4caf50;">確定済み：U-02, U-04</span>
+  </div>
+
+  <div class="tabs">
+    <div class="tab active" onclick="sw(this,'t-biz')">① 業務要件</div>
+    <div class="tab" onclick="sw(this,'t-fr')">② 機能要件</div>
+    <div class="tab" onclick="sw(this,'t-nfr')">③ 非機能要件</div>
+    <div class="tab" onclick="sw(this,'t-open')">④ 未確認事項</div>
+    <div class="tab" onclick="sw(this,'t-risk')">⑤ 懸念・リスク</div>
+    <div class="tab" onclick="sw(this,'t-cost')">⑥ 運用コスト</div>
+    <div class="tab" onclick="sw(this,'t-log')">⑦ 変更履歴</div>
+  </div>
+
+  <!-- ① 業務要件 -->
+  <div id="t-biz" class="tab-content active">
+    <div class="section">
+      <h2>業務要件（ビジネスゴール）</h2>
+      <table>
+        <thead><tr><th style="width:80px;">ID</th><th>業務ゴール</th></tr></thead>
+        <tbody>
+          <tr><td class="fr-id">BG-01</td><td>新卒採用のエントリーから内定承諾まで、採用プロセス全体を1システムで完結させる</td></tr>
+          <tr><td class="fr-id">BG-02</td><td>複数媒体・流入経路からの応募者を一元管理し、情報の分散・二重入力を排除する</td></tr>
+          <tr><td class="fr-id">BG-03</td><td>LINEを主要コミュニケーションチャネルとして、学生との接点を最大化する</td></tr>
+          <tr><td class="fr-id">BG-04</td><td>エントリー〜承諾の各ステップ遷移率を可視化し、採用活動の改善に活用する</td></tr>
+          <tr><td class="fr-id">BG-05</td><td>内定承諾後はSalesforceと連携し、入社後の人材管理へシームレスに引き継ぐ</td></tr>
+          <tr><td class="fr-id">BG-06</td><td>自社専用の閉じたシステムとして運用し、外部へのデータ流出リスクを最小化する</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="section">
+      <h2>システムスコープ</h2>
+      <div class="two-col">
+        <div>
+          <h3>対象ユーザー</h3>
+          <table>
+            <tbody>
+              <tr><td style="width:100px;font-weight:600;">採用担当者</td><td>管理画面全般を操作。メッセージ送信・選考管理・分析</td></tr>
+              <tr><td style="font-weight:600;">面接官</td><td>面接評価の入力・閲覧（限定権限）</td></tr>
+              <tr><td style="font-weight:600;">エージェント</td><td>カレンダー経由での面接予約調整</td></tr>
+              <tr><td style="font-weight:600;">応募者（学生）</td><td>LINEおよびLIFFマイページから操作</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div>
+          <h3>応募者区分</h3>
+          <table>
+            <tbody>
+              <tr><td><span class="badge badge-new">新卒</span></td><td>大学・大学院在学中。卒業見込み年度あり</td></tr>
+              <tr><td><span class="badge" style="background:#ff9800;color:#fff;">既卒</span></td><td>卒業後未就業。Re就活等から流入</td></tr>
+              <tr><td><span class="badge" style="background:#9c27b0;color:#fff;">第二新卒</span></td><td>卒業後3年以内の転職者。Re就活から流入の可能性あり</td></tr>
+            </tbody>
+          </table>
+          <div class="warn-box" style="margin-top:8px;">⚠️ 第二新卒含むかは確認中（U-03）</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ② 機能要件 -->
+  <div id="t-fr" class="tab-content">
+    <div class="section">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+        <h2 style="margin-bottom:0;">機能要件一覧</h2>
+        <div style="display:flex;gap:6px;font-size:11px;">
+          <span class="badge badge-new">NEW</span><span style="color:#888;">新規追加</span>
+          <span class="badge badge-update" style="margin-left:8px;">UPD</span><span style="color:#888;">変更あり</span>
+        </div>
+      </div>
+
+      <div class="cat-header">学生管理</div>
+      <table>
+        <thead><tr><th style="width:90px;">ID</th><th style="width:220px;">機能</th><th>詳細</th><th style="width:60px;">優先度</th></tr></thead>
+        <tbody>
+          <tr><td class="fr-id">FR001</td><td>学生登録・プロフィール管理</td><td>氏名・学校・学部・連絡先・卒業見込み年度・<strong>応募者区分（新卒/既卒/第二新卒）</strong>を登録・編集</td><td><span class="badge badge-high">高</span></td></tr>
+          <tr><td class="fr-id">FR002</td><td>マイページ（LIFF）</td><td>個人情報登録・書類アップロード・画像アップロード・選考状況確認</td><td><span class="badge badge-high">高</span></td></tr>
+          <tr><td class="fr-id">FR003 <span class="badge badge-update">UPD</span></td><td>タグ管理</td><td>タグマスターで一元管理（Tag / ApplicantTag テーブル）。媒体・QRスキャン時に自動付与。複数タグの組み合わせ検索対応</td><td><span class="badge badge-high">高</span></td></tr>
+          <tr><td class="fr-id">FR004</td><td>学生一覧・検索</td><td>氏名・学校・タグ・ステータス・媒体・応募者区分による複合絞り込み</td><td><span class="badge badge-high">高</span></td></tr>
+          <tr><td class="fr-id">FR005</td><td>書類管理</td><td>学生ごとの添付ファイル（PDF・画像等）の保存・閲覧・ダウンロード</td><td><span class="badge badge-mid">中</span></td></tr>
+        </tbody>
+      </table>
+
+      <div class="cat-header">選考管理</div>
+      <table>
+        <thead><tr><th style="width:90px;">ID</th><th style="width:220px;">機能</th><th>詳細</th><th style="width:60px;">優先度</th></tr></thead>
+        <tbody>
+          <tr><td class="fr-id">FR010 <span class="badge badge-update">UPD</span></td><td>選考フロー管理</td><td><strong>複数フローを自由に設計可能</strong>（SelectionFlow / SelectionStage）。ステージ名・順序をカスタマイズ。各ステージに stage_type を設定してファネル集計に使用</td><td><span class="badge badge-high">高</span></td></tr>
+          <tr><td class="fr-id">FR011</td><td>パイプラインビュー</td><td>カンバン形式とリスト形式で選考状況を可視化。ドラッグ&ドロップでステータス変更</td><td><span class="badge badge-high">高</span></td></tr>
+          <tr><td class="fr-id">FR012</td><td>面接情報登録</td><td>面接日時・担当者・評価スコア・コメントをシステム内に記録</td><td><span class="badge badge-high">高</span></td></tr>
+          <tr><td class="fr-id">FR013</td><td>面接書類データ化</td><td>評価シート・面接メモをシステム上で作成・保存（紙廃止）</td><td><span class="badge badge-mid">中</span></td></tr>
+          <tr><td class="fr-id">FR014 <span class="badge badge-new">NEW</span></td><td>選考履歴ログ</td><td>SelectionHistory テーブルで誰がいつどのステージに変更したかを全記録</td><td><span class="badge badge-mid">中</span></td></tr>
+        </tbody>
+      </table>
+
+      <div class="cat-header">カレンダー・予約</div>
+      <table>
+        <thead><tr><th style="width:90px;">ID</th><th style="width:220px;">機能</th><th>詳細</th><th style="width:60px;">優先度</th></tr></thead>
+        <tbody>
+          <tr><td class="fr-id">FR020</td><td>カレンダー機能</td><td>面接・説明会の予定管理。担当者・エージェント別の空き枠管理（eeasy 不使用）</td><td><span class="badge badge-high">高</span></td></tr>
+          <tr><td class="fr-id">FR021</td><td>面接予約（管理者）</td><td>管理者がシステム内から学生・担当者の予定を調整</td><td><span class="badge badge-high">高</span></td></tr>
+          <tr><td class="fr-id">FR022</td><td>説明会予約（学生）</td><td>LINEリッチメニューまたはLIFFから学生が直接予約</td><td><span class="badge badge-high">高</span></td></tr>
+          <tr><td class="fr-id">FR023</td><td>エージェント連携予約</td><td>人材エージェントもカレンダー経由で面接日程調整可能</td><td><span class="badge badge-mid">中</span></td></tr>
+        </tbody>
+      </table>
+
+      <div class="cat-header">LINE連携</div>
+      <table>
+        <thead><tr><th style="width:90px;">ID</th><th style="width:220px;">機能</th><th>詳細</th><th style="width:60px;">優先度</th></tr></thead>
+        <tbody>
+          <tr><td class="fr-id">FR030</td><td>LINE友達登録フロー</td><td>QRコード（LIFF）経由で簡単に友達追加＆LINE UserID紐付け。媒体経由はトークン照合方式</td><td><span class="badge badge-high">高</span></td></tr>
+          <tr><td class="fr-id">FR031</td><td>メッセージ送信</td><td>タグ・ステータスで対象を絞って一斉送信。差し込み変数（氏名等）対応</td><td><span class="badge badge-high">高</span></td></tr>
+          <tr><td class="fr-id">FR032</td><td>画像送受信</td><td>管理者→学生・学生→管理者の両方向での画像送受信</td><td><span class="badge badge-mid">中</span></td></tr>
+          <tr><td class="fr-id">FR033</td><td>送信履歴・開封集計</td><td>送信日時・送信数・開封率（集計値）の記録・表示。※個人単位の既読取得は LINE API 制約により不可</td><td><span class="badge badge-mid">中</span></td></tr>
+          <tr><td class="fr-id">FR034 <span class="badge badge-update">UPD</span></td><td>リッチメニュー管理</td><td><strong>複数メニューを管理・タグで自動割り当て</strong>（職種別・選考ステータス別等）。優先順位設定あり。公開中/下書きのステータス管理</td><td><span class="badge badge-high">高</span></td></tr>
+          <tr><td class="fr-id">FR035 <span class="badge badge-new">NEW</span></td><td>リッチメニュー自動切替</td><td>応募者のタグが変更された際に、RichMenuRule に基づき LINE 側のメニューを自動切り替え</td><td><span class="badge badge-high">高</span></td></tr>
+          <tr><td class="fr-id">FR036</td><td>LINEアンケート</td><td>LIFF経由のアンケートをLINEで送付・回答回収・集計</td><td><span class="badge badge-mid">中</span></td></tr>
+        </tbody>
+      </table>
+
+      <div class="cat-header">媒体・流入経路管理</div>
+      <table>
+        <thead><tr><th style="width:90px;">ID</th><th style="width:220px;">機能</th><th>詳細</th><th style="width:60px;">優先度</th></tr></thead>
+        <tbody>
+          <tr><td class="fr-id">FR040 <span class="badge badge-update">UPD</span></td><td>媒体連携</td><td><strong>マイナビ・リクナビ・OfferBox・Re就活</strong>からの応募データ自動取込（API/CSV）。媒体ごとのフィールドマッピング設定。重複排除ロジックあり</td><td><span class="badge badge-high">高</span></td></tr>
+          <tr><td class="fr-id">FR041</td><td>流入経路別QRコード</td><td>学校・イベント単位でQRコードを生成。スキャン時に対応タグを自動付与</td><td><span class="badge badge-high">高</span></td></tr>
+          <tr><td class="fr-id">FR042</td><td>流入経路トラッキング</td><td>媒体・QR別のエントリー数・承諾率を記録・集計</td><td><span class="badge badge-mid">中</span></td></tr>
+        </tbody>
+      </table>
+
+      <div class="cat-header">分析・レポート</div>
+      <table>
+        <thead><tr><th style="width:90px;">ID</th><th style="width:220px;">機能</th><th>詳細</th><th style="width:60px;">優先度</th></tr></thead>
+        <tbody>
+          <tr><td class="fr-id">FR050 <span class="badge badge-update">UPD</span></td><td>統合ファネル遷移率</td><td>複数フローを統合した1本のファネルで集計。<strong>フローにないステージでも「それより先に進んでいれば通過扱い」のバイパスカウントロジック</strong>（stage_type ENUMで実装）</td><td><span class="badge badge-high">高</span></td></tr>
+          <tr><td class="fr-id">FR051</td><td>媒体・流入経路別分析</td><td>媒体・学校・QR別のエントリー数・各ステージ通過率・承諾率・平均採用日数の比較</td><td><span class="badge badge-high">高</span></td></tr>
+          <tr><td class="fr-id">FR052</td><td>内定者・承諾者一覧</td><td>フィルター付きリスト表示。印刷・CSV出力対応</td><td><span class="badge badge-high">高</span></td></tr>
+          <tr><td class="fr-id">FR053</td><td>全データエクスポート</td><td>学生データ・選考データ・アンケートデータのCSV一括出力</td><td><span class="badge badge-mid">中</span></td></tr>
+          <tr><td class="fr-id">FR054 <span class="badge badge-new">NEW</span></td><td>採用スピード分析</td><td>ステージ別平均滞在日数・ボトルネック検出。面接官別通過率・評価スコア分布</td><td><span class="badge badge-mid">中</span></td></tr>
+          <tr><td class="fr-id">FR055 <span class="badge badge-new">NEW</span></td><td>辞退リスクスコア</td><td>アンケート入社意欲・LINEアクセス頻度・承諾期限残日数から辞退リスクを算出。一覧表示＋即時LINEフォロー</td><td><span class="badge badge-mid">中</span></td></tr>
+          <tr><td class="fr-id">FR056 <span class="badge badge-new">NEW</span></td><td>採用目標達成予測</td><td>現在のファネル状況から最終承諾数を予測。目標との差分を可視化</td><td><span class="badge badge-mid">中</span></td></tr>
+          <tr><td class="fr-id">FR057 <span class="badge badge-new">NEW</span></td><td>前年比較</td><td>同一期間の主要指標（エントリー数・承諾率・採用日数等）を前年と比較</td><td><span class="badge badge-low">低</span></td></tr>
+        </tbody>
+      </table>
+
+      <div class="cat-header">書類生成</div>
+      <table>
+        <thead><tr><th style="width:90px;">ID</th><th style="width:220px;">機能</th><th>詳細</th><th style="width:60px;">優先度</th></tr></thead>
+        <tbody>
+          <tr><td class="fr-id">FR060</td><td>書類テンプレート管理</td><td>内定通知書・内定承諾書・入社誓約書等のテンプレート登録・編集</td><td><span class="badge badge-mid">中</span></td></tr>
+          <tr><td class="fr-id">FR061</td><td>書類生成（個別・一括）</td><td>学生データ差し込みによるPDF生成。個別または対象者一括出力</td><td><span class="badge badge-mid">中</span></td></tr>
+        </tbody>
+      </table>
+
+      <div class="cat-header">Salesforce連携</div>
+      <table>
+        <thead><tr><th style="width:90px;">ID</th><th style="width:220px;">機能</th><th>詳細</th><th style="width:60px;">優先度</th></tr></thead>
+        <tbody>
+          <tr><td class="fr-id">FR070</td><td>承諾時の自動SF登録</td><td>内定承諾ステータス変更をトリガーにSalesforce REST APIでContactを自動生成。ATS_Applicant_ID__c カスタム項目で双方向リンク</td><td><span class="badge badge-high">高</span></td></tr>
+          <tr><td class="fr-id">FR071 <span class="badge badge-update">UPD</span></td><td>SF→ATS 在籍情報同期</td><td><strong>SF が主従（マスター）</strong>。退職・部署異動のレコード変更を日次バッチで取得。ATS側は読み取り専用キャッシュ。上書き不可</td><td><span class="badge badge-mid">中</span></td></tr>
+          <tr><td class="fr-id">FR072 <span class="badge badge-update">UPD</span></td><td>SF→ATS 大学情報同期</td><td><strong>SF が主従</strong>。SFのAccountオブジェクト（大学）から訪問履歴・担当者情報を取得。ATSの学校マスターに反映</td><td><span class="badge badge-mid">中</span></td></tr>
+        </tbody>
+      </table>
+
+      <div class="cat-header">システム管理</div>
+      <table>
+        <thead><tr><th style="width:90px;">ID</th><th style="width:220px;">機能</th><th>詳細</th><th style="width:60px;">優先度</th></tr></thead>
+        <tbody>
+          <tr><td class="fr-id">FR080 <span class="badge badge-update">UPD</span></td><td>担当者・権限管理</td><td>Staff テーブルで管理。admin / interviewer / viewer の3権限。担当者もLINE通知受け取り可</td><td><span class="badge badge-high">高</span></td></tr>
+          <tr><td class="fr-id">FR081 <span class="badge badge-update">UPD</span></td><td>選考フロー設定</td><td>複数フローの作成・ステージ追加・並び替え・stage_type 設定</td><td><span class="badge badge-high">高</span></td></tr>
+          <tr><td class="fr-id">FR082</td><td>タグマスター管理</td><td>タグの作成・色設定・編集・削除。削除時は ApplicantTag の紐付けも解除</td><td><span class="badge badge-mid">中</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ③ 非機能要件 -->
+  <div id="t-nfr" class="tab-content">
+    <div class="section">
+      <h2>非機能要件</h2>
+      <table>
+        <thead><tr><th style="width:120px;">カテゴリ</th><th>要件</th></tr></thead>
+        <tbody>
+          <tr>
+            <td style="font-weight:600;color:#e53935;">セキュリティ</td>
+            <td>
+              HTTPS必須・認証必須（2要素認証推奨）・アクセスログ記録<br>
+              自社専用クローズドシステム。外部からのアクセス制限（IP制限またはVPN推奨）<br>
+              管理者・面接官・閲覧者の権限分離（RBAC）
+            </td>
+          </tr>
+          <tr>
+            <td style="font-weight:600;color:#e53935;">個人情報保護</td>
+            <td>
+              個人情報保護法・採用情報の取り扱い規程に準拠<br>
+              不採用者・辞退者データの保持期間ポリシーを定義（要ヒアリング）<br>
+              データ削除・匿名化機能を実装
+            </td>
+          </tr>
+          <tr>
+            <td style="font-weight:600;color:#ff9800;">可用性</td>
+            <td>
+              採用繁忙期（10月〜3月）の安定稼働。目標稼働率 <strong>99.5%</strong> 以上<br>
+              計画メンテナンスは深夜帯に実施
+            </td>
+          </tr>
+          <tr>
+            <td style="font-weight:600;color:#ff9800;">性能</td>
+            <td>
+              学生一覧（500件）の表示：<strong>2秒以内</strong><br>
+              LINE一斉送信（500名）：エラーなく完了（Messaging API のレート制限考慮）<br>
+              ファネル分析の集計：<strong>5秒以内</strong>
+            </td>
+          </tr>
+          <tr>
+            <td style="font-weight:600;color:#7c83fd;">拡張性</td>
+            <td>
+              採用人数・担当者数増加時にスケールアウト可能な構成<br>
+              媒体追加・フロー追加が管理画面から行える設計<br>
+              custom_fields（JSONB）で任意の応募者属性を追加可能
+            </td>
+          </tr>
+          <tr>
+            <td style="font-weight:600;color:#4caf50;">操作性</td>
+            <td>
+              採用担当者が直感的に操作できるUI<br>
+              スマートフォンからの管理操作も考慮（レスポンシブ対応）<br>
+              LINE LIFF（学生側）はモバイルファーストで設計
+            </td>
+          </tr>
+          <tr>
+            <td style="font-weight:600;color:#1565c0;">データ保全</td>
+            <td>
+              日次バックアップ。過去3年分のデータ保持を想定<br>
+              Salesforce との同期ログも保持
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ④ 未確認事項 -->
+  <div id="t-open" class="tab-content">
+    <div class="section">
+      <h2>未確認事項（追加ヒアリングが必要な点）</h2>
+      <table>
+        <thead><tr><th style="width:80px;">ID</th><th style="width:80px;">状態</th><th style="width:200px;">確認事項</th><th>詳細・決定内容</th></tr></thead>
+        <tbody>
+          <tr style="background:#e8f5e9;">
+            <td class="fr-id">U-01</td>
+            <td><span class="badge badge-done">確認中</span></td>
+            <td>LINE既読確認の代替案合意</td>
+            <td>個人単位の既読取得はLINE API仕様上不可。<strong>マイページアクセス日時を「最終確認日」として代用</strong>する方向で調整中</td>
+          </tr>
+          <tr style="background:#e8f5e9;">
+            <td class="fr-id">U-02</td>
+            <td><span class="badge badge-done">✓ 確定</span></td>
+            <td>連携媒体名の確定</td>
+            <td><strong>マイナビ・リクナビ・OfferBox・Re就活</strong>の4媒体に決定。APIパートナー契約の要否は媒体ごとに個別確認が必要</td>
+          </tr>
+          <tr>
+            <td class="fr-id">U-03</td>
+            <td><span class="badge badge-open">確認中</span></td>
+            <td>応募者スコープ（新卒のみ vs 第二新卒含む）</td>
+            <td>Re就活が主に<strong>既卒・第二新卒向け</strong>のため確認が必要。スコープによってデータモデルの卒業年度フィールドや職歴フィールドの扱いが変わる。<br>→ 柔軟な設計（custom_fields）で対応できるよう準備済み</td>
+          </tr>
+          <tr style="background:#e8f5e9;">
+            <td class="fr-id">U-04</td>
+            <td><span class="badge badge-done">✓ 確定</span></td>
+            <td>SF連携の主従関係</td>
+            <td><strong>Salesforceが主（マスター）</strong>。退職・異動データはSF→ATSの一方向。コンフリクト時はSF優先。ATSは読み取り専用キャッシュとして扱う</td>
+          </tr>
+          <tr>
+            <td class="fr-id">U-05</td>
+            <td><span class="badge badge-open">未確認</span></td>
+            <td>エージェント連携の仕様</td>
+            <td>エージェントへのカレンダー公開範囲（全員共通URLか個別か）。エージェント側にシステムアカウントを発行するか、URLのみ共有するか</td>
+          </tr>
+          <tr>
+            <td class="fr-id">U-06</td>
+            <td><span class="badge badge-open">未確認</span></td>
+            <td>面接評価項目の詳細</td>
+            <td>評価シートの項目・評価スケール（5段階等）。職種・フローごとに異なる評価シートを使うか</td>
+          </tr>
+          <tr>
+            <td class="fr-id">U-07</td>
+            <td><span class="badge badge-open">未確認</span></td>
+            <td>説明会の形式</td>
+            <td>オンライン・対面両方か。Zoom等のURL自動付与が必要か。定員管理が必要か</td>
+          </tr>
+          <tr>
+            <td class="fr-id">U-08</td>
+            <td><span class="badge badge-open">未確認</span></td>
+            <td>担当者数・権限パターン</td>
+            <td>採用担当者は何名か。面接官のシステム利用範囲（閲覧のみか入力もするか）</td>
+          </tr>
+          <tr>
+            <td class="fr-id">U-09</td>
+            <td><span class="badge badge-open">未確認</span></td>
+            <td>データ保持期間ポリシー</td>
+            <td>不採用者・辞退者のデータをいつまで保持するか。個人情報保護法の観点で定義が必要</td>
+          </tr>
+          <tr>
+            <td class="fr-id">U-10</td>
+            <td><span class="badge badge-open">未確認</span></td>
+            <td>内定承諾書類の受領方法</td>
+            <td>電子署名での受領か、紙でのスキャン添付か。電子の場合は電子契約サービスとの連携要否</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ⑤ 懸念・リスク -->
+  <div id="t-risk" class="tab-content">
+    <div class="section">
+      <h2>懸念事項・リスク</h2>
+      <table>
+        <thead><tr><th style="width:80px;">ID</th><th style="width:80px;">深刻度</th><th style="width:200px;">懸念・リスク</th><th>詳細と対応方針</th></tr></thead>
+        <tbody>
+          <tr>
+            <td class="fr-id">R-01</td>
+            <td><span class="badge badge-high">高</span></td>
+            <td>LINE Messaging API のコスト</td>
+            <td>メッセージ送信数によって月額費用が変動。採用繁忙期に大量送信した場合のコストが想定外になる可能性。<br><strong>対応：</strong> 月間送信数を見積もりプラン選定。フリープラン（200通/月）を超える場合は有料プランへ</td>
+          </tr>
+          <tr>
+            <td class="fr-id">R-02</td>
+            <td><span class="badge badge-high">高</span></td>
+            <td>LINE 個人既読確認の制約</td>
+            <td>「学生の既読確認」要件はLINE API仕様で実現不可。要件調整が必要。<br><strong>対応：</strong> マイページアクセス日時を代替指標として提案中（U-01）</td>
+          </tr>
+          <tr>
+            <td class="fr-id">R-03</td>
+            <td><span class="badge badge-high">高</span></td>
+            <td>媒体API連携の難易度・コスト</td>
+            <td>マイナビ・リクナビはAPIパートナー契約が必要な場合あり。契約なしではCSVのみ対応。<br><strong>対応：</strong> まずCSV連携で開発。API連携は媒体ごとに個別交渉後に追加</td>
+          </tr>
+          <tr>
+            <td class="fr-id">R-04</td>
+            <td><span class="badge badge-mid">中</span></td>
+            <td>Salesforce 双方向同期の複雑性</td>
+            <td>コンフリクト・同期タイミングのミスはデータ破損リスク。<br><strong>対応：</strong> U-04で主従関係確定済み。SFマスターとして一方向同期から実装開始</td>
+          </tr>
+          <tr>
+            <td class="fr-id">R-05</td>
+            <td><span class="badge badge-mid">中</span></td>
+            <td>個人情報の取り扱い</td>
+            <td>学生の個人情報・採用評価情報を扱うため情報漏洩リスクが高い。<br><strong>対応：</strong> 閉じたシステム設計・IP制限・アクセスログ・定期的な脆弱性診断</td>
+          </tr>
+          <tr>
+            <td class="fr-id">R-06</td>
+            <td><span class="badge badge-mid">中</span></td>
+            <td>カレンダー機能の工数</td>
+            <td>空き枠管理・エージェント含む予約システムは工数が大きい。eeasy廃止の代替として品質担保が必要。<br><strong>対応：</strong> 初期はシンプルな枠予約から実装し段階的に拡張</td>
+          </tr>
+          <tr>
+            <td class="fr-id">R-07</td>
+            <td><span class="badge badge-mid">中</span></td>
+            <td>採用繁忙期の集中アクセス</td>
+            <td>エントリー解禁時期（3月・6月）に大量アクセスが集中する可能性。<br><strong>対応：</strong> 負荷試験の実施とスケールアウト構成の検討</td>
+          </tr>
+          <tr>
+            <td class="fr-id">R-08</td>
+            <td><span class="badge badge-low">低</span></td>
+            <td>Re就活のAPI提供状況</td>
+            <td>Re就活のAPI連携情報が未確認。CSV対応のみの可能性あり。<br><strong>対応：</strong> 直接問い合わせて確認。最悪CSVフォールバックで対応</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ⑥ 運用コスト -->
+  <div id="t-cost" class="tab-content">
+    <div class="section">
+      <h2>運用コスト概算（月額）</h2>
+      <table>
+        <thead><tr><th>項目</th><th>概算月額</th><th>備考</th></tr></thead>
+        <tbody>
+          <tr><td>インフラ（クラウド）</td><td>¥10,000〜30,000</td><td>AWS / GCP。ストレージ・DB・サーバー含む。規模により変動</td></tr>
+          <tr><td>LINE Messaging API</td><td>¥0〜15,000</td><td>月200通まで無料。超過分は従量課金。採用繁忙期は要注意</td></tr>
+          <tr><td>Salesforce</td><td>既存契約に依存</td><td>既存ライセンスへのAPI接続追加費用が発生する場合あり</td></tr>
+          <tr><td>媒体API連携費</td><td>要別途見積</td><td>マイナビ・リクナビはパートナー契約が必要な場合あり</td></tr>
+          <tr><td>SSL証明書・ドメイン</td><td>¥0〜2,000</td><td>Let's Encrypt等を活用</td></tr>
+          <tr><td>バックアップ・監視</td><td>¥2,000〜5,000</td><td>ストレージ・監視ツール（Datadog等）</td></tr>
+        </tbody>
+      </table>
+      <div class="cost-total">
+        <span>月額合計目安（Salesforce・媒体費を除く）</span>
+        <span style="font-size:20px;">¥20,000〜50,000 / 月</span>
+      </div>
+      <div class="warn-box">
+        <strong>初期開発コスト：</strong> 全機能フルスクラッチで3〜6ヶ月程度の開発規模と想定。詳細は別途見積もりが必要。
+      </div>
+    </div>
+  </div>
+
+  <!-- ⑦ 変更履歴 -->
+  <div id="t-log" class="tab-content">
+    <div class="section" style="margin-bottom:16px;">
+      <h2>関連ドキュメント</h2>
+      <div style="display:flex;gap:12px;flex-wrap:wrap;">
+        <a href="dataflow.html" style="display:flex;align-items:center;gap:10px;background:#f0f0ff;border:1.5px solid #c5cae9;border-radius:10px;padding:12px 18px;text-decoration:none;color:#3949ab;font-size:13px;font-weight:600;">
+          🔀 データフロー設計 →<span style="font-size:11px;font-weight:400;color:#7c83fd;">ERD・LINE連携フロー・SF連携</span>
+        </a>
+        <a href="index.html" style="display:flex;align-items:center;gap:10px;background:#f8f9fc;border:1.5px solid #e0e0e0;border-radius:10px;padding:12px 18px;text-decoration:none;color:#555;font-size:13px;font-weight:600;">
+          🖥 ワイヤーフレーム →<span style="font-size:11px;font-weight:400;color:#888;">画面構成・UI設計</span>
+        </a>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2>変更履歴</h2>
+      <table>
+        <thead><tr><th style="width:100px;">日付</th><th style="width:60px;">Ver</th><th>変更内容</th></tr></thead>
+        <tbody>
+          <tr>
+            <td>2026-06-04</td><td>v0.3</td>
+            <td>
+              <span class="badge badge-done" style="margin-right:4px;">U-02確定</span> 連携媒体：マイナビ・リクナビ・OfferBox・Re就活に決定<br>
+              <span class="badge badge-done" style="margin-right:4px;">U-04確定</span> SF連携の主従：Salesforceがマスター（退職・異動・大学情報）<br>
+              <span class="badge badge-new" style="margin-right:4px;">NEW</span> FR034/035：複数リッチメニュー・タグ別自動割り当て機能を追加<br>
+              <span class="badge badge-update" style="margin-right:4px;">UPD</span> FR010：選考フローを複数・自由設計に変更（SelectionFlow/Stage設計）<br>
+              <span class="badge badge-update" style="margin-right:4px;">UPD</span> FR050：統合ファネルにバイパスカウントロジックを追記<br>
+              <span class="badge badge-new" style="margin-right:4px;">NEW</span> FR054〜057：採用スピード分析・辞退リスクスコア・予測・前年比較を追加<br>
+              <span class="badge badge-update" style="margin-right:4px;">UPD</span> applicant_type（新卒/既卒/第二新卒）の柔軟対応を追記<br>
+              <span class="badge badge-update" style="margin-right:4px;">UPD</span> データモデルにTag・ApplicantTag・Staff・RichMenu・RichMenuRuleを追加
+            </td>
+          </tr>
+          <tr>
+            <td>2026-06-04</td><td>v0.2</td>
+            <td>初稿（ヒアリング内容に基づき作成）。業務要件BG01〜06、機能要件FR001〜082、未確認事項U-01〜U-10を整理</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</div>
+
+<script>
+function sw(el, tabId) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById(tabId).classList.add('active');
+}
+</script>
+</body>
+</html>
