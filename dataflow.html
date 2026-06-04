@@ -619,7 +619,60 @@
   <!-- ④ 媒体連携フロー -->
   <div id="tab-media" class="tab-content">
     <div class="section">
-      <h2>媒体連携フロー</h2>
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;">
+        <h2 style="margin-bottom:0;">媒体連携フロー</h2>
+        <span style="background:#4caf50;color:#fff;font-size:10px;font-weight:700;border-radius:10px;padding:2px 8px;">✓ U-02 確定</span>
+      </div>
+
+      <!-- Confirmed media list -->
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:20px;">
+
+        <div style="border:2px solid #e53935;border-radius:10px;overflow:hidden;">
+          <div style="background:#e53935;color:#fff;padding:8px 12px;font-size:12px;font-weight:700;">① マイナビ</div>
+          <div style="padding:10px 12px;font-size:12px;line-height:1.8;">
+            <div>対象：<strong>新卒</strong></div>
+            <div>連携：API / CSV</div>
+            <div>優先度：<strong style="color:#e53935;">最高</strong></div>
+          </div>
+          <div style="background:#ffebee;padding:6px 12px;font-size:11px;color:#c62828;">APIパートナー契約が必要な場合あり。要確認。</div>
+        </div>
+
+        <div style="border:2px solid #1565c0;border-radius:10px;overflow:hidden;">
+          <div style="background:#1565c0;color:#fff;padding:8px 12px;font-size:12px;font-weight:700;">② リクナビ</div>
+          <div style="padding:10px 12px;font-size:12px;line-height:1.8;">
+            <div>対象：<strong>新卒</strong></div>
+            <div>連携：API / CSV</div>
+            <div>優先度：<strong style="color:#1565c0;">最高</strong></div>
+          </div>
+          <div style="background:#e3f2fd;padding:6px 12px;font-size:11px;color:#1565c0;">APIパートナー契約が必要な場合あり。要確認。</div>
+        </div>
+
+        <div style="border:2px solid #e65100;border-radius:10px;overflow:hidden;">
+          <div style="background:#e65100;color:#fff;padding:8px 12px;font-size:12px;font-weight:700;">③ OfferBox</div>
+          <div style="padding:10px 12px;font-size:12px;line-height:1.8;">
+            <div>対象：<strong>新卒（スカウト型）</strong></div>
+            <div>連携：API / CSV</div>
+            <div>優先度：<strong style="color:#e65100;">高</strong></div>
+          </div>
+          <div style="background:#fff3e0;padding:6px 12px;font-size:11px;color:#e65100;">スカウト型。企業側から学生にアプローチする流れ。</div>
+        </div>
+
+        <div style="border:2px solid #6a1b9a;border-radius:10px;overflow:hidden;">
+          <div style="background:#6a1b9a;color:#fff;padding:8px 12px;font-size:12px;font-weight:700;">④ Re就活</div>
+          <div style="padding:10px 12px;font-size:12px;line-height:1.8;">
+            <div>対象：<strong>既卒・第二新卒（20代）</strong></div>
+            <div>連携：CSV（API要確認）</div>
+            <div>優先度：<strong style="color:#6a1b9a;">高</strong></div>
+          </div>
+          <div style="background:#f3e5f5;padding:6px 12px;font-size:11px;color:#6a1b9a;">⚠️ 新卒ではなく<strong>既卒・第二新卒</strong>向けサービス。ATSのスコープを要確認。</div>
+        </div>
+
+      </div>
+
+      <div style="background:#fff8e1;border:1px solid #ffcc80;border-radius:8px;padding:12px 16px;font-size:12px;color:#e65100;margin-bottom:20px;">
+        <strong>⚠️ Re就活について：</strong> Re就活（学情社運営）は主に<strong>20代の既卒・第二新卒</strong>向け媒体です。「Re就活Campus」という新卒（在学生）向けサービスも存在しますが、本ATSが<strong>純粋な新卒のみを対象とするのか、既卒・第二新卒も含めるのか</strong>を確認してください。スコープによってデータモデルの「卒業年度」フィールドの扱いが変わります。
+      </div>
+
       <div class="three-col">
 
         <div style="border:2px solid #c5cae9;border-radius:10px;padding:16px;">
