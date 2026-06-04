@@ -1,0 +1,1299 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>新卒採用ATS - 画面構成案</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Hiragino Sans', sans-serif; background: #f0f2f5; color: #1a1a2e; display: flex; height: 100vh; overflow: hidden; }
+
+  /* Sidebar */
+  .sidebar {
+    width: 220px; min-width: 220px; background: #1a1a2e; color: #fff;
+    display: flex; flex-direction: column; height: 100vh; overflow-y: auto;
+  }
+  .sidebar-logo {
+    padding: 20px 16px; font-size: 16px; font-weight: 700;
+    border-bottom: 1px solid #2d2d4e; letter-spacing: 0.5px;
+    color: #7c83fd;
+  }
+  .sidebar-logo span { font-size: 11px; color: #888; display: block; margin-top: 2px; font-weight: 400; }
+  .nav-section { padding: 12px 0 4px; }
+  .nav-section-label {
+    font-size: 10px; color: #666; padding: 0 16px 6px;
+    letter-spacing: 1px; text-transform: uppercase;
+  }
+  .nav-item {
+    display: flex; align-items: center; gap: 10px;
+    padding: 9px 16px; cursor: pointer; font-size: 13px;
+    color: #bbb; border-radius: 6px; margin: 1px 8px;
+    transition: all 0.15s;
+  }
+  .nav-item:hover { background: #2d2d4e; color: #fff; }
+  .nav-item.active { background: #7c83fd; color: #fff; }
+  .nav-icon { font-size: 15px; width: 20px; text-align: center; }
+  .nav-badge {
+    margin-left: auto; background: #ff6b6b; color: #fff;
+    border-radius: 10px; padding: 1px 6px; font-size: 10px;
+  }
+
+  /* Main */
+  .main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+  .topbar {
+    background: #fff; padding: 0 24px; height: 56px;
+    display: flex; align-items: center; justify-content: space-between;
+    border-bottom: 1px solid #e8eaf0; flex-shrink: 0;
+  }
+  .topbar-title { font-size: 16px; font-weight: 600; color: #1a1a2e; }
+  .topbar-actions { display: flex; gap: 10px; align-items: center; }
+  .btn {
+    padding: 7px 16px; border-radius: 6px; border: none;
+    cursor: pointer; font-size: 13px; font-weight: 500;
+    transition: all 0.15s;
+  }
+  .btn-primary { background: #7c83fd; color: #fff; }
+  .btn-primary:hover { background: #6970e8; }
+  .btn-secondary { background: #f0f2f5; color: #555; border: 1px solid #e0e0e0; }
+  .btn-secondary:hover { background: #e8eaf0; }
+  .btn-line { background: #06c755; color: #fff; }
+  .btn-danger { background: #ff6b6b; color: #fff; }
+  .btn-sm { padding: 5px 12px; font-size: 12px; }
+
+  .content { flex: 1; overflow-y: auto; padding: 24px; }
+
+  /* Cards */
+  .card {
+    background: #fff; border-radius: 10px; padding: 20px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.06); margin-bottom: 16px;
+  }
+  .card-title { font-size: 14px; font-weight: 600; color: #444; margin-bottom: 16px; }
+
+  /* KPI Grid */
+  .kpi-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 16px; }
+  .kpi-card {
+    background: #fff; border-radius: 10px; padding: 18px 20px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+  }
+  .kpi-label { font-size: 11px; color: #888; margin-bottom: 6px; }
+  .kpi-value { font-size: 28px; font-weight: 700; color: #1a1a2e; }
+  .kpi-sub { font-size: 11px; color: #aaa; margin-top: 4px; }
+  .kpi-up { color: #4caf50; }
+  .kpi-down { color: #ff6b6b; }
+
+  /* Funnel */
+  .funnel-row {
+    display: flex; align-items: center; gap: 0; margin-bottom: 8px;
+  }
+  .funnel-label { width: 80px; font-size: 12px; color: #666; text-align: right; padding-right: 12px; }
+  .funnel-bar-wrap { flex: 1; background: #f0f2f5; border-radius: 4px; height: 28px; position: relative; }
+  .funnel-bar {
+    height: 100%; border-radius: 4px;
+    display: flex; align-items: center; padding: 0 10px;
+    font-size: 12px; color: #fff; font-weight: 600;
+    transition: width 0.5s;
+  }
+  .funnel-rate { width: 60px; font-size: 11px; color: #888; padding-left: 10px; }
+
+  /* Table */
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  th { background: #f8f9fc; padding: 10px 14px; text-align: left; font-weight: 600; color: #666; font-size: 12px; border-bottom: 1px solid #e8eaf0; }
+  td { padding: 11px 14px; border-bottom: 1px solid #f0f2f5; vertical-align: middle; }
+  tr:hover td { background: #fafbff; }
+  .avatar {
+    width: 32px; height: 32px; border-radius: 50%;
+    background: #7c83fd; color: #fff;
+    display: inline-flex; align-items: center; justify-content: center;
+    font-size: 12px; font-weight: 600; margin-right: 8px;
+  }
+  .student-name { font-weight: 500; }
+  .student-school { font-size: 11px; color: #999; }
+
+  /* Tags */
+  .tag {
+    display: inline-block; padding: 2px 8px; border-radius: 10px;
+    font-size: 11px; font-weight: 500; margin: 1px;
+  }
+  .tag-blue { background: #e8f0fe; color: #4a6cf7; }
+  .tag-green { background: #e8f5e9; color: #388e3c; }
+  .tag-orange { background: #fff3e0; color: #e65100; }
+  .tag-purple { background: #f3e5f5; color: #7b1fa2; }
+  .tag-red { background: #ffebee; color: #c62828; }
+  .tag-gray { background: #f0f2f5; color: #666; }
+
+  /* Status badges */
+  .status {
+    display: inline-block; padding: 3px 10px; border-radius: 12px;
+    font-size: 11px; font-weight: 600;
+  }
+  .status-entry { background: #e8f0fe; color: #4a6cf7; }
+  .status-booked { background: #fff3e0; color: #e65100; }
+  .status-done { background: #e8f5e9; color: #388e3c; }
+  .status-offer { background: #f3e5f5; color: #7b1fa2; }
+  .status-accept { background: #4caf50; color: #fff; }
+  .status-ng { background: #ffebee; color: #c62828; }
+
+  /* Pipeline Kanban */
+  .kanban { display: flex; gap: 12px; overflow-x: auto; padding-bottom: 8px; }
+  .kanban-col {
+    min-width: 180px; background: #f8f9fc; border-radius: 10px; padding: 12px;
+  }
+  .kanban-col-title {
+    font-size: 12px; font-weight: 700; color: #444;
+    margin-bottom: 10px; display: flex; justify-content: space-between;
+  }
+  .kanban-count {
+    background: #7c83fd; color: #fff; border-radius: 10px;
+    padding: 1px 7px; font-size: 10px;
+  }
+  .kanban-card {
+    background: #fff; border-radius: 8px; padding: 10px 12px;
+    margin-bottom: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.07);
+    cursor: pointer; transition: all 0.15s;
+  }
+  .kanban-card:hover { box-shadow: 0 3px 8px rgba(0,0,0,0.1); transform: translateY(-1px); }
+  .kanban-card-name { font-size: 13px; font-weight: 500; margin-bottom: 4px; }
+  .kanban-card-sub { font-size: 11px; color: #999; }
+
+  /* Calendar */
+  .calendar-grid {
+    display: grid; grid-template-columns: 60px repeat(5, 1fr); gap: 1px;
+    background: #e8eaf0; border-radius: 8px; overflow: hidden;
+  }
+  .cal-header { background: #f8f9fc; padding: 8px; font-size: 12px; font-weight: 600; text-align: center; color: #444; }
+  .cal-time { background: #fff; padding: 8px; font-size: 11px; color: #999; text-align: right; }
+  .cal-cell { background: #fff; padding: 4px; min-height: 48px; position: relative; }
+  .cal-event {
+    background: #7c83fd; color: #fff; border-radius: 4px;
+    padding: 4px 7px; font-size: 11px; margin-bottom: 2px; cursor: pointer;
+  }
+  .cal-event.line-event { background: #06c755; }
+  .cal-event.agent-event { background: #ff9800; }
+
+  /* LINE Message */
+  .line-composer {
+    background: #f0f2f5; border-radius: 10px; padding: 16px;
+  }
+  .line-preview {
+    background: #e8f5e9; border-radius: 10px; padding: 16px;
+    max-width: 320px; font-size: 13px;
+  }
+  .line-bubble {
+    background: #fff; border-radius: 12px; padding: 10px 14px;
+    font-size: 13px; display: inline-block; margin-bottom: 8px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1); max-width: 240px;
+  }
+  .line-bubble.sent { background: #06c755; color: #fff; }
+
+  /* Forms */
+  input[type="text"], textarea, select {
+    width: 100%; padding: 8px 12px; border: 1px solid #e0e0e0;
+    border-radius: 6px; font-size: 13px; color: #333;
+    outline: none; transition: border 0.15s;
+  }
+  input[type="text"]:focus, textarea:focus, select:focus { border-color: #7c83fd; }
+  textarea { resize: vertical; min-height: 80px; }
+  label { font-size: 12px; color: #666; display: block; margin-bottom: 4px; }
+  .form-row { margin-bottom: 14px; }
+  .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+
+  /* Progress bar */
+  .progress-wrap { background: #f0f2f5; border-radius: 4px; height: 8px; overflow: hidden; }
+  .progress-bar { height: 100%; border-radius: 4px; background: #7c83fd; }
+
+  /* Tabs */
+  .tabs { display: flex; gap: 0; border-bottom: 2px solid #e8eaf0; margin-bottom: 20px; }
+  .tab {
+    padding: 10px 20px; font-size: 13px; cursor: pointer;
+    color: #888; border-bottom: 2px solid transparent; margin-bottom: -2px;
+    transition: all 0.15s;
+  }
+  .tab.active { color: #7c83fd; border-bottom-color: #7c83fd; font-weight: 600; }
+  .tab:hover { color: #555; }
+
+  /* Pages */
+  .page { display: none; }
+  .page.active { display: block; }
+
+  /* Student detail */
+  .detail-grid { display: grid; grid-template-columns: 1fr 2fr; gap: 16px; }
+  .detail-profile { text-align: center; padding: 20px; }
+  .avatar-lg {
+    width: 72px; height: 72px; border-radius: 50%;
+    background: #7c83fd; color: #fff;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 24px; font-weight: 700; margin: 0 auto 12px;
+  }
+  .timeline { padding: 0; }
+  .timeline-item {
+    display: flex; gap: 12px; padding-bottom: 16px;
+    border-left: 2px solid #e8eaf0; margin-left: 8px; padding-left: 16px;
+    position: relative;
+  }
+  .timeline-dot {
+    width: 10px; height: 10px; border-radius: 50%; background: #7c83fd;
+    position: absolute; left: -6px; top: 4px;
+  }
+  .timeline-text { font-size: 13px; }
+  .timeline-date { font-size: 11px; color: #999; }
+
+  /* Analytics */
+  .analytics-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .source-bar { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+  .source-label { width: 100px; font-size: 12px; color: #555; }
+  .source-bar-wrap { flex: 1; background: #f0f2f5; border-radius: 4px; height: 20px; }
+  .source-bar-fill { height: 100%; border-radius: 4px; display: flex; align-items: center; padding: 0 8px; font-size: 11px; color: #fff; font-weight: 600; }
+  .source-count { width: 40px; font-size: 12px; color: #666; text-align: right; }
+
+  /* QR */
+  .qr-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+  .qr-card { border: 1px solid #e8eaf0; border-radius: 10px; padding: 16px; text-align: center; }
+  .qr-placeholder {
+    width: 100px; height: 100px; background: #f0f2f5; border-radius: 8px;
+    margin: 0 auto 10px; display: flex; align-items: center; justify-content: center;
+    font-size: 32px;
+  }
+  .qr-name { font-size: 13px; font-weight: 600; margin-bottom: 4px; }
+  .qr-count { font-size: 11px; color: #999; }
+
+  /* Scrollbar */
+  ::-webkit-scrollbar { width: 4px; height: 4px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: #ccc; border-radius: 2px; }
+
+  /* Student detail tab content */
+  .tab-content { display: none; }
+  .tab-content.active { display: block; }
+</style>
+</head>
+<body>
+
+<!-- Sidebar -->
+<nav class="sidebar">
+  <div class="sidebar-logo">
+    新卒採用管理システム
+  </div>
+
+  <div class="nav-section">
+    <div class="nav-section-label">メイン</div>
+    <div class="nav-item active" onclick="showPage('dashboard')">
+      <span class="nav-icon">📊</span> ダッシュボード
+    </div>
+    <div class="nav-item" onclick="showPage('students')">
+      <span class="nav-icon">👥</span> 学生一覧
+      <span class="nav-badge">148</span>
+    </div>
+    <div class="nav-item" onclick="showPage('pipeline')">
+      <span class="nav-icon">🔄</span> 選考管理
+    </div>
+    <div class="nav-item" onclick="showPage('calendar')">
+      <span class="nav-icon">📅</span> カレンダー
+    </div>
+  </div>
+
+  <div class="nav-section">
+    <div class="nav-section-label">LINE</div>
+    <div class="nav-item" onclick="showPage('line-send')">
+      <span class="nav-icon">💬</span> メッセージ送信
+    </div>
+    <div class="nav-item" onclick="showPage('survey')">
+      <span class="nav-icon">📝</span> アンケート
+    </div>
+    <div class="nav-item" onclick="showPage('richmenu')">
+      <span class="nav-icon">🎛️</span> リッチメニュー
+    </div>
+  </div>
+
+  <div class="nav-section">
+    <div class="nav-section-label">書類・データ</div>
+    <div class="nav-item" onclick="showPage('documents')">
+      <span class="nav-icon">📄</span> 書類管理
+    </div>
+    <div class="nav-item" onclick="showPage('analytics')">
+      <span class="nav-icon">📈</span> 分析・レポート
+    </div>
+  </div>
+
+  <div class="nav-section">
+    <div class="nav-section-label">設定</div>
+    <div class="nav-item" onclick="showPage('media')">
+      <span class="nav-icon">🔗</span> 媒体・QR管理
+    </div>
+    <div class="nav-item" onclick="showPage('settings')">
+      <span class="nav-icon">⚙️</span> システム設定
+    </div>
+  </div>
+</nav>
+
+<!-- Main -->
+<div class="main">
+
+  <!-- Topbar -->
+  <div class="topbar">
+    <div class="topbar-title" id="page-title">ダッシュボード</div>
+    <div class="topbar-actions">
+      <button class="btn btn-secondary btn-sm" onclick="showPage('students')">＋ 学生追加</button>
+      <button class="btn btn-line btn-sm" onclick="showPage('line-send')">LINE送信</button>
+      <div style="width:32px;height:32px;border-radius:50%;background:#7c83fd;color:#fff;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;">小</div>
+    </div>
+  </div>
+
+  <!-- Content -->
+  <div class="content">
+
+    <!-- ① Dashboard -->
+    <div id="page-dashboard" class="page active">
+      <div class="kpi-grid">
+        <div class="kpi-card">
+          <div class="kpi-label">総エントリー数</div>
+          <div class="kpi-value">348</div>
+          <div class="kpi-sub kpi-up">↑ 前月比 +23</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">内定者数</div>
+          <div class="kpi-value">42</div>
+          <div class="kpi-sub">承諾待ち 8名</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">承諾率</div>
+          <div class="kpi-value">81%</div>
+          <div class="kpi-sub kpi-down">↓ 前月比 -3%</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">本日の面接</div>
+          <div class="kpi-value">6</div>
+          <div class="kpi-sub">次：13:00 田中さん</div>
+        </div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+        <div class="card">
+          <div class="card-title">選考ファネル（全体）</div>
+          <div style="margin-bottom:6px;">
+            <div class="funnel-row">
+              <div class="funnel-label">エントリー</div>
+              <div class="funnel-bar-wrap">
+                <div class="funnel-bar" style="width:100%;background:#7c83fd;">348名</div>
+              </div>
+              <div class="funnel-rate">—</div>
+            </div>
+            <div class="funnel-row">
+              <div class="funnel-label">説明会予約</div>
+              <div class="funnel-bar-wrap">
+                <div class="funnel-bar" style="width:76%;background:#9c88fd;">264名</div>
+              </div>
+              <div class="funnel-rate">76%</div>
+            </div>
+            <div class="funnel-row">
+              <div class="funnel-label">1次面接</div>
+              <div class="funnel-bar-wrap">
+                <div class="funnel-bar" style="width:52%;background:#7c83fd;">182名</div>
+              </div>
+              <div class="funnel-rate">69%</div>
+            </div>
+            <div class="funnel-row">
+              <div class="funnel-label">最終面接</div>
+              <div class="funnel-bar-wrap">
+                <div class="funnel-bar" style="width:28%;background:#5c6bc0;">98名</div>
+              </div>
+              <div class="funnel-rate">54%</div>
+            </div>
+            <div class="funnel-row">
+              <div class="funnel-label">内定</div>
+              <div class="funnel-bar-wrap">
+                <div class="funnel-bar" style="width:12%;background:#3949ab;">42名</div>
+              </div>
+              <div class="funnel-rate">43%</div>
+            </div>
+            <div class="funnel-row">
+              <div class="funnel-label">承諾</div>
+              <div class="funnel-bar-wrap">
+                <div class="funnel-bar" style="width:10%;background:#4caf50;">34名</div>
+              </div>
+              <div class="funnel-rate">81%</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-title">本日のスケジュール</div>
+          <table>
+            <tr>
+              <td style="width:70px;font-size:12px;color:#888;">10:00</td>
+              <td><span class="status status-done">1次面接</span></td>
+              <td style="font-size:13px;">佐藤 花子<div style="font-size:11px;color:#999;">東京大学 / 担当：山田</div></td>
+            </tr>
+            <tr>
+              <td style="font-size:12px;color:#888;">13:00</td>
+              <td><span class="status status-booked">最終面接</span></td>
+              <td style="font-size:13px;">田中 一郎<div style="font-size:11px;color:#999;">早稲田大学 / 担当：鈴木・代表</div></td>
+            </tr>
+            <tr>
+              <td style="font-size:12px;color:#888;">14:30</td>
+              <td><span class="status status-booked">1次面接</span></td>
+              <td style="font-size:13px;">伊藤 美咲<div style="font-size:11px;color:#999;">慶應大学 / 担当：山田</div></td>
+            </tr>
+            <tr>
+              <td style="font-size:12px;color:#888;">16:00</td>
+              <td><span class="status status-booked">最終面接</span></td>
+              <td style="font-size:13px;">山本 健太<div style="font-size:11px;color:#999;">明治大学 / 担当：代表</div></td>
+            </tr>
+          </table>
+        </div>
+      </div>
+
+      <div class="card" style="margin-top:0;">
+        <div class="card-title">最近のエントリー</div>
+        <table>
+          <thead>
+            <tr>
+              <th>氏名</th><th>学校</th><th>流入経路</th><th>ステータス</th><th>登録日</th><th>操作</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><span class="avatar">山</span><span class="student-name">山口 沙織</span></td>
+              <td style="font-size:12px;">東京工業大学</td>
+              <td><span class="tag tag-blue">マイナビ</span></td>
+              <td><span class="status status-entry">エントリー</span></td>
+              <td style="font-size:12px;color:#999;">2025/10/28</td>
+              <td><button class="btn btn-secondary btn-sm" onclick="showPage('student-detail')">詳細</button></td>
+            </tr>
+            <tr>
+              <td><span class="avatar">中</span><span class="student-name">中村 翔太</span></td>
+              <td style="font-size:12px;">大阪大学</td>
+              <td><span class="tag tag-green">リクナビ</span></td>
+              <td><span class="status status-booked">説明会予約</span></td>
+              <td style="font-size:12px;color:#999;">2025/10/27</td>
+              <td><button class="btn btn-secondary btn-sm" onclick="showPage('student-detail')">詳細</button></td>
+            </tr>
+            <tr>
+              <td><span class="avatar">林</span><span class="student-name">林 奈々</span></td>
+              <td style="font-size:12px;">名古屋大学</td>
+              <td><span class="tag tag-orange">学校訪問QR</span></td>
+              <td><span class="status status-offer">内定</span></td>
+              <td style="font-size:12px;color:#999;">2025/10/01</td>
+              <td><button class="btn btn-secondary btn-sm" onclick="showPage('student-detail')">詳細</button></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ② Students List -->
+    <div id="page-students" class="page">
+      <div style="display:flex;gap:10px;margin-bottom:16px;align-items:center;">
+        <input type="text" placeholder="氏名・学校名で検索..." style="max-width:240px;">
+        <select style="width:140px;">
+          <option>ステータス：全て</option>
+          <option>エントリー</option>
+          <option>説明会予約</option>
+          <option>1次面接</option>
+          <option>最終面接</option>
+          <option>内定</option>
+          <option>承諾</option>
+        </select>
+        <select style="width:140px;">
+          <option>タグ：全て</option>
+          <option>マイナビ</option>
+          <option>リクナビ</option>
+          <option>理系</option>
+          <option>文系</option>
+          <option>東京校QR</option>
+        </select>
+        <select style="width:140px;">
+          <option>媒体：全て</option>
+          <option>マイナビ</option>
+          <option>リクナビ</option>
+          <option>OfferBox</option>
+          <option>学校訪問</option>
+        </select>
+        <div style="margin-left:auto;display:flex;gap:8px;">
+          <button class="btn btn-secondary btn-sm">CSVエクスポート</button>
+          <button class="btn btn-line btn-sm" onclick="showPage('line-send')">選択してLINE送信</button>
+        </div>
+      </div>
+      <div class="card" style="padding:0;overflow:hidden;">
+        <table>
+          <thead>
+            <tr>
+              <th><input type="checkbox"></th>
+              <th>氏名</th>
+              <th>学校・学部</th>
+              <th>媒体</th>
+              <th>タグ</th>
+              <th>ステータス</th>
+              <th>LINE</th>
+              <th>最終アクション</th>
+              <th>操作</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><input type="checkbox"></td>
+              <td onclick="showPage('student-detail')" style="cursor:pointer;"><span class="avatar">田</span><span class="student-name">田中 一郎</span></td>
+              <td><div style="font-size:13px;">早稲田大学</div><div style="font-size:11px;color:#999;">政治経済学部</div></td>
+              <td><span class="tag tag-blue">マイナビ</span></td>
+              <td><span class="tag tag-purple">理系</span><span class="tag tag-orange">関東</span></td>
+              <td><span class="status status-offer">内定</span></td>
+              <td><span style="color:#06c755;font-size:12px;">✓ 連携済</span></td>
+              <td style="font-size:11px;color:#999;">最終面接 10/25</td>
+              <td><button class="btn btn-secondary btn-sm" onclick="showPage('student-detail')">詳細</button></td>
+            </tr>
+            <tr>
+              <td><input type="checkbox"></td>
+              <td onclick="showPage('student-detail')" style="cursor:pointer;"><span class="avatar">佐</span><span class="student-name">佐藤 花子</span></td>
+              <td><div style="font-size:13px;">東京大学</div><div style="font-size:11px;color:#999;">工学部</div></td>
+              <td><span class="tag tag-green">リクナビ</span></td>
+              <td><span class="tag tag-blue">理系</span><span class="tag tag-orange">関東</span></td>
+              <td><span class="status status-done">1次面接済</span></td>
+              <td><span style="color:#06c755;font-size:12px;">✓ 連携済</span></td>
+              <td style="font-size:11px;color:#999;">1次面接 10/28</td>
+              <td><button class="btn btn-secondary btn-sm" onclick="showPage('student-detail')">詳細</button></td>
+            </tr>
+            <tr>
+              <td><input type="checkbox"></td>
+              <td><span class="avatar">鈴</span><span class="student-name">鈴木 健太</span></td>
+              <td><div style="font-size:13px;">慶應義塾大学</div><div style="font-size:11px;color:#999;">経済学部</div></td>
+              <td><span class="tag tag-orange">OfferBox</span></td>
+              <td><span class="tag tag-green">文系</span></td>
+              <td><span class="status status-entry">エントリー</span></td>
+              <td><span style="color:#ccc;font-size:12px;">未連携</span></td>
+              <td style="font-size:11px;color:#999;">登録 10/29</td>
+              <td><button class="btn btn-secondary btn-sm">詳細</button></td>
+            </tr>
+            <tr>
+              <td><input type="checkbox"></td>
+              <td><span class="avatar">伊</span><span class="student-name">伊藤 美咲</span></td>
+              <td><div style="font-size:13px;">大阪大学</div><div style="font-size:11px;color:#999;">医学部</div></td>
+              <td><span class="tag tag-purple">学校訪問QR</span></td>
+              <td><span class="tag tag-blue">関西</span><span class="tag tag-purple">理系</span></td>
+              <td><span class="status status-accept">承諾</span></td>
+              <td><span style="color:#06c755;font-size:12px;">✓ 連携済</span></td>
+              <td style="font-size:11px;color:#999;">承諾書受領 10/20</td>
+              <td><button class="btn btn-secondary btn-sm">詳細</button></td>
+            </tr>
+            <tr>
+              <td><input type="checkbox"></td>
+              <td><span class="avatar">渡</span><span class="student-name">渡辺 拓也</span></td>
+              <td><div style="font-size:13px;">北海道大学</div><div style="font-size:11px;color:#999;">農学部</div></td>
+              <td><span class="tag tag-green">リクナビ</span></td>
+              <td><span class="tag tag-gray">北海道</span></td>
+              <td><span class="status status-ng">辞退</span></td>
+              <td><span style="color:#06c755;font-size:12px;">✓ 連携済</span></td>
+              <td style="font-size:11px;color:#999;">辞退 10/22</td>
+              <td><button class="btn btn-secondary btn-sm">詳細</button></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ③ Student Detail -->
+    <div id="page-student-detail" class="page">
+      <div style="display:flex;gap:8px;align-items:center;margin-bottom:16px;">
+        <button class="btn btn-secondary btn-sm" onclick="showPage('students')">← 一覧に戻る</button>
+        <span style="font-size:14px;font-weight:600;">田中 一郎</span>
+        <span class="status status-offer">内定</span>
+        <div style="margin-left:auto;display:flex;gap:8px;">
+          <button class="btn btn-secondary btn-sm">ステータス変更</button>
+          <button class="btn btn-line btn-sm">LINEメッセージ</button>
+          <button class="btn btn-primary btn-sm">書類出力</button>
+        </div>
+      </div>
+
+      <div class="detail-grid">
+        <div>
+          <div class="card">
+            <div class="detail-profile">
+              <div class="avatar-lg">田</div>
+              <div style="font-size:16px;font-weight:700;">田中 一郎</div>
+              <div style="font-size:12px;color:#999;margin-top:4px;">早稲田大学 政治経済学部</div>
+              <div style="margin-top:12px;display:flex;flex-wrap:wrap;gap:4px;justify-content:center;">
+                <span class="tag tag-blue">マイナビ</span>
+                <span class="tag tag-orange">関東</span>
+                <span class="tag tag-green">文系</span>
+                <span class="tag tag-purple">優秀</span>
+              </div>
+              <button class="btn btn-secondary btn-sm" style="margin-top:10px;">タグ編集</button>
+            </div>
+            <hr style="border:none;border-top:1px solid #f0f2f5;margin:0 -20px 16px;">
+            <div style="font-size:12px;color:#666;line-height:2;">
+              <div>📞 090-1234-5678</div>
+              <div>📧 tanaka@example.com</div>
+              <div>🎓 2026年3月卒業見込み</div>
+              <div style="color:#06c755;">💬 LINE連携済み</div>
+              <div>📍 東京都渋谷区</div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-title">マイページ書類</div>
+            <div style="font-size:13px;line-height:2.2;">
+              <div style="display:flex;justify-content:space-between;align-items:center;">
+                <span>📎 履歴書.pdf</span>
+                <button class="btn btn-secondary btn-sm">DL</button>
+              </div>
+              <div style="display:flex;justify-content:space-between;align-items:center;">
+                <span>📎 成績証明書.pdf</span>
+                <button class="btn btn-secondary btn-sm">DL</button>
+              </div>
+              <div style="display:flex;justify-content:space-between;align-items:center;color:#ccc;">
+                <span>📎 卒業見込証明書（未提出）</span>
+                <button class="btn btn-secondary btn-sm" style="opacity:0.4;">—</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <div class="card">
+            <div class="tabs">
+              <div class="tab active" onclick="switchStudentTab(this, 'tab-timeline')">選考履歴</div>
+              <div class="tab" onclick="switchStudentTab(this, 'tab-interview')">面接情報</div>
+              <div class="tab" onclick="switchStudentTab(this, 'tab-line')">LINEチャット</div>
+              <div class="tab" onclick="switchStudentTab(this, 'tab-survey')">アンケート結果</div>
+            </div>
+
+            <div id="tab-timeline" class="tab-content active">
+              <div class="timeline">
+                <div class="timeline-item">
+                  <div class="timeline-dot"></div>
+                  <div>
+                    <div class="timeline-text"><strong>最終面接 実施</strong> — 担当：鈴木・代表取締役</div>
+                    <div class="timeline-date">2025/10/25 14:00</div>
+                  </div>
+                </div>
+                <div class="timeline-item">
+                  <div class="timeline-dot"></div>
+                  <div>
+                    <div class="timeline-text"><strong>内定通知</strong> — LINEで通知済み</div>
+                    <div class="timeline-date">2025/10/26 10:00</div>
+                  </div>
+                </div>
+                <div class="timeline-item">
+                  <div class="timeline-dot" style="background:#ff9800;"></div>
+                  <div>
+                    <div class="timeline-text"><strong>承諾期限</strong> — 2025/11/10まで</div>
+                    <div class="timeline-date" style="color:#ff9800;">残り 12日</div>
+                  </div>
+                </div>
+                <div class="timeline-item">
+                  <div class="timeline-dot" style="background:#ccc;"></div>
+                  <div>
+                    <div class="timeline-text" style="color:#aaa;">承諾書受領（待ち）</div>
+                    <div class="timeline-date">—</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div id="tab-interview" class="tab-content">
+              <div style="font-size:13px;">
+                <div style="background:#f8f9fc;border-radius:8px;padding:14px;margin-bottom:12px;">
+                  <div style="font-weight:600;margin-bottom:8px;">1次面接 — 2025/10/15 13:00</div>
+                  <div class="form-grid" style="font-size:12px;color:#555;gap:8px;">
+                    <div><span style="color:#999;">面接官：</span>山田 太郎</div>
+                    <div><span style="color:#999;">場所：</span>オンライン（Zoom）</div>
+                    <div><span style="color:#999;">評価：</span>⭐⭐⭐⭐☆ (4/5)</div>
+                    <div><span style="color:#999;">結果：</span><span class="status status-done">通過</span></div>
+                  </div>
+                  <div style="margin-top:8px;font-size:12px;color:#555;background:#fff;border-radius:6px;padding:8px;">
+                    コミュニケーション能力高い。論理的思考力◎。入社意欲を要確認。
+                  </div>
+                </div>
+                <div style="background:#f8f9fc;border-radius:8px;padding:14px;">
+                  <div style="font-weight:600;margin-bottom:8px;">最終面接 — 2025/10/25 14:00</div>
+                  <div class="form-grid" style="font-size:12px;color:#555;gap:8px;">
+                    <div><span style="color:#999;">面接官：</span>鈴木 代表・山田</div>
+                    <div><span style="color:#999;">場所：</span>本社会議室</div>
+                    <div><span style="color:#999;">評価：</span>⭐⭐⭐⭐⭐ (5/5)</div>
+                    <div><span style="color:#999;">結果：</span><span class="status status-offer">内定</span></div>
+                  </div>
+                  <div style="margin-top:8px;font-size:12px;color:#555;background:#fff;border-radius:6px;padding:8px;">
+                    志望動機明確。即戦力として期待大。採用決定。
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div id="tab-line" class="tab-content">
+              <div style="background:#e8f5e9;border-radius:10px;padding:14px;min-height:200px;">
+                <div style="font-size:12px;color:#666;text-align:center;margin-bottom:12px;">2025/10/26</div>
+                <div><div class="line-bubble">内定おめでとうございます！🎉<br>詳細はマイページをご確認ください。</div></div>
+                <div style="text-align:right;margin-top:8px;"><div class="line-bubble sent" style="display:inline-block;">ありがとうございます！よろしくお願いします。</div></div>
+                <div style="margin-top:8px;"><div class="line-bubble">承諾書の提出期限は11/10です。マイページからご提出ください。</div></div>
+              </div>
+              <div style="display:flex;gap:8px;margin-top:10px;">
+                <input type="text" placeholder="メッセージを入力..." style="flex:1;">
+                <button class="btn btn-line">送信</button>
+              </div>
+            </div>
+
+            <div id="tab-survey" class="tab-content">
+              <div style="font-size:13px;">
+                <div style="background:#f8f9fc;border-radius:8px;padding:14px;margin-bottom:10px;">
+                  <div style="font-weight:600;margin-bottom:8px;">内定者アンケート（回答済み）</div>
+                  <div style="font-size:12px;line-height:2;color:#555;">
+                    <div>Q1. 第一志望ですか？ → <strong>はい</strong></div>
+                    <div>Q2. 懸念点はありますか？ → <strong>転勤の可能性について確認したい</strong></div>
+                    <div>Q3. 入社意欲（10点満点）→ <strong>9点</strong></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ④ Pipeline -->
+    <div id="page-pipeline" class="page">
+      <div style="display:flex;gap:10px;margin-bottom:16px;">
+        <select style="width:160px;">
+          <option>全媒体</option>
+          <option>マイナビ</option>
+          <option>リクナビ</option>
+        </select>
+        <select style="width:160px;">
+          <option>タグ：全て</option>
+          <option>理系</option>
+          <option>関東</option>
+        </select>
+        <div style="margin-left:auto;">
+          <button class="btn btn-secondary btn-sm">リスト表示</button>
+          <button class="btn btn-primary btn-sm">カンバン表示</button>
+        </div>
+      </div>
+      <div class="kanban">
+        <div class="kanban-col">
+          <div class="kanban-col-title">エントリー <span class="kanban-count">84</span></div>
+          <div class="kanban-card"><div class="kanban-card-name">山口 沙織</div><div class="kanban-card-sub">東京工業大学 · マイナビ</div></div>
+          <div class="kanban-card"><div class="kanban-card-name">小林 直人</div><div class="kanban-card-sub">明治大学 · リクナビ</div></div>
+          <div class="kanban-card"><div class="kanban-card-name">加藤 彩花</div><div class="kanban-card-sub">立命館大学 · OfferBox</div></div>
+          <div style="font-size:11px;color:#aaa;text-align:center;padding-top:4px;">他 81名</div>
+        </div>
+        <div class="kanban-col">
+          <div class="kanban-col-title">説明会予約 <span class="kanban-count">56</span></div>
+          <div class="kanban-card"><div class="kanban-card-name">中村 翔太</div><div class="kanban-card-sub">大阪大学 · 11/2 10:00</div></div>
+          <div class="kanban-card"><div class="kanban-card-name">木村 理恵</div><div class="kanban-card-sub">九州大学 · 11/3 14:00</div></div>
+        </div>
+        <div class="kanban-col">
+          <div class="kanban-col-title">1次面接 <span class="kanban-count">48</span></div>
+          <div class="kanban-card"><div class="kanban-card-name">佐藤 花子</div><div class="kanban-card-sub">東京大学 · 10/28済</div></div>
+          <div class="kanban-card"><div class="kanban-card-name">伊藤 大輝</div><div class="kanban-card-sub">一橋大学 · 11/1予定</div></div>
+        </div>
+        <div class="kanban-col">
+          <div class="kanban-col-title">最終面接 <span class="kanban-count">22</span></div>
+          <div class="kanban-card"><div class="kanban-card-name">田中 一郎</div><div class="kanban-card-sub">早稲田大学 · 10/25済</div></div>
+          <div class="kanban-card"><div class="kanban-card-name">松本 愛</div><div class="kanban-card-sub">慶應大学 · 11/4予定</div></div>
+        </div>
+        <div class="kanban-col">
+          <div class="kanban-col-title">内定 <span class="kanban-count">42</span></div>
+          <div class="kanban-card" style="border-left:3px solid #ff9800;"><div class="kanban-card-name">林 奈々</div><div class="kanban-card-sub" style="color:#ff9800;">承諾期限 11/5</div></div>
+          <div class="kanban-card"><div class="kanban-card-name">田中 一郎</div><div class="kanban-card-sub" style="color:#ff9800;">承諾期限 11/10</div></div>
+        </div>
+        <div class="kanban-col">
+          <div class="kanban-col-title">承諾 <span class="kanban-count" style="background:#4caf50;">34</span></div>
+          <div class="kanban-card" style="border-left:3px solid #4caf50;"><div class="kanban-card-name">伊藤 美咲</div><div class="kanban-card-sub">大阪大学 · 承諾済</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ⑤ Calendar -->
+    <div id="page-calendar" class="page">
+      <div style="display:flex;gap:10px;margin-bottom:16px;align-items:center;">
+        <button class="btn btn-secondary btn-sm">← 前週</button>
+        <span style="font-size:14px;font-weight:600;">2025年10月28日（月）〜 11月1日（金）</span>
+        <button class="btn btn-secondary btn-sm">次週 →</button>
+        <div style="margin-left:auto;display:flex;gap:8px;font-size:12px;">
+          <span style="display:flex;align-items:center;gap:4px;"><span style="width:10px;height:10px;border-radius:2px;background:#7c83fd;display:inline-block;"></span> 面接</span>
+          <span style="display:flex;align-items:center;gap:4px;"><span style="width:10px;height:10px;border-radius:2px;background:#06c755;display:inline-block;"></span> 説明会</span>
+          <span style="display:flex;align-items:center;gap:4px;"><span style="width:10px;height:10px;border-radius:2px;background:#ff9800;display:inline-block;"></span> エージェント</span>
+        </div>
+        <button class="btn btn-primary btn-sm">＋ 枠追加</button>
+      </div>
+      <div class="card" style="padding:0;overflow:hidden;">
+        <div class="calendar-grid">
+          <div class="cal-header"></div>
+          <div class="cal-header">10/28 月</div>
+          <div class="cal-header">10/29 火</div>
+          <div class="cal-header">10/30 水</div>
+          <div class="cal-header">10/31 木</div>
+          <div class="cal-header">11/1 金</div>
+
+          <div class="cal-time">10:00</div>
+          <div class="cal-cell"><div class="cal-event">佐藤 花子<br>1次面接</div></div>
+          <div class="cal-cell"></div>
+          <div class="cal-cell"><div class="cal-event line-event">オンライン説明会<br>20名</div></div>
+          <div class="cal-cell"></div>
+          <div class="cal-cell"></div>
+
+          <div class="cal-time">13:00</div>
+          <div class="cal-cell"></div>
+          <div class="cal-cell"><div class="cal-event">中村 翔太<br>1次面接</div></div>
+          <div class="cal-cell"></div>
+          <div class="cal-cell"><div class="cal-event agent-event">エージェント<br>ABCキャリア</div></div>
+          <div class="cal-cell"><div class="cal-event">松本 愛<br>最終面接</div></div>
+
+          <div class="cal-time">15:00</div>
+          <div class="cal-cell"><div class="cal-event">木村 理恵<br>1次面接</div></div>
+          <div class="cal-cell"></div>
+          <div class="cal-cell"></div>
+          <div class="cal-cell"><div class="cal-event">加藤 彩花<br>1次面接</div></div>
+          <div class="cal-cell"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ⑥ LINE Send -->
+    <div id="page-line-send" class="page">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+        <div>
+          <div class="card">
+            <div class="card-title">送信対象の選択</div>
+            <div class="form-row">
+              <label>タグで絞り込み（複数選択可）</label>
+              <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:6px;">
+                <span class="tag tag-blue" style="cursor:pointer;padding:5px 12px;">マイナビ</span>
+                <span class="tag tag-green" style="cursor:pointer;padding:5px 12px;">リクナビ</span>
+                <span class="tag tag-blue" style="cursor:pointer;padding:5px 12px;background:#4a6cf7;color:#fff;">理系 ✓</span>
+                <span class="tag tag-orange" style="cursor:pointer;padding:5px 12px;">関東</span>
+                <span class="tag tag-purple" style="cursor:pointer;padding:5px 12px;">内定者</span>
+                <span class="tag tag-gray" style="cursor:pointer;padding:5px 12px;">承諾者</span>
+              </div>
+            </div>
+            <div class="form-row">
+              <label>ステータスで絞り込み</label>
+              <select>
+                <option>全ステータス</option>
+                <option>エントリー</option>
+                <option>内定</option>
+              </select>
+            </div>
+            <div style="background:#f8f9fc;border-radius:8px;padding:12px;font-size:13px;">
+              対象：<strong style="color:#7c83fd;">47名</strong>（LINE連携済み）
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-title">メッセージ作成</div>
+            <div class="form-row">
+              <label>メッセージ種別</label>
+              <select>
+                <option>テキストメッセージ</option>
+                <option>アンケート添付</option>
+                <option>予約フォーム添付</option>
+                <option>画像送信</option>
+              </select>
+            </div>
+            <div class="form-row">
+              <label>本文（差し込み：{氏名}）</label>
+              <textarea placeholder="{氏名}さん、お世話になっております。&#10;&#10;〇〇について..."></textarea>
+            </div>
+            <div style="display:flex;gap:8px;">
+              <button class="btn btn-secondary">プレビュー</button>
+              <button class="btn btn-line" style="margin-left:auto;">47名に送信する</button>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <div class="card">
+            <div class="card-title">送信プレビュー</div>
+            <div class="line-preview">
+              <div style="font-size:11px;color:#888;margin-bottom:10px;text-align:center;">LINEプレビュー</div>
+              <div class="line-bubble">田中さん、お世話になっております。<br><br>最終面接の日程についてご連絡いたします。<br>下記よりご都合の良い日程をお選びください。<br><br>👉 日程選択はこちら</div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-title">送信履歴</div>
+            <table>
+              <thead>
+                <tr><th>日時</th><th>内容</th><th>送信数</th><th>開封率</th></tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td style="font-size:11px;">10/25 10:00</td>
+                  <td style="font-size:12px;">内定通知</td>
+                  <td style="font-size:12px;">42名</td>
+                  <td style="font-size:12px;">89%</td>
+                </tr>
+                <tr>
+                  <td style="font-size:11px;">10/20 14:00</td>
+                  <td style="font-size:12px;">最終面接案内</td>
+                  <td style="font-size:12px;">28名</td>
+                  <td style="font-size:12px;">92%</td>
+                </tr>
+                <tr>
+                  <td style="font-size:11px;">10/10 09:00</td>
+                  <td style="font-size:12px;">説明会リマインド</td>
+                  <td style="font-size:12px;">112名</td>
+                  <td style="font-size:12px;">76%</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ⑦ Survey -->
+    <div id="page-survey" class="page">
+      <div style="display:flex;gap:10px;margin-bottom:16px;">
+        <button class="btn btn-primary btn-sm">＋ アンケート作成</button>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+        <div>
+          <div class="card-title" style="margin-bottom:12px;">アンケート一覧</div>
+          <div class="card" style="padding:14px;cursor:pointer;border:2px solid #7c83fd;">
+            <div style="font-size:13px;font-weight:600;">内定者アンケート</div>
+            <div style="font-size:11px;color:#999;margin-top:4px;">送信：42名 / 回答：38名 (90%)</div>
+            <div style="margin-top:8px;"><div class="progress-wrap"><div class="progress-bar" style="width:90%;"></div></div></div>
+          </div>
+          <div class="card" style="padding:14px;cursor:pointer;">
+            <div style="font-size:13px;font-weight:600;">説明会満足度アンケート</div>
+            <div style="font-size:11px;color:#999;margin-top:4px;">送信：264名 / 回答：198名 (75%)</div>
+            <div style="margin-top:8px;"><div class="progress-wrap"><div class="progress-bar" style="width:75%;background:#06c755;"></div></div></div>
+          </div>
+          <div class="card" style="padding:14px;cursor:pointer;">
+            <div style="font-size:13px;font-weight:600;">志望動機確認アンケート</div>
+            <div style="font-size:11px;color:#999;margin-top:4px;">下書き</div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-title">内定者アンケート — 集計結果</div>
+          <div style="font-size:13px;margin-bottom:12px;">
+            <div style="font-weight:600;margin-bottom:8px;">Q1. 第一志望ですか？</div>
+            <div class="source-bar"><div class="source-label">はい</div><div class="source-bar-wrap"><div class="source-bar-fill" style="width:68%;background:#7c83fd;">68%</div></div></div>
+            <div class="source-bar"><div class="source-label">第2志望</div><div class="source-bar-wrap"><div class="source-bar-fill" style="width:22%;background:#9c88fd;">22%</div></div></div>
+            <div class="source-bar"><div class="source-label">その他</div><div class="source-bar-wrap"><div class="source-bar-fill" style="width:10%;background:#ccc;">10%</div></div></div>
+          </div>
+          <hr style="border:none;border-top:1px solid #f0f2f5;margin:12px 0;">
+          <div style="font-size:13px;">
+            <div style="font-weight:600;margin-bottom:8px;">Q3. 入社意欲（平均）</div>
+            <div style="font-size:28px;font-weight:700;color:#7c83fd;">8.4 <span style="font-size:14px;color:#999;">/ 10</span></div>
+          </div>
+          <div style="margin-top:12px;display:flex;gap:8px;">
+            <button class="btn btn-secondary btn-sm">CSV出力</button>
+            <button class="btn btn-line btn-sm" onclick="showPage('line-send')">未回答者にリマインド</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ⑧ Documents -->
+    <div id="page-documents" class="page">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+        <div>
+          <div class="card">
+            <div class="card-title">書類テンプレート</div>
+            <table>
+              <thead><tr><th>書類名</th><th>操作</th></tr></thead>
+              <tbody>
+                <tr><td>📄 内定通知書</td><td><button class="btn btn-secondary btn-sm">編集</button></td></tr>
+                <tr><td>📄 内定承諾書</td><td><button class="btn btn-secondary btn-sm">編集</button></td></tr>
+                <tr><td>📄 面接評価シート</td><td><button class="btn btn-secondary btn-sm">編集</button></td></tr>
+                <tr><td>📄 入社誓約書</td><td><button class="btn btn-secondary btn-sm">編集</button></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-title">一括書類出力</div>
+          <div class="form-row">
+            <label>対象者</label>
+            <select>
+              <option>内定者全員（42名）</option>
+              <option>承諾者全員（34名）</option>
+              <option>タグで絞る</option>
+            </select>
+          </div>
+          <div class="form-row">
+            <label>書類種別</label>
+            <select>
+              <option>内定承諾書</option>
+              <option>入社誓約書</option>
+            </select>
+          </div>
+          <div class="form-row">
+            <label>出力形式</label>
+            <select>
+              <option>PDF（個別ファイル）</option>
+              <option>PDF（一括）</option>
+              <option>Word</option>
+            </select>
+          </div>
+          <button class="btn btn-primary">📄 42名分を出力する</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ⑨ Analytics -->
+    <div id="page-analytics" class="page">
+      <div style="display:flex;gap:8px;margin-bottom:16px;">
+        <select style="width:140px;"><option>2025年度 新卒</option></select>
+        <select style="width:140px;"><option>全媒体</option><option>マイナビ</option></select>
+        <button class="btn btn-secondary btn-sm" style="margin-left:auto;">CSVエクスポート</button>
+      </div>
+
+      <div class="analytics-grid">
+        <div class="card">
+          <div class="card-title">ファネル遷移率（統合1フロー）</div>
+          <div>
+            <div class="funnel-row">
+              <div class="funnel-label">エントリー</div>
+              <div class="funnel-bar-wrap">
+                <div class="funnel-bar" style="width:100%;background:#7c83fd;">348名</div>
+              </div><div class="funnel-rate">—</div>
+            </div>
+            <div class="funnel-row">
+              <div class="funnel-label">説明会予約</div>
+              <div class="funnel-bar-wrap">
+                <div class="funnel-bar" style="width:76%;background:#8d7ffd;">264名</div>
+              </div><div class="funnel-rate">76%</div>
+            </div>
+            <div class="funnel-row">
+              <div class="funnel-label">1次面接</div>
+              <div class="funnel-bar-wrap">
+                <div class="funnel-bar" style="width:52%;background:#7c83fd;">182名</div>
+              </div><div class="funnel-rate">69%</div>
+            </div>
+            <div class="funnel-row">
+              <div class="funnel-label">最終面接</div>
+              <div class="funnel-bar-wrap">
+                <div class="funnel-bar" style="width:28%;background:#5c6bc0;">98名</div>
+              </div><div class="funnel-rate">54%</div>
+            </div>
+            <div class="funnel-row">
+              <div class="funnel-label">内定</div>
+              <div class="funnel-bar-wrap">
+                <div class="funnel-bar" style="width:12%;background:#3949ab;">42名</div>
+              </div><div class="funnel-rate">43%</div>
+            </div>
+            <div class="funnel-row">
+              <div class="funnel-label">承諾</div>
+              <div class="funnel-bar-wrap">
+                <div class="funnel-bar" style="width:10%;background:#4caf50;">34名</div>
+              </div><div class="funnel-rate">81%</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-title">流入経路別 エントリー数</div>
+          <div class="source-bar"><div class="source-label">マイナビ</div><div class="source-bar-wrap"><div class="source-bar-fill" style="width:45%;background:#7c83fd;">45%</div></div><div class="source-count">157名</div></div>
+          <div class="source-bar"><div class="source-label">リクナビ</div><div class="source-bar-wrap"><div class="source-bar-fill" style="width:28%;background:#06c755;">28%</div></div><div class="source-count">97名</div></div>
+          <div class="source-bar"><div class="source-label">OfferBox</div><div class="source-bar-wrap"><div class="source-bar-fill" style="width:12%;background:#ff9800;">12%</div></div><div class="source-count">42名</div></div>
+          <div class="source-bar"><div class="source-label">学校訪問QR</div><div class="source-bar-wrap"><div class="source-bar-fill" style="width:9%;background:#e91e63;">9%</div></div><div class="source-count">31名</div></div>
+          <div class="source-bar"><div class="source-label">その他</div><div class="source-bar-wrap"><div class="source-bar-fill" style="width:6%;background:#ccc;">6%</div></div><div class="source-count">21名</div></div>
+        </div>
+
+        <div class="card">
+          <div class="card-title">内定者一覧</div>
+          <table>
+            <thead><tr><th>氏名</th><th>学校</th><th>ステータス</th><th>期限</th></tr></thead>
+            <tbody>
+              <tr><td>田中 一郎</td><td style="font-size:11px;">早稲田大</td><td><span class="status status-offer">内定</span></td><td style="font-size:11px;color:#ff9800;">11/10</td></tr>
+              <tr><td>伊藤 美咲</td><td style="font-size:11px;">大阪大</td><td><span class="status status-accept">承諾</span></td><td style="font-size:11px;color:#999;">済</td></tr>
+              <tr><td>林 奈々</td><td style="font-size:11px;">名古屋大</td><td><span class="status status-offer">内定</span></td><td style="font-size:11px;color:#ff6b6b;">11/5</td></tr>
+            </tbody>
+          </table>
+          <button class="btn btn-secondary btn-sm" style="margin-top:10px;">全件 CSVエクスポート</button>
+        </div>
+
+        <div class="card">
+          <div class="card-title">媒体別 承諾率</div>
+          <div class="source-bar"><div class="source-label">OfferBox</div><div class="source-bar-wrap"><div class="source-bar-fill" style="width:91%;background:#7c83fd;">91%</div></div></div>
+          <div class="source-bar"><div class="source-label">マイナビ</div><div class="source-bar-wrap"><div class="source-bar-fill" style="width:83%;background:#5c6bc0;">83%</div></div></div>
+          <div class="source-bar"><div class="source-label">学校訪問QR</div><div class="source-bar-wrap"><div class="source-bar-fill" style="width:78%;background:#3949ab;">78%</div></div></div>
+          <div class="source-bar"><div class="source-label">リクナビ</div><div class="source-bar-wrap"><div class="source-bar-fill" style="width:72%;background:#9c88fd;">72%</div></div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ⑩ Media / QR -->
+    <div id="page-media" class="page">
+      <div style="display:flex;gap:10px;margin-bottom:16px;">
+        <button class="btn btn-primary btn-sm">＋ QRコード生成</button>
+        <button class="btn btn-secondary btn-sm">媒体設定</button>
+      </div>
+
+      <div class="card" style="margin-bottom:16px;">
+        <div class="card-title">媒体連携</div>
+        <table>
+          <thead><tr><th>媒体名</th><th>連携状況</th><th>取込数</th><th>最終同期</th><th>操作</th></tr></thead>
+          <tbody>
+            <tr><td>マイナビ</td><td><span style="color:#4caf50;font-size:12px;">● 連携中</span></td><td>157名</td><td style="font-size:11px;">10/29 09:00</td><td><button class="btn btn-secondary btn-sm">設定</button></td></tr>
+            <tr><td>リクナビ</td><td><span style="color:#4caf50;font-size:12px;">● 連携中</span></td><td>97名</td><td style="font-size:11px;">10/29 09:00</td><td><button class="btn btn-secondary btn-sm">設定</button></td></tr>
+            <tr><td>OfferBox</td><td><span style="color:#4caf50;font-size:12px;">● 連携中</span></td><td>42名</td><td style="font-size:11px;">10/28 18:00</td><td><button class="btn btn-secondary btn-sm">設定</button></td></tr>
+            <tr><td>doda キャンパス</td><td><span style="color:#ccc;font-size:12px;">○ 未連携</span></td><td>—</td><td style="font-size:11px;">—</td><td><button class="btn btn-primary btn-sm">連携する</button></td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="card">
+        <div class="card-title">流入経路別 QRコード（学校・イベント）</div>
+        <div class="qr-grid">
+          <div class="qr-card">
+            <div class="qr-placeholder">⬛</div>
+            <div class="qr-name">東京大学 訪問</div>
+            <div class="qr-count">31名スキャン</div>
+            <div style="margin-top:4px;"><span class="tag tag-orange">学校訪問QR</span></div>
+            <button class="btn btn-secondary btn-sm" style="margin-top:8px;">DL</button>
+          </div>
+          <div class="qr-card">
+            <div class="qr-placeholder">⬛</div>
+            <div class="qr-name">合同説明会 11/5</div>
+            <div class="qr-count">0名（開催前）</div>
+            <div style="margin-top:4px;"><span class="tag tag-blue">イベント</span></div>
+            <button class="btn btn-secondary btn-sm" style="margin-top:8px;">DL</button>
+          </div>
+          <div class="qr-card" style="border:2px dashed #e0e0e0;display:flex;align-items:center;justify-content:center;flex-direction:column;color:#aaa;cursor:pointer;min-height:170px;">
+            <div style="font-size:28px;">＋</div>
+            <div style="font-size:12px;margin-top:6px;">QRコード追加</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ⑪ Rich Menu -->
+    <div id="page-richmenu" class="page">
+      <div class="card">
+        <div class="card-title">LINEリッチメニュー設定</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;">
+          <div>
+            <div style="background:#f8f9fc;border-radius:10px;padding:16px;margin-bottom:14px;">
+              <div style="font-size:12px;color:#666;margin-bottom:10px;">プレビュー（スマートフォン表示）</div>
+              <div style="background:#fff;border-radius:8px;overflow:hidden;border:1px solid #e0e0e0;">
+                <div style="display:grid;grid-template-columns:1fr 1fr 1fr;border-bottom:1px solid #e0e0e0;">
+                  <div style="padding:14px;text-align:center;font-size:12px;border-right:1px solid #e0e0e0;">
+                    <div style="font-size:20px;">🏠</div>企業HP
+                  </div>
+                  <div style="padding:14px;text-align:center;font-size:12px;border-right:1px solid #e0e0e0;">
+                    <div style="font-size:20px;">📋</div>マイページ
+                  </div>
+                  <div style="padding:14px;text-align:center;font-size:12px;">
+                    <div style="font-size:20px;">📅</div>説明会予約
+                  </div>
+                </div>
+                <div style="display:grid;grid-template-columns:1fr 1fr 1fr;">
+                  <div style="padding:14px;text-align:center;font-size:12px;border-right:1px solid #e0e0e0;">
+                    <div style="font-size:20px;">❓</div>よくある質問
+                  </div>
+                  <div style="padding:14px;text-align:center;font-size:12px;border-right:1px solid #e0e0e0;">
+                    <div style="font-size:20px;">📞</div>お問い合わせ
+                  </div>
+                  <div style="padding:14px;text-align:center;font-size:12px;">
+                    <div style="font-size:20px;">📝</div>アンケート
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div>
+            <div class="card-title" style="font-size:12px;">ボタン設定</div>
+            <table>
+              <thead><tr><th>ボタン</th><th>リンク先</th><th></th></tr></thead>
+              <tbody>
+                <tr><td style="font-size:12px;">🏠 企業HP</td><td><input type="text" value="https://example.com" style="font-size:11px;"></td><td><button class="btn btn-secondary btn-sm">編集</button></td></tr>
+                <tr><td style="font-size:12px;">📋 マイページ</td><td><input type="text" value="LIFF: マイページ" style="font-size:11px;"></td><td><button class="btn btn-secondary btn-sm">編集</button></td></tr>
+                <tr><td style="font-size:12px;">📅 説明会予約</td><td><input type="text" value="LIFF: 予約フォーム" style="font-size:11px;"></td><td><button class="btn btn-secondary btn-sm">編集</button></td></tr>
+                <tr><td style="font-size:12px;">❓ よくある質問</td><td><input type="text" value="https://tayori.com/..." style="font-size:11px;"></td><td><button class="btn btn-secondary btn-sm">編集</button></td></tr>
+              </tbody>
+            </table>
+            <button class="btn btn-primary" style="margin-top:14px;">LINEに反映する</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ⑫ Settings -->
+    <div id="page-settings" class="page">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+        <div class="card">
+          <div class="card-title">タグ管理</div>
+          <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px;">
+            <span class="tag tag-blue" style="padding:5px 10px;">マイナビ ✕</span>
+            <span class="tag tag-green" style="padding:5px 10px;">リクナビ ✕</span>
+            <span class="tag tag-orange" style="padding:5px 10px;">関東 ✕</span>
+            <span class="tag tag-purple" style="padding:5px 10px;">理系 ✕</span>
+            <span class="tag tag-blue" style="padding:5px 10px;">内定者 ✕</span>
+            <span class="tag tag-gray" style="padding:5px 10px;">+ タグ追加</span>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-title">担当者管理</div>
+          <table>
+            <thead><tr><th>氏名</th><th>権限</th><th></th></tr></thead>
+            <tbody>
+              <tr><td style="font-size:13px;">小川 拓也</td><td><span class="tag tag-purple">管理者</span></td><td><button class="btn btn-secondary btn-sm">編集</button></td></tr>
+              <tr><td style="font-size:13px;">山田 太郎</td><td><span class="tag tag-blue">面接官</span></td><td><button class="btn btn-secondary btn-sm">編集</button></td></tr>
+            </tbody>
+          </table>
+          <button class="btn btn-secondary btn-sm" style="margin-top:10px;">＋ 担当者追加</button>
+        </div>
+        <div class="card">
+          <div class="card-title">選考ステップ設定</div>
+          <div style="font-size:13px;line-height:2.5;">
+            <div style="display:flex;align-items:center;gap:8px;">1. エントリー <span style="color:#ccc;font-size:11px;">— 変更不可</span></div>
+            <div style="display:flex;align-items:center;gap:8px;">2. 説明会予約 <button class="btn btn-secondary btn-sm">編集</button></div>
+            <div style="display:flex;align-items:center;gap:8px;">3. 1次面接 <button class="btn btn-secondary btn-sm">編集</button></div>
+            <div style="display:flex;align-items:center;gap:8px;">4. 最終面接 <button class="btn btn-secondary btn-sm">編集</button></div>
+            <div style="display:flex;align-items:center;gap:8px;">5. 内定 <span style="color:#ccc;font-size:11px;">— 変更不可</span></div>
+            <div style="display:flex;align-items:center;gap:8px;">6. 承諾 <span style="color:#ccc;font-size:11px;">— 変更不可</span></div>
+          </div>
+          <button class="btn btn-secondary btn-sm" style="margin-top:8px;">＋ ステップ追加</button>
+        </div>
+        <div class="card">
+          <div class="card-title">LINE連携設定</div>
+          <div class="form-row"><label>Channel Access Token</label><input type="text" value="•••••••••••••••••"></div>
+          <div class="form-row"><label>Channel Secret</label><input type="text" value="•••••••••••••••••"></div>
+          <div class="form-row"><label>LIFF ID（マイページ）</label><input type="text" value="1234567890-AbCdEfGh"></div>
+          <button class="btn btn-primary btn-sm">保存</button>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /content -->
+</div><!-- /main -->
+
+<script>
+const pageTitles = {
+  'dashboard': 'ダッシュボード',
+  'students': '学生一覧',
+  'student-detail': '学生詳細 — 田中 一郎',
+  'pipeline': '選考管理',
+  'calendar': 'カレンダー',
+  'line-send': 'LINEメッセージ送信',
+  'survey': 'アンケート管理',
+  'richmenu': 'LINEリッチメニュー',
+  'documents': '書類管理',
+  'analytics': '分析・レポート',
+  'media': '媒体・QR管理',
+  'settings': 'システム設定',
+};
+
+function showPage(name) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  const page = document.getElementById('page-' + name);
+  if (page) page.classList.add('active');
+  document.getElementById('page-title').textContent = pageTitles[name] || name;
+  document.querySelectorAll('.nav-item').forEach(item => {
+    if (item.getAttribute('onclick') && item.getAttribute('onclick').includes("'" + name + "'")) {
+      item.classList.add('active');
+    }
+  });
+}
+
+function switchStudentTab(el, tabId) {
+  el.closest('.card').querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  el.closest('.card').querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById(tabId).classList.add('active');
+}
+</script>
+</body>
+</html>
