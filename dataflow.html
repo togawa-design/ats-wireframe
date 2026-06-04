@@ -364,28 +364,127 @@
 
     <div class="section">
       <h2>LIFFトークン照合シーケンス（パターンB詳細）</h2>
-      <div style="background:#1a1a2e;border-radius:10px;padding:20px;overflow-x:auto;">
-        <pre style="background:none;padding:0;font-size:12px;line-height:1.8;">
-学生ブラウザ             LIFF App              ATS Backend            LINE Platform
-    |                      |                       |                       |
-    | URLタップ             |                       |                       |
-    |──────────────────────>|                       |                       |
-    |                      | liff.init()           |                       |
-    |                      |──────────────────────────────────────────────>|
-    |                      |<────────────────── userId取得 ────────────────|
-    |                      |                       |                       |
-    |                      | POST /api/line/link   |                       |
-    |                      | { token, lineUserId } |                       |
-    |                      |──────────────────────>|                       |
-    |                      |                       | tokenで応募者検索     |
-    |                      |                       | lineUserIdを保存      |
-    |                      |                       | tokenを無効化         |
-    |                      |<────── 200 OK ────────|                       |
-    |                      |                       |                       |
-    |<── 登録完了画面 ──────|                       |                       |
-    |                      |                       | 登録完了LINEメッセージ|
-    |                      |                       |──────────────────────>|
-    |<────────────────── LINEで通知 ────────────────────────────────────── |</pre>
+
+      <!-- Actor headers -->
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:8px;margin-bottom:4px;">
+        <div style="background:#fff8e1;border:2px solid #ffcc80;border-radius:8px;padding:10px;text-align:center;font-size:12px;font-weight:700;color:#e65100;">📱 学生</div>
+        <div style="background:#e8f5e9;border:2px solid #81c784;border-radius:8px;padding:10px;text-align:center;font-size:12px;font-weight:700;color:#2e7d32;">🟢 LIFF App</div>
+        <div style="background:#ede7f6;border:2px solid #b39ddb;border-radius:8px;padding:10px;text-align:center;font-size:12px;font-weight:700;color:#512da8;">🖥️ ATS Backend</div>
+        <div style="background:#e3f2fd;border:2px solid #90caf9;border-radius:8px;padding:10px;text-align:center;font-size:12px;font-weight:700;color:#1565c0;">💬 LINE Platform</div>
+      </div>
+
+      <!-- Sequence steps -->
+      <div style="display:flex;flex-direction:column;gap:2px;">
+
+        <!-- Step 1 -->
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:8px;align-items:center;background:#fffde7;border-radius:8px;padding:10px 8px;">
+          <div style="font-size:12px;text-align:center;">
+            <span style="background:#e65100;color:#fff;border-radius:12px;padding:2px 8px;font-size:10px;font-weight:700;">STEP 1</span><br>
+            <span style="font-size:12px;margin-top:6px;display:block;">メールのURLをタップ</span>
+            <span style="font-size:10px;color:#999;word-break:break-all;">liff.me/xxx?<strong>token=UUID</strong></span>
+          </div>
+          <div style="text-align:center;font-size:20px;color:#ffcc80;">→→→</div>
+          <div></div>
+          <div></div>
+        </div>
+
+        <!-- Step 2 -->
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:8px;align-items:center;background:#f1f8e9;border-radius:8px;padding:10px 8px;">
+          <div></div>
+          <div style="font-size:12px;text-align:center;">
+            <span style="background:#2e7d32;color:#fff;border-radius:12px;padding:2px 8px;font-size:10px;font-weight:700;">STEP 2</span><br>
+            <span style="font-size:12px;margin-top:6px;display:block;">liff.init() を実行</span>
+            <span style="font-size:10px;color:#999;">URLからtokenを取り出す</span>
+          </div>
+          <div></div>
+          <div style="text-align:center;font-size:20px;color:#81c784;">→→→</div>
+        </div>
+
+        <!-- Step 3 -->
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:8px;align-items:center;background:#e3f2fd;border-radius:8px;padding:10px 8px;">
+          <div></div>
+          <div></div>
+          <div></div>
+          <div style="font-size:12px;text-align:center;">
+            <span style="background:#1565c0;color:#fff;border-radius:12px;padding:2px 8px;font-size:10px;font-weight:700;">STEP 3</span><br>
+            <span style="font-size:12px;margin-top:6px;display:block;">LINE UserID を返す</span>
+            <span style="font-size:10px;color:#999;">liff.getContext().userId</span>
+          </div>
+        </div>
+
+        <!-- Step 3 return arrow -->
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:8px;align-items:center;padding:0 8px;">
+          <div></div>
+          <div style="text-align:center;font-size:20px;color:#90caf9;">←←←</div>
+          <div></div>
+          <div style="text-align:center;font-size:11px;color:#1565c0;font-weight:600;">UserID返却</div>
+        </div>
+
+        <!-- Step 4 -->
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:8px;align-items:center;background:#f3e5f5;border-radius:8px;padding:10px 8px;">
+          <div></div>
+          <div style="font-size:12px;text-align:center;">
+            <span style="background:#512da8;color:#fff;border-radius:12px;padding:2px 8px;font-size:10px;font-weight:700;">STEP 4</span><br>
+            <span style="font-size:12px;margin-top:6px;display:block;">ATSへ送信</span>
+            <span style="font-size:10px;color:#999;font-family:monospace;">{ token, lineUserId }</span>
+          </div>
+          <div style="text-align:center;font-size:20px;color:#b39ddb;">→→→</div>
+          <div></div>
+        </div>
+
+        <!-- Step 5 -->
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:8px;align-items:center;background:#ede7f6;border-radius:8px;padding:10px 8px;">
+          <div></div>
+          <div></div>
+          <div style="font-size:12px;text-align:center;">
+            <span style="background:#512da8;color:#fff;border-radius:12px;padding:2px 8px;font-size:10px;font-weight:700;">STEP 5</span><br>
+            <div style="margin-top:6px;display:flex;flex-direction:column;gap:4px;text-align:left;">
+              <div style="background:#fff;border-radius:4px;padding:4px 8px;font-size:11px;">① tokenで応募者レコードを検索</div>
+              <div style="background:#fff;border-radius:4px;padding:4px 8px;font-size:11px;">② LINE UserIDを紐付け・保存</div>
+              <div style="background:#fff;border-radius:4px;padding:4px 8px;font-size:11px;">③ tokenを使用済みに更新</div>
+            </div>
+          </div>
+          <div></div>
+        </div>
+
+        <!-- Step 5 return -->
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:8px;align-items:center;padding:0 8px;">
+          <div></div>
+          <div style="text-align:center;font-size:11px;color:#512da8;font-weight:600;">← 200 OK</div>
+          <div style="text-align:center;font-size:20px;color:#b39ddb;">←←←</div>
+          <div></div>
+        </div>
+
+        <!-- Step 6 -->
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:8px;align-items:center;background:#fffde7;border-radius:8px;padding:10px 8px;">
+          <div style="font-size:12px;text-align:center;">
+            <span style="background:#e65100;color:#fff;border-radius:12px;padding:2px 8px;font-size:10px;font-weight:700;">STEP 6</span><br>
+            <span style="font-size:12px;margin-top:6px;display:block;">「登録完了」画面を表示</span>
+          </div>
+          <div style="text-align:center;font-size:20px;color:#ffcc80;">←←←</div>
+          <div></div>
+          <div></div>
+        </div>
+
+        <!-- Step 7 -->
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:8px;align-items:center;background:#e3f2fd;border-radius:8px;padding:10px 8px;">
+          <div></div>
+          <div></div>
+          <div style="font-size:12px;text-align:center;">
+            <span style="background:#1565c0;color:#fff;border-radius:12px;padding:2px 8px;font-size:10px;font-weight:700;">STEP 7</span><br>
+            <span style="font-size:12px;margin-top:6px;display:block;">完了通知LINEを送信</span>
+          </div>
+          <div style="text-align:center;font-size:20px;color:#90caf9;">→→→</div>
+        </div>
+
+        <!-- Step 7 result -->
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:8px;align-items:center;padding:0 8px;">
+          <div style="text-align:center;font-size:11px;color:#e65100;font-weight:600;">📩 LINEで通知受信</div>
+          <div style="text-align:center;font-size:20px;color:#ffcc80;">←←←←←←←←</div>
+          <div></div>
+          <div style="text-align:center;font-size:11px;color:#1565c0;font-weight:600;">「連携しました！」を送信</div>
+        </div>
+
       </div>
 
       <div class="warn-box" style="margin-top:16px;">
