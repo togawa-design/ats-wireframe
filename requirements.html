@@ -243,11 +243,34 @@
         </tbody>
       </table>
 
+      <div class="cat-header">認証・ユーザー管理</div>
+      <table>
+        <thead><tr><th style="width:90px;">ID</th><th style="width:220px;">機能</th><th>詳細</th><th style="width:60px;">優先度</th></tr></thead>
+        <tbody>
+          <tr><td class="fr-id">FR085 <span class="badge badge-new">NEW</span></td><td>Google OAuth認証</td><td>先方のGoogleアカウントでログイン。パスワード管理不要。許可済みドメインのみログイン可能にする（不正アクセス防止）</td><td><span class="badge badge-high">高</span></td></tr>
+          <tr><td class="fr-id">FR086 <span class="badge badge-new">NEW</span></td><td>ロールベースアクセス制御</td><td>
+            4権限：<strong>管理者</strong>（全操作）/  <strong>採用担当</strong>（学生管理・LINE・分析）/ <strong>面接官</strong>（担当学生の閲覧・評価入力のみ）/ <strong>閲覧のみ</strong>（データ閲覧・分析）<br>
+            面接官は自分が assigned_to に設定された学生のみ表示
+          </td><td><span class="badge badge-high">高</span></td></tr>
+          <tr><td class="fr-id">FR087 <span class="badge badge-new">NEW</span></td><td>ユーザー管理画面</td><td>管理者のみ操作可。招待メール送付・ロール変更・アカウント停止。Googleアカウントとの紐付け管理</td><td><span class="badge badge-high">高</span></td></tr>
+          <tr><td class="fr-id">FR088 <span class="badge badge-new">NEW</span></td><td>操作ログ（監査ログ）</td><td>
+            全ログイン/ログアウト（IP・日時）を記録。<br>
+            重要操作を AuditLog に記録：データエクスポート・選考ステータス変更・内定/承諾操作・LINE一斉送信・学生情報編集<br>
+            管理者のみ閲覧可能
+          </td><td><span class="badge badge-high">高</span></td></tr>
+          <tr><td class="fr-id">FR089 <span class="badge badge-new">NEW</span></td><td>Googleカレンダー連携</td><td>
+            複数担当者のGoogleカレンダーをATS上で表示・空き枠を自動検出。<br>
+            面接確定時にGoogleカレンダーへ予定を自動登録。<br>
+            ※ Google Workspace / 個人アカウントで実装方式が変わる（U-11で確認中）
+          </td><td><span class="badge badge-mid">中</span></td></tr>
+        </tbody>
+      </table>
+
       <div class="cat-header">システム管理</div>
       <table>
         <thead><tr><th style="width:90px;">ID</th><th style="width:220px;">機能</th><th>詳細</th><th style="width:60px;">優先度</th></tr></thead>
         <tbody>
-          <tr><td class="fr-id">FR080 <span class="badge badge-update">UPD</span></td><td>担当者・権限管理</td><td>Staff テーブルで管理。admin / interviewer / viewer の3権限。担当者もLINE通知受け取り可</td><td><span class="badge badge-high">高</span></td></tr>
+          <tr><td class="fr-id">FR080 <span class="badge badge-update">UPD</span></td><td>担当者・権限管理</td><td>Staff テーブルで管理。Google OAuth と紐付け。担当者もLINE通知受け取り可</td><td><span class="badge badge-high">高</span></td></tr>
           <tr><td class="fr-id">FR081 <span class="badge badge-update">UPD</span></td><td>選考フロー設定</td><td>複数フローの作成・ステージ追加・並び替え・stage_type 設定</td><td><span class="badge badge-high">高</span></td></tr>
           <tr><td class="fr-id">FR082</td><td>タグマスター管理</td><td>タグの作成・色設定・編集・削除。削除時は ApplicantTag の紐付けも解除</td><td><span class="badge badge-mid">中</span></td></tr>
         </tbody>
@@ -353,10 +376,14 @@
             <td><strong>Salesforceが主（マスター）</strong>。退職・異動データはSF→ATSの一方向。コンフリクト時はSF優先。ATSは読み取り専用キャッシュとして扱う</td>
           </tr>
           <tr>
-            <td class="fr-id">U-05</td>
-            <td><span class="badge badge-open">未確認</span></td>
-            <td>エージェント連携の仕様</td>
-            <td>エージェントへのカレンダー公開範囲（全員共通URLか個別か）。エージェント側にシステムアカウントを発行するか、URLのみ共有するか</td>
+            <td class="fr-id">U-05 <span class="badge badge-update">UPD</span></td>
+            <td><span class="badge badge-open">確認中</span></td>
+            <td>エージェント利用有無</td>
+            <td>
+              <strong>自社新卒採用のため、外部エージェントを使うケースが少ない可能性あり。</strong><br>
+              新卒採用はマイナビ・リクナビ等のナビサイトが主流のため、エージェント連携（FR023）は不要かもしれない。<br>
+              → 先方に「新卒採用でエージェントを使っているか」を確認する。不要であれば FR023 はスコープ外に。
+            </td>
           </tr>
           <tr>
             <td class="fr-id">U-06</td>
@@ -371,10 +398,14 @@
             <td>オンライン・対面両方か。Zoom等のURL自動付与が必要か。定員管理が必要か</td>
           </tr>
           <tr>
-            <td class="fr-id">U-08</td>
-            <td><span class="badge badge-open">未確認</span></td>
+            <td class="fr-id">U-08 <span class="badge badge-update">UPD</span></td>
+            <td><span class="badge badge-done">一部確定</span></td>
             <td>担当者数・権限パターン</td>
-            <td>採用担当者は何名か。面接官のシステム利用範囲（閲覧のみか入力もするか）</td>
+            <td>
+              <strong>権限ロールは4種類に確定：</strong> 管理者 / 採用担当 / 面接官 / 閲覧のみ<br>
+              面接官は自分が担当した学生のみ表示（閲覧・評価入力）。<br>
+              残り確認：採用担当者は何名か。面接官の人数。
+            </td>
           </tr>
           <tr>
             <td class="fr-id">U-09</td>
@@ -387,6 +418,26 @@
             <td><span class="badge badge-open">未確認</span></td>
             <td>内定承諾書類の受領方法</td>
             <td>電子署名での受領か、紙でのスキャン添付か。電子の場合は電子契約サービスとの連携要否</td>
+          </tr>
+          <tr>
+            <td class="fr-id">U-11 <span class="badge badge-new">NEW</span></td>
+            <td><span class="badge badge-open">未確認</span></td>
+            <td>Google Workspace利用有無</td>
+            <td>
+              <strong>Googleカレンダー連携の実装方式が変わるため確認必須。</strong><br>
+              <strong>Google Workspace（会社ドメイン）の場合：</strong> ドメイン全体委任で管理者が一括許可。各担当者のOAuth不要。<br>
+              <strong>個人Googleアカウントの場合：</strong> 各担当者がOAuthで個別に「カレンダー共有」を許可する操作が必要。<br>
+              → 先方のGoogle利用形態（Workspace or 個人）を確認する。
+            </td>
+          </tr>
+          <tr>
+            <td class="fr-id">U-12 <span class="badge badge-new">NEW</span></td>
+            <td><span class="badge badge-open">未確認</span></td>
+            <td>Googleカレンダー連携の範囲</td>
+            <td>
+              複数担当者のGoogleカレンダーをATS上で重ねて表示し、空き時間を自動検出する機能の要否。<br>
+              確認事項：① 何名分のカレンダーを表示するか　② 面接確定時にGoogleカレンダーへ予定を自動登録するか　③ 学生への予約確認LINEと連動させるか
+            </td>
           </tr>
         </tbody>
       </table>
@@ -497,6 +548,18 @@
       <table>
         <thead><tr><th style="width:100px;">日付</th><th style="width:60px;">Ver</th><th>変更内容</th></tr></thead>
         <tbody>
+          <tr>
+            <td>2026-06-04</td><td>v0.4</td>
+            <td>
+              <span class="badge badge-done" style="margin-right:4px;">確定</span> 認証方式：Google OAuthに決定<br>
+              <span class="badge badge-done" style="margin-right:4px;">確定</span> 面接官の表示範囲：担当学生のみに決定<br>
+              <span class="badge badge-new" style="margin-right:4px;">NEW</span> FR085〜089：認証・RBAC・ユーザー管理・監査ログ・Googleカレンダー連携を追加<br>
+              <span class="badge badge-new" style="margin-right:4px;">NEW</span> U-11：Google Workspace利用有無をヒアリング事項に追加<br>
+              <span class="badge badge-new" style="margin-right:4px;">NEW</span> U-12：Googleカレンダー連携範囲をヒアリング事項に追加<br>
+              <span class="badge badge-update" style="margin-right:4px;">UPD</span> U-05：エージェント利用有無（自社新卒のため不要の可能性）を要確認に更新<br>
+              <span class="badge badge-update" style="margin-right:4px;">UPD</span> U-08：権限ロール4種類を一部確定
+            </td>
+          </tr>
           <tr>
             <td>2026-06-04</td><td>v0.3</td>
             <td>
