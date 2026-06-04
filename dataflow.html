@@ -1,0 +1,698 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ATS データフロー設計</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Hiragino Sans', sans-serif; background: #f0f2f5; color: #1a1a2e; }
+
+  .page { max-width: 1200px; margin: 0 auto; padding: 32px 24px; }
+  h1 { font-size: 22px; font-weight: 700; margin-bottom: 6px; }
+  h2 { font-size: 16px; font-weight: 700; color: #1a1a2e; margin-bottom: 16px; border-left: 4px solid #7c83fd; padding-left: 10px; }
+  h3 { font-size: 13px; font-weight: 700; color: #555; margin-bottom: 10px; }
+  .subtitle { font-size: 13px; color: #888; margin-bottom: 32px; }
+
+  .section { background: #fff; border-radius: 12px; padding: 24px; margin-bottom: 24px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); }
+
+  /* Tabs */
+  .tabs { display: flex; gap: 0; border-bottom: 2px solid #e8eaf0; margin-bottom: 24px; }
+  .tab { padding: 10px 20px; font-size: 13px; cursor: pointer; color: #888; border-bottom: 2px solid transparent; margin-bottom: -2px; transition: all 0.15s; }
+  .tab.active { color: #7c83fd; border-bottom-color: #7c83fd; font-weight: 600; }
+  .tab-content { display: none; }
+  .tab-content.active { display: block; }
+
+  /* Flow diagram */
+  .flow { display: flex; align-items: flex-start; gap: 0; flex-wrap: wrap; }
+  .flow-col { display: flex; flex-direction: column; align-items: center; min-width: 120px; }
+  .flow-arrow-h { display: flex; align-items: center; padding: 0 4px; margin-top: 20px; }
+  .flow-arrow-h::after { content: '→'; font-size: 20px; color: #aaa; }
+  .flow-node {
+    border-radius: 10px; padding: 10px 14px; font-size: 12px; font-weight: 600;
+    text-align: center; min-width: 110px; position: relative;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+  }
+  .flow-label { font-size: 10px; color: #aaa; margin-top: 6px; text-align: center; max-width: 110px; }
+  .flow-arrow-down { font-size: 18px; color: #bbb; margin: 4px 0; }
+
+  /* Colors */
+  .c-media { background: #e8f0fe; color: #3949ab; border: 1.5px solid #aabfff; }
+  .c-ats { background: #ede7f6; color: #512da8; border: 1.5px solid #b39ddb; }
+  .c-line { background: #e8f5e9; color: #2e7d32; border: 1.5px solid #81c784; }
+  .c-student { background: #fff8e1; color: #e65100; border: 1.5px solid #ffcc80; }
+  .c-sf { background: #e3f2fd; color: #1565c0; border: 1.5px solid #90caf9; }
+  .c-action { background: #fce4ec; color: #880e4f; border: 1.5px solid #f48fb1; }
+  .c-gray { background: #f5f5f5; color: #555; border: 1.5px solid #ddd; }
+  .c-green { background: #e8f5e9; color: #1b5e20; border: 1.5px solid #66bb6a; }
+
+  /* Entity Diagram */
+  .erd { display: flex; gap: 16px; flex-wrap: wrap; }
+  .entity {
+    border: 2px solid #e0e0e0; border-radius: 10px; overflow: hidden;
+    min-width: 220px; flex: 1;
+  }
+  .entity-header {
+    background: #7c83fd; color: #fff; padding: 10px 14px;
+    font-size: 13px; font-weight: 700;
+  }
+  .entity-header.orange { background: #ff9800; }
+  .entity-header.green { background: #4caf50; }
+  .entity-header.blue { background: #2196f3; }
+  .entity-header.pink { background: #e91e63; }
+  .entity-header.gray { background: #607d8b; }
+  .entity-field {
+    padding: 7px 14px; font-size: 12px; border-bottom: 1px solid #f5f5f5;
+    display: flex; justify-content: space-between; align-items: center;
+  }
+  .entity-field:last-child { border-bottom: none; }
+  .field-type { color: #aaa; font-size: 10px; font-family: monospace; }
+  .pk { color: #ff9800; font-weight: 700; font-size: 10px; }
+  .fk { color: #7c83fd; font-weight: 700; font-size: 10px; }
+  .nullable { color: #aaa; font-size: 10px; }
+
+  /* Arrow connector */
+  .rel-line { display: flex; align-items: center; gap: 8px; font-size: 12px; color: #666; padding: 6px 0; }
+  .rel-line::before { content: ''; display: block; width: 30px; height: 2px; background: #ddd; }
+
+  /* Step flow */
+  .steps { display: flex; flex-direction: column; gap: 0; }
+  .step {
+    display: flex; gap: 16px; align-items: flex-start;
+    padding: 16px 0; border-bottom: 1px solid #f0f2f5;
+  }
+  .step:last-child { border-bottom: none; }
+  .step-num {
+    width: 28px; height: 28px; border-radius: 50%;
+    background: #7c83fd; color: #fff;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px; font-weight: 700; flex-shrink: 0;
+  }
+  .step-num.green { background: #4caf50; }
+  .step-num.orange { background: #ff9800; }
+  .step-body { flex: 1; }
+  .step-title { font-size: 13px; font-weight: 600; margin-bottom: 4px; }
+  .step-desc { font-size: 12px; color: #666; line-height: 1.6; }
+  .step-tech { font-size: 11px; color: #7c83fd; background: #f0f0ff; border-radius: 4px; padding: 2px 8px; display: inline-block; margin-top: 4px; }
+  .step-warn { font-size: 11px; color: #e65100; background: #fff3e0; border-radius: 4px; padding: 2px 8px; display: inline-block; margin-top: 4px; }
+
+  /* Two column layout */
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  .three-col { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
+
+  /* Tag */
+  .tag { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 11px; font-weight: 500; margin: 2px; }
+  .tag-api { background: #e8f0fe; color: #3949ab; }
+  .tag-csv { background: #e8f5e9; color: #2e7d32; }
+  .tag-manual { background: #fff8e1; color: #e65100; }
+  .tag-line { background: #e8f5e9; color: #1b5e20; }
+  .tag-webhook { background: #fce4ec; color: #880e4f; }
+
+  /* Info box */
+  .info-box { background: #f8f9ff; border: 1px solid #c5cae9; border-radius: 8px; padding: 12px 16px; font-size: 12px; color: #3949ab; margin-top: 12px; }
+  .warn-box { background: #fff8e1; border: 1px solid #ffcc80; border-radius: 8px; padding: 12px 16px; font-size: 12px; color: #e65100; margin-top: 12px; }
+
+  /* Flex flow horizontal */
+  .hflow { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin: 12px 0; }
+  .hflow-node { border-radius: 8px; padding: 8px 14px; font-size: 12px; font-weight: 600; text-align: center; }
+  .hflow-arrow { color: #aaa; font-size: 18px; }
+  .hflow-sub { font-size: 10px; color: #999; display: block; margin-top: 2px; font-weight: 400; }
+
+  /* JSON display */
+  pre { background: #1a1a2e; color: #a8d8ff; padding: 14px 16px; border-radius: 8px; font-size: 12px; overflow-x: auto; line-height: 1.6; }
+  .json-key { color: #f9e2af; }
+  .json-str { color: #a6e3a1; }
+  .json-num { color: #fab387; }
+  .json-null { color: #f38ba8; }
+</style>
+</head>
+<body>
+<div class="page">
+  <h1>新卒採用ATS — データフロー設計</h1>
+  <div class="subtitle">v0.1 / 2026-06-04 / システム要件定義フェーズ</div>
+
+  <div class="tabs">
+    <div class="tab active" onclick="switchTab(this,'tab-overview')">① 全体データフロー</div>
+    <div class="tab" onclick="switchTab(this,'tab-line')">② LINE友達追加フロー</div>
+    <div class="tab" onclick="switchTab(this,'tab-erd')">③ データモデル（ERD）</div>
+    <div class="tab" onclick="switchTab(this,'tab-media')">④ 媒体連携フロー</div>
+    <div class="tab" onclick="switchTab(this,'tab-sf')">⑤ Salesforce連携</div>
+  </div>
+
+  <!-- ① 全体データフロー -->
+  <div id="tab-overview" class="tab-content active">
+
+    <div class="section">
+      <h2>全体データフロー概観</h2>
+
+      <!-- Flow 1 -->
+      <h3 style="margin-bottom:12px;">▌ 流入〜LINE連携〜選考管理</h3>
+      <div style="overflow-x:auto;">
+        <div style="display:flex;align-items:flex-start;gap:0;min-width:900px;">
+
+          <div class="flow-col">
+            <div class="flow-node c-student">学生</div>
+            <div class="flow-label">応募者</div>
+          </div>
+          <div class="flow-arrow-h"></div>
+
+          <div class="flow-col">
+            <div class="flow-node c-media">媒体<br><span style="font-size:10px;font-weight:400;">マイナビ / リクナビ</span></div>
+            <div class="flow-label">QRコード<br>または媒体経由</div>
+          </div>
+          <div class="flow-arrow-h"></div>
+
+          <div class="flow-col">
+            <div class="flow-node c-ats">ATS<br><span style="font-size:10px;font-weight:400;">応募者レコード生成</span></div>
+            <div class="flow-label">トークン発行<br>タグ自動付与</div>
+          </div>
+          <div class="flow-arrow-h"></div>
+
+          <div class="flow-col">
+            <div class="flow-node c-line">LINE LIFF<br><span style="font-size:10px;font-weight:400;">友達追加 + 登録</span></div>
+            <div class="flow-label">LINE UserID<br>取得・紐付け</div>
+          </div>
+          <div class="flow-arrow-h"></div>
+
+          <div class="flow-col">
+            <div class="flow-node c-ats">選考管理<br><span style="font-size:10px;font-weight:400;">ステータス遷移</span></div>
+            <div class="flow-label">面接・評価<br>ファネル管理</div>
+          </div>
+          <div class="flow-arrow-h"></div>
+
+          <div class="flow-col">
+            <div class="flow-node c-action">内定承諾</div>
+            <div class="flow-label">承諾書類<br>PDF出力</div>
+          </div>
+          <div class="flow-arrow-h"></div>
+
+          <div class="flow-col">
+            <div class="flow-node c-sf">Salesforce<br><span style="font-size:10px;font-weight:400;">Contact登録</span></div>
+            <div class="flow-label">入社後管理<br>へ引継ぎ</div>
+          </div>
+
+        </div>
+      </div>
+
+      <div class="info-box" style="margin-top:20px;">
+        <strong>設計方針：</strong> 学生は「媒体ID」と「LINE UserID」の2軸で識別。どちらか一方でも存在すれば1つの応募者レコードに集約する。媒体未経由（QR直接）の場合はLINE登録時にレコードを新規生成する。
+      </div>
+    </div>
+
+    <div class="section">
+      <h2>データの流れ — 詳細</h2>
+      <div class="two-col">
+        <div>
+          <h3>入力データフロー（インバウンド）</h3>
+          <div class="steps">
+            <div class="step">
+              <div class="step-num">1</div>
+              <div class="step-body">
+                <div class="step-title">媒体からの応募データ取込</div>
+                <div class="step-desc">マイナビ・リクナビ等のAPIまたはCSVから応募者情報を定期取込。媒体固有の項目はJSONBフィールドに格納。</div>
+                <span class="tag tag-api">API連携</span>
+                <span class="tag tag-csv">CSVインポート</span>
+              </div>
+            </div>
+            <div class="step">
+              <div class="step-num">2</div>
+              <div class="step-body">
+                <div class="step-title">QRコードスキャン → 直接登録</div>
+                <div class="step-desc">学校訪問・説明会等でQRをスキャン。LIFFアプリが開き、学生が直接プロフィール入力。QRに紐づいたタグが自動付与される。</div>
+                <span class="step-tech">LINE LIFF + QR</span>
+              </div>
+            </div>
+            <div class="step">
+              <div class="step-num">3</div>
+              <div class="step-body">
+                <div class="step-title">マイページ入力（書類・追加情報）</div>
+                <div class="step-desc">学生がLIFFマイページから書類アップロード・個人情報補足入力。カスタムフィールドにも対応。</div>
+                <span class="step-tech">LIFF App</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div>
+          <h3>出力データフロー（アウトバウンド）</h3>
+          <div class="steps">
+            <div class="step">
+              <div class="step-num orange">A</div>
+              <div class="step-body">
+                <div class="step-title">LINE一斉送信</div>
+                <div class="step-desc">タグ・ステータスで絞り込んだ応募者にLINE送信。Messaging API multicast/narrowcastを使用。</div>
+                <span class="step-tech">LINE Messaging API</span>
+              </div>
+            </div>
+            <div class="step">
+              <div class="step-num orange">B</div>
+              <div class="step-body">
+                <div class="step-title">書類PDF生成</div>
+                <div class="step-desc">内定通知書・承諾書等をテンプレートから生成。応募者データを差し込み。</div>
+              </div>
+            </div>
+            <div class="step">
+              <div class="step-num orange">C</div>
+              <div class="step-body">
+                <div class="step-title">Salesforce登録（承諾時）</div>
+                <div class="step-desc">承諾ステータス変更をトリガーにSalesforce REST APIでContactを自動生成。</div>
+                <span class="step-tech">SF REST API</span>
+              </div>
+            </div>
+            <div class="step">
+              <div class="step-num orange">D</div>
+              <div class="step-body">
+                <div class="step-title">CSVエクスポート</div>
+                <div class="step-desc">全応募者データ・選考データ・アンケートデータを随時エクスポート可能。</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ② LINE友達追加フロー -->
+  <div id="tab-line" class="tab-content">
+    <div class="section">
+      <h2>LINE友達追加 — 2パターンの設計</h2>
+      <div class="two-col">
+
+        <div style="border:2px solid #c8e6c9;border-radius:10px;padding:20px;">
+          <h3 style="color:#2e7d32;margin-bottom:14px;">🟢 パターンA：QRコード直接登録<br><span style="font-size:11px;font-weight:400;color:#888;">（学校訪問・説明会で推奨）</span></h3>
+          <div class="steps">
+            <div class="step">
+              <div class="step-num green">1</div>
+              <div class="step-body">
+                <div class="step-title">管理者がQR発行</div>
+                <div class="step-desc">流入経路タグ付きのLIFF URLを含むQRを生成<br><code style="font-size:10px;">liff.me/xxxxx?source=tokyo_univ</code></div>
+              </div>
+            </div>
+            <div class="step">
+              <div class="step-num green">2</div>
+              <div class="step-body">
+                <div class="step-title">学生がQRをスキャン</div>
+                <div class="step-desc">LINE内ブラウザでLIFFアプリが起動。<strong>LINE自動ログイン</strong>でユーザーIDが取得される</div>
+                <span class="step-tech">liff.getContext().userId</span>
+              </div>
+            </div>
+            <div class="step">
+              <div class="step-num green">3</div>
+              <div class="step-body">
+                <div class="step-title">LIFFで簡易登録フォーム</div>
+                <div class="step-desc">氏名・学校・メールアドレスを入力（最小限）</div>
+              </div>
+            </div>
+            <div class="step">
+              <div class="step-num green">4</div>
+              <div class="step-body">
+                <div class="step-title">ATS：応募者レコード生成</div>
+                <div class="step-desc">LINE UserID + 入力情報 + 流入タグで<br>新規レコードを作成。友達追加も同時完了</div>
+              </div>
+            </div>
+          </div>
+          <div class="info-box">LINE UserIDとATSレコードが<strong>同時に生成</strong>されるため、紐付け処理が不要。最もシンプル。</div>
+        </div>
+
+        <div style="border:2px solid #bbdefb;border-radius:10px;padding:20px;">
+          <h3 style="color:#1565c0;margin-bottom:14px;">🔵 パターンB：媒体経由 → LINE後付け連携<br><span style="font-size:11px;font-weight:400;color:#888;">（マイナビ・リクナビ等で応募後）</span></h3>
+          <div class="steps">
+            <div class="step">
+              <div class="step-num">1</div>
+              <div class="step-body">
+                <div class="step-title">媒体から応募データ取込</div>
+                <div class="step-desc">ATSに応募者レコードを生成。この時点ではLINE未連携</div>
+                <span class="step-tech">API / CSV</span>
+              </div>
+            </div>
+            <div class="step">
+              <div class="step-num">2</div>
+              <div class="step-body">
+                <div class="step-title">一意トークン発行</div>
+                <div class="step-desc">応募者ごとにユニークなトークンを生成<br><code style="font-size:10px;">UUID or short hash</code>、有効期限あり</div>
+              </div>
+            </div>
+            <div class="step">
+              <div class="step-num">3</div>
+              <div class="step-body">
+                <div class="step-title">LINE招待URLを送付</div>
+                <div class="step-desc">媒体のメッセージ or メールで下記URLを送付<br><code style="font-size:10px;">liff.me/xxxxx?token={UUID}</code></div>
+                <span class="step-warn">⚠️ メールアドレス必須</span>
+              </div>
+            </div>
+            <div class="step">
+              <div class="step-num">4</div>
+              <div class="step-body">
+                <div class="step-title">学生がURLをタップ → LIFF起動</div>
+                <div class="step-desc">LINE内でLIFFが開き、<code>liff.getContext()</code>でLINE UserIDを取得。tokenとUserIDをバックエンドに送信</div>
+                <span class="step-tech">LIFF + token照合</span>
+              </div>
+            </div>
+            <div class="step">
+              <div class="step-num">5</div>
+              <div class="step-body">
+                <div class="step-title">ATS：LINE UserID紐付け</div>
+                <div class="step-desc">tokenで応募者レコードを検索 → LINE UserIDを保存。以降はLINEで双方向コミュニケーション可能</div>
+              </div>
+            </div>
+          </div>
+          <div class="info-box">既存の応募者レコードに<strong>後からLINEを紐付ける</strong>パターン。媒体API連携で多用。</div>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="section">
+      <h2>LIFFトークン照合シーケンス（パターンB詳細）</h2>
+      <div style="background:#1a1a2e;border-radius:10px;padding:20px;overflow-x:auto;">
+        <pre style="background:none;padding:0;font-size:12px;line-height:1.8;">
+学生ブラウザ             LIFF App              ATS Backend            LINE Platform
+    |                      |                       |                       |
+    | URLタップ             |                       |                       |
+    |──────────────────────>|                       |                       |
+    |                      | liff.init()           |                       |
+    |                      |──────────────────────────────────────────────>|
+    |                      |<────────────────── userId取得 ────────────────|
+    |                      |                       |                       |
+    |                      | POST /api/line/link   |                       |
+    |                      | { token, lineUserId } |                       |
+    |                      |──────────────────────>|                       |
+    |                      |                       | tokenで応募者検索     |
+    |                      |                       | lineUserIdを保存      |
+    |                      |                       | tokenを無効化         |
+    |                      |<────── 200 OK ────────|                       |
+    |                      |                       |                       |
+    |<── 登録完了画面 ──────|                       |                       |
+    |                      |                       | 登録完了LINEメッセージ|
+    |                      |                       |──────────────────────>|
+    |<────────────────── LINEで通知 ────────────────────────────────────── |</pre>
+      </div>
+
+      <div class="warn-box" style="margin-top:16px;">
+        <strong>⚠️ 既読確認について：</strong> LINE Messaging APIでは「個人単位の既読状態」はAPI取得不可（LINE仕様）。<br>
+        代替案：LIFF経由のマイページアクセス日時を「最終確認日」として記録し、既読の代替指標として活用することを推奨。
+      </div>
+    </div>
+  </div>
+
+  <!-- ③ データモデル -->
+  <div id="tab-erd" class="tab-content">
+    <div class="section">
+      <h2>エンティティ関係図（ER概要）</h2>
+
+      <div class="erd" style="margin-bottom:20px;">
+
+        <div class="entity" style="flex:2;min-width:280px;">
+          <div class="entity-header">👤 Applicant（応募者）</div>
+          <div class="entity-field"><span><span class="pk">PK</span> id</span><span class="field-type">UUID</span></div>
+          <div class="entity-field"><span>last_name / first_name</span><span class="field-type">VARCHAR</span></div>
+          <div class="entity-field"><span>email</span><span class="field-type">VARCHAR</span></div>
+          <div class="entity-field"><span>phone</span><span class="field-type">VARCHAR</span></div>
+          <div class="entity-field"><span><span class="fk">FK</span> school_id</span><span class="field-type">UUID</span></div>
+          <div class="entity-field"><span>department</span><span class="field-type">VARCHAR</span></div>
+          <div class="entity-field"><span>graduation_year</span><span class="field-type">INT</span></div>
+          <div class="entity-field" style="background:#fffde7;"><span><strong>line_user_id</strong></span><span class="field-type nullable">VARCHAR | NULL</span></div>
+          <div class="entity-field" style="background:#fffde7;"><span>line_linked_at</span><span class="field-type nullable">TIMESTAMP | NULL</span></div>
+          <div class="entity-field"><span><span class="fk">FK</span> primary_source_id</span><span class="field-type">UUID</span></div>
+          <div class="entity-field" style="background:#f3e5f5;"><span><strong>custom_fields</strong></span><span class="field-type">JSONB</span></div>
+          <div class="entity-field"><span>created_at / updated_at</span><span class="field-type">TIMESTAMP</span></div>
+        </div>
+
+        <div style="display:flex;flex-direction:column;gap:12px;min-width:220px;">
+          <div class="entity">
+            <div class="entity-header green">🏫 School（学校マスター）</div>
+            <div class="entity-field"><span><span class="pk">PK</span> id</span><span class="field-type">UUID</span></div>
+            <div class="entity-field"><span>name</span><span class="field-type">VARCHAR</span></div>
+            <div class="entity-field"><span>type</span><span class="field-type">ENUM</span></div>
+            <div class="entity-field"><span><span class="fk">FK</span> sf_account_id</span><span class="field-type nullable">VARCHAR | NULL</span></div>
+          </div>
+
+          <div class="entity">
+            <div class="entity-header orange">📡 ApplicantSource（流入元）</div>
+            <div class="entity-field"><span><span class="pk">PK</span> id</span><span class="field-type">UUID</span></div>
+            <div class="entity-field"><span><span class="fk">FK</span> applicant_id</span><span class="field-type">UUID</span></div>
+            <div class="entity-field"><span><span class="fk">FK</span> media_id</span><span class="field-type nullable">UUID | NULL</span></div>
+            <div class="entity-field"><span><span class="fk">FK</span> qr_code_id</span><span class="field-type nullable">UUID | NULL</span></div>
+            <div class="entity-field"><span>external_applicant_id</span><span class="field-type">VARCHAR</span></div>
+            <div class="entity-field"><span>raw_data</span><span class="field-type">JSONB</span></div>
+          </div>
+        </div>
+
+        <div style="display:flex;flex-direction:column;gap:12px;min-width:220px;">
+          <div class="entity">
+            <div class="entity-header pink">🎯 Selection（選考）</div>
+            <div class="entity-field"><span><span class="pk">PK</span> id</span><span class="field-type">UUID</span></div>
+            <div class="entity-field"><span><span class="fk">FK</span> applicant_id</span><span class="field-type">UUID</span></div>
+            <div class="entity-field"><span>status</span><span class="field-type">ENUM</span></div>
+            <div class="entity-field"><span>status_changed_at</span><span class="field-type">TIMESTAMP</span></div>
+            <div class="entity-field"><span><span class="fk">FK</span> assigned_to</span><span class="field-type">UUID</span></div>
+          </div>
+
+          <div class="entity">
+            <div class="entity-header" style="background:#5c6bc0;">📋 Interview（面接）</div>
+            <div class="entity-field"><span><span class="pk">PK</span> id</span><span class="field-type">UUID</span></div>
+            <div class="entity-field"><span><span class="fk">FK</span> selection_id</span><span class="field-type">UUID</span></div>
+            <div class="entity-field"><span>scheduled_at</span><span class="field-type">TIMESTAMP</span></div>
+            <div class="entity-field"><span>type</span><span class="field-type">ENUM</span></div>
+            <div class="entity-field"><span>score</span><span class="field-type">INT</span></div>
+            <div class="entity-field"><span>notes</span><span class="field-type">TEXT</span></div>
+          </div>
+        </div>
+
+        <div style="display:flex;flex-direction:column;gap:12px;min-width:220px;">
+          <div class="entity">
+            <div class="entity-header gray">🔗 LineRegistrationToken</div>
+            <div class="entity-field"><span><span class="pk">PK</span> token</span><span class="field-type">VARCHAR</span></div>
+            <div class="entity-field"><span><span class="fk">FK</span> applicant_id</span><span class="field-type">UUID</span></div>
+            <div class="entity-field"><span>expires_at</span><span class="field-type">TIMESTAMP</span></div>
+            <div class="entity-field"><span>used_at</span><span class="field-type nullable">TIMESTAMP | NULL</span></div>
+          </div>
+
+          <div class="entity">
+            <div class="entity-header gray">📱 Media（媒体）</div>
+            <div class="entity-field"><span><span class="pk">PK</span> id</span><span class="field-type">UUID</span></div>
+            <div class="entity-field"><span>name</span><span class="field-type">VARCHAR</span></div>
+            <div class="entity-field"><span>field_mapping</span><span class="field-type">JSONB</span></div>
+            <div class="entity-field"><span>sync_type</span><span class="field-type">ENUM</span></div>
+          </div>
+
+          <div class="entity">
+            <div class="entity-header gray">📲 QRCode（QRコード）</div>
+            <div class="entity-field"><span><span class="pk">PK</span> id</span><span class="field-type">UUID</span></div>
+            <div class="entity-field"><span>label</span><span class="field-type">VARCHAR</span></div>
+            <div class="entity-field"><span>liff_url</span><span class="field-type">VARCHAR</span></div>
+            <div class="entity-field"><span>auto_tags</span><span class="field-type">JSONB</span></div>
+          </div>
+        </div>
+
+      </div>
+
+      <div style="background:#f8f9ff;border-radius:10px;padding:16px;">
+        <h3 style="margin-bottom:10px;">custom_fields（JSONB）設計の考え方</h3>
+        <div class="two-col">
+          <div>
+            <div style="font-size:12px;color:#666;margin-bottom:8px;">固定フィールド（全媒体共通）</div>
+            <pre>{
+  <span class="json-key">"name"</span>: <span class="json-str">"田中 一郎"</span>,
+  <span class="json-key">"school"</span>: <span class="json-str">"早稲田大学"</span>,
+  <span class="json-key">"email"</span>: <span class="json-str">"tanaka@example.com"</span>,
+  <span class="json-key">"graduation_year"</span>: <span class="json-num">2026</span>
+}</pre>
+          </div>
+          <div>
+            <div style="font-size:12px;color:#666;margin-bottom:8px;">custom_fields（媒体・用途ごとに柔軟）</div>
+            <pre>{
+  <span class="json-key">"mynavi_score"</span>: <span class="json-num">82</span>,
+  <span class="json-key">"club_activity"</span>: <span class="json-str">"サッカー部"</span>,
+  <span class="json-key">"toeic"</span>: <span class="json-num">850</span>,
+  <span class="json-key">"preferred_location"</span>: <span class="json-str">"東京"</span>,
+  <span class="json-key">"intern_history"</span>: [<span class="json-str">"〇〇社"</span>, <span class="json-str">"△△社"</span>]
+}</pre>
+          </div>
+        </div>
+        <div class="info-box" style="margin-top:0;">
+          媒体ごとに異なる項目・独自の採用評価項目は全て <strong>custom_fields (JSONB)</strong> に格納。管理画面から項目の追加・表示設定が可能な設計にする。PostgreSQLを前提とすることで検索・インデックスも対応可能。
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ④ 媒体連携フロー -->
+  <div id="tab-media" class="tab-content">
+    <div class="section">
+      <h2>媒体連携フロー</h2>
+      <div class="three-col">
+
+        <div style="border:2px solid #c5cae9;border-radius:10px;padding:16px;">
+          <h3 style="color:#3949ab;margin-bottom:12px;">API連携（自動取込）</h3>
+          <div class="steps">
+            <div class="step">
+              <div class="step-num">1</div>
+              <div class="step-body"><div class="step-title">定期ポーリング or Webhook</div><div class="step-desc">媒体側の新着応募を定期取得（例：1時間ごと）</div></div>
+            </div>
+            <div class="step">
+              <div class="step-num">2</div>
+              <div class="step-body"><div class="step-title">フィールドマッピング変換</div><div class="step-desc">媒体固有の項目名をATSの共通フォーマットに変換。差分はcustom_fieldsへ</div></div>
+            </div>
+            <div class="step">
+              <div class="step-num">3</div>
+              <div class="step-body"><div class="step-title">重複チェック・UPSERT</div><div class="step-desc">メールアドレスまたは媒体IDで同一人物を判定。存在すれば更新、なければ新規作成</div></div>
+            </div>
+            <div class="step">
+              <div class="step-num">4</div>
+              <div class="step-body"><div class="step-title">LINE招待URL自動生成</div><div class="step-desc">新規登録時にトークン生成。媒体のサンクスページ or メールで案内</div></div>
+            </div>
+          </div>
+        </div>
+
+        <div style="border:2px solid #c8e6c9;border-radius:10px;padding:16px;">
+          <h3 style="color:#2e7d32;margin-bottom:12px;">CSVインポート（手動）</h3>
+          <div class="steps">
+            <div class="step">
+              <div class="step-num green">1</div>
+              <div class="step-body"><div class="step-title">CSVダウンロード</div><div class="step-desc">媒体の管理画面からCSVをダウンロード</div></div>
+            </div>
+            <div class="step">
+              <div class="step-num green">2</div>
+              <div class="step-body"><div class="step-title">ATS画面でアップロード</div><div class="step-desc">媒体を選択してCSVアップロード。プレビューで確認後、インポート実行</div></div>
+            </div>
+            <div class="step">
+              <div class="step-num green">3</div>
+              <div class="step-body"><div class="step-title">マッピング・重複チェック</div><div class="step-desc">API連携と同様の処理でレコード生成</div></div>
+            </div>
+          </div>
+          <div class="warn-box" style="margin-top:8px;">API未対応の媒体はCSVで対応。最終的にはAPI連携に移行推奨。</div>
+        </div>
+
+        <div style="border:2px solid #ffcc80;border-radius:10px;padding:16px;">
+          <h3 style="color:#e65100;margin-bottom:12px;">重複排除ロジック</h3>
+          <div class="steps">
+            <div class="step">
+              <div class="step-num orange">①</div>
+              <div class="step-body"><div class="step-title">LINE UserIDで照合</div><div class="step-desc">LINE連携済みなら確実に同一人物と判定</div></div>
+            </div>
+            <div class="step">
+              <div class="step-num orange">②</div>
+              <div class="step-body"><div class="step-title">メールアドレスで照合</div><div class="step-desc">同一メールアドレスが存在すれば更新</div></div>
+            </div>
+            <div class="step">
+              <div class="step-num orange">③</div>
+              <div class="step-body"><div class="step-title">氏名 + 学校で照合</div><div class="step-desc">メール未登録の場合の補助的照合。要手動確認フラグ付与</div></div>
+            </div>
+            <div class="step">
+              <div class="step-num orange">④</div>
+              <div class="step-body"><div class="step-title">新規作成</div><div class="step-desc">いずれにも該当しない場合のみ新規レコード生成</div></div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- ⑤ Salesforce連携 -->
+  <div id="tab-sf" class="tab-content">
+    <div class="section">
+      <h2>Salesforce 連携フロー</h2>
+
+      <div class="two-col">
+        <div>
+          <h3 style="margin-bottom:12px;">ATS → Salesforce（承諾時）</h3>
+          <div class="hflow">
+            <div class="hflow-node c-action">内定承諾<br>ステータス変更</div>
+            <div class="hflow-arrow">→</div>
+            <div class="hflow-node c-ats">ATS<br>Webhook発火</div>
+            <div class="hflow-arrow">→</div>
+            <div class="hflow-node c-sf">SF REST API<br>Contact登録</div>
+          </div>
+          <div style="background:#f8f9fc;border-radius:8px;padding:14px;margin-top:14px;">
+            <div style="font-size:12px;font-weight:600;margin-bottom:8px;">送信フィールド（案）</div>
+            <pre>{
+  <span class="json-key">"FirstName"</span>: <span class="json-str">"一郎"</span>,
+  <span class="json-key">"LastName"</span>: <span class="json-str">"田中"</span>,
+  <span class="json-key">"Email"</span>: <span class="json-str">"tanaka@example.com"</span>,
+  <span class="json-key">"Phone"</span>: <span class="json-str">"090-1234-5678"</span>,
+  <span class="json-key">"AccountId"</span>: <span class="json-str">"学校のSF Account ID"</span>,
+  <span class="json-key">"ATS_Applicant_ID__c"</span>: <span class="json-str">"ATS側のUUID"</span>,
+  <span class="json-key">"Hire_Date__c"</span>: <span class="json-str">"2026-04-01"</span>,
+  <span class="json-key">"RecordType"</span>: <span class="json-str">"内定者"</span>
+}</pre>
+          </div>
+          <div class="warn-box">SFのオブジェクト設計・カスタム項目は<br>SF管理者との事前合意が必要</div>
+        </div>
+
+        <div>
+          <h3 style="margin-bottom:12px;">Salesforce → ATS（定期同期）</h3>
+          <div class="steps">
+            <div class="step">
+              <div class="step-num">1</div>
+              <div class="step-body">
+                <div class="step-title">在籍情報の同期</div>
+                <div class="step-desc">退職・部署異動のレコード変更をSFから定期取得（日次バッチ）。ATSの応募者レコードに在籍履歴として保存</div>
+                <span class="step-tech">SF SOQL / Bulk API</span>
+              </div>
+            </div>
+            <div class="step">
+              <div class="step-num">2</div>
+              <div class="step-body">
+                <div class="step-title">大学情報の取得</div>
+                <div class="step-desc">SFのAccountオブジェクト（大学）から訪問履歴・担当者情報を取得。ATSの学校マスターと紐付け</div>
+                <span class="step-tech">SF AccountオブジェクトAPI</span>
+              </div>
+            </div>
+            <div class="step">
+              <div class="step-num">3</div>
+              <div class="step-body">
+                <div class="step-title">OB/OG情報としての活用</div>
+                <div class="step-desc">退職者が訪問・リファラル等で再接点を持った場合、ATS上で在籍履歴付きのOB/OGとして管理</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="info-box" style="margin-top:12px;">
+            <strong>主従関係の設計方針：</strong><br>
+            採用情報（選考・評価）→ <strong>ATSがマスター</strong><br>
+            在籍・退職・異動情報 → <strong>SFがマスター</strong><br>
+            学校・大学情報 → <strong>SFがマスター</strong>（ATSに読み取りキャッシュ）
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2>ATS_Applicant_ID__c による双方向リンク</h2>
+      <div style="font-size:13px;line-height:2;color:#555;">
+        SalesforceのContactに <code>ATS_Applicant_ID__c</code>（カスタム項目）を持たせることで、
+        どちらのシステムからも対応するレコードを特定可能にする。これがコンフリクト解消の基盤となる。
+      </div>
+      <div class="hflow" style="margin-top:16px;">
+        <div class="hflow-node c-ats" style="text-align:left;padding:12px 16px;">
+          <strong>ATS: Applicant</strong><br>
+          <span style="font-size:11px;">id: "ats-uuid-xxxx"</span><br>
+          <span style="font-size:11px;">sf_contact_id: "SF-003xxxx"</span>
+        </div>
+        <div style="font-size:12px;color:#7c83fd;text-align:center;">
+          ←——双方向リンク——→<br>
+          <span style="font-size:10px;">ATS_Applicant_ID__c</span>
+        </div>
+        <div class="hflow-node c-sf" style="text-align:left;padding:12px 16px;">
+          <strong>SF: Contact</strong><br>
+          <span style="font-size:11px;">Id: "SF-003xxxx"</span><br>
+          <span style="font-size:11px;">ATS_Applicant_ID__c: "ats-uuid-xxxx"</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /page -->
+
+<script>
+function switchTab(el, tabId) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById(tabId).classList.add('active');
+}
+</script>
+</body>
+</html>
