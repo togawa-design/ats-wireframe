@@ -721,63 +721,116 @@
         </div>
 
         <div>
-          <h3 style="margin-bottom:12px;">Salesforce → ATS（定期同期）</h3>
-          <div class="steps">
-            <div class="step">
-              <div class="step-num">1</div>
-              <div class="step-body">
-                <div class="step-title">在籍情報の同期</div>
-                <div class="step-desc">退職・部署異動のレコード変更をSFから定期取得（日次バッチ）。ATSの応募者レコードに在籍履歴として保存</div>
-                <span class="step-tech">SF SOQL / Bulk API</span>
+          <!-- Confirmed badge -->
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;">
+            <h3>Salesforce → ATS（定期同期）</h3>
+            <span style="background:#4caf50;color:#fff;font-size:10px;font-weight:700;border-radius:10px;padding:2px 8px;">✓ U-04 確定</span>
+          </div>
+
+          <!-- Master rule banner -->
+          <div style="background:#1a237e;color:#fff;border-radius:8px;padding:12px 16px;margin-bottom:14px;font-size:13px;">
+            <div style="font-size:11px;color:#9fa8da;margin-bottom:4px;">コンフリクト発生時の優先ルール（確定）</div>
+            <div style="display:flex;gap:16px;flex-wrap:wrap;">
+              <div style="display:flex;align-items:center;gap:6px;">
+                <span style="background:#1565c0;border-radius:4px;padding:2px 8px;font-size:11px;font-weight:700;">SF マスター</span>
+                <span style="font-size:12px;">退職・異動・在籍情報</span>
               </div>
-            </div>
-            <div class="step">
-              <div class="step-num">2</div>
-              <div class="step-body">
-                <div class="step-title">大学情報の取得</div>
-                <div class="step-desc">SFのAccountオブジェクト（大学）から訪問履歴・担当者情報を取得。ATSの学校マスターと紐付け</div>
-                <span class="step-tech">SF AccountオブジェクトAPI</span>
+              <div style="display:flex;align-items:center;gap:6px;">
+                <span style="background:#1565c0;border-radius:4px;padding:2px 8px;font-size:11px;font-weight:700;">SF マスター</span>
+                <span style="font-size:12px;">大学・学校情報</span>
               </div>
-            </div>
-            <div class="step">
-              <div class="step-num">3</div>
-              <div class="step-body">
-                <div class="step-title">OB/OG情報としての活用</div>
-                <div class="step-desc">退職者が訪問・リファラル等で再接点を持った場合、ATS上で在籍履歴付きのOB/OGとして管理</div>
+              <div style="display:flex;align-items:center;gap:6px;">
+                <span style="background:#512da8;border-radius:4px;padding:2px 8px;font-size:11px;font-weight:700;">ATS マスター</span>
+                <span style="font-size:12px;">採用選考・評価情報</span>
               </div>
             </div>
           </div>
 
-          <div class="info-box" style="margin-top:12px;">
-            <strong>主従関係の設計方針：</strong><br>
-            採用情報（選考・評価）→ <strong>ATSがマスター</strong><br>
-            在籍・退職・異動情報 → <strong>SFがマスター</strong><br>
-            学校・大学情報 → <strong>SFがマスター</strong>（ATSに読み取りキャッシュ）
+          <!-- Sync flow -->
+          <div style="border:2px solid #bbdefb;border-radius:10px;overflow:hidden;">
+            <div style="background:#e3f2fd;padding:8px 14px;font-size:12px;font-weight:700;color:#1565c0;display:flex;align-items:center;gap:6px;">
+              <span>Salesforce → ATS &nbsp;（一方向・読み取り専用）</span>
+              <span style="background:#1565c0;color:#fff;border-radius:10px;padding:1px 8px;font-size:10px;">SFがマスター</span>
+            </div>
+            <div class="steps" style="padding:0 14px;">
+              <div class="step">
+                <div class="step-num">1</div>
+                <div class="step-body">
+                  <div class="step-title">在籍情報の取得（日次バッチ）</div>
+                  <div class="step-desc">退職・部署異動のレコード変更をSFから取得。ATSには<strong>読み取り専用キャッシュ</strong>として保存。ATS側から上書き不可。</div>
+                  <span class="step-tech">SF SOQL / Bulk API</span>
+                </div>
+              </div>
+              <div class="step">
+                <div class="step-num">2</div>
+                <div class="step-body">
+                  <div class="step-title">大学・学校情報の取得</div>
+                  <div class="step-desc">SFのAccountオブジェクト（大学）から訪問履歴・担当者情報を取得。ATSの学校マスターに同期。SF側の変更が自動反映される。</div>
+                  <span class="step-tech">SF Account API</span>
+                </div>
+              </div>
+              <div class="step">
+                <div class="step-num">3</div>
+                <div class="step-body">
+                  <div class="step-title">OB/OG情報としての活用</div>
+                  <div class="step-desc">退職者データをATS上でOB/OGとして表示。採用活動でのリファラル管理等に活用。在籍履歴はSF側の情報が正。</div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
     </div>
 
     <div class="section">
-      <h2>ATS_Applicant_ID__c による双方向リンク</h2>
-      <div style="font-size:13px;line-height:2;color:#555;">
-        SalesforceのContactに <code>ATS_Applicant_ID__c</code>（カスタム項目）を持たせることで、
-        どちらのシステムからも対応するレコードを特定可能にする。これがコンフリクト解消の基盤となる。
+      <h2>データ主従マップ</h2>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:20px;">
+        <div style="border:2px solid #1565c0;border-radius:10px;overflow:hidden;">
+          <div style="background:#1565c0;color:#fff;padding:10px 16px;font-size:13px;font-weight:700;">🔵 Salesforce がマスター</div>
+          <div style="padding:12px 16px;font-size:13px;line-height:2.2;">
+            <div>📋 退職・部署異動・在籍履歴</div>
+            <div>🏫 大学・学校情報・訪問履歴</div>
+            <div>👔 入社後の人事情報</div>
+          </div>
+          <div style="background:#e3f2fd;padding:8px 16px;font-size:11px;color:#1565c0;">
+            ATSはこれらを<strong>読み取り専用</strong>で参照。上書き・編集は行わない。
+          </div>
+        </div>
+        <div style="border:2px solid #512da8;border-radius:10px;overflow:hidden;">
+          <div style="background:#512da8;color:#fff;padding:10px 16px;font-size:13px;font-weight:700;">🟣 ATS がマスター</div>
+          <div style="padding:12px 16px;font-size:13px;line-height:2.2;">
+            <div>📝 エントリー情報・応募書類</div>
+            <div>🎯 選考ステータス・遷移履歴</div>
+            <div>🗣️ 面接評価・担当者メモ</div>
+            <div>💬 LINEコミュニケーション履歴</div>
+          </div>
+          <div style="background:#ede7f6;padding:8px 16px;font-size:11px;color:#512da8;">
+            承諾時にSFへ<strong>一度だけ書き込み</strong>。以降はSFの管轄。
+          </div>
+        </div>
       </div>
-      <div class="hflow" style="margin-top:16px;">
+
+      <h2 style="margin-top:0;">ATS_Applicant_ID__c によるリンク構造</h2>
+      <div style="font-size:13px;line-height:2;color:#555;margin-bottom:16px;">
+        SalesforceのContactに <code>ATS_Applicant_ID__c</code>（カスタム項目）を持たせることで、どちらのシステムからも対応するレコードを特定できる。SFが更新された際にATSキャッシュを更新する際のキーにもなる。
+      </div>
+      <div style="display:flex;align-items:center;gap:0;flex-wrap:wrap;">
         <div class="hflow-node c-ats" style="text-align:left;padding:12px 16px;">
           <strong>ATS: Applicant</strong><br>
           <span style="font-size:11px;">id: "ats-uuid-xxxx"</span><br>
-          <span style="font-size:11px;">sf_contact_id: "SF-003xxxx"</span>
+          <span style="font-size:11px;">sf_contact_id: "SF-003xxxx"</span><br>
+          <span style="font-size:10px;color:#aaa;">sf_employment_cache: JSONB</span>
         </div>
-        <div style="font-size:12px;color:#7c83fd;text-align:center;">
-          ←——双方向リンク——→<br>
-          <span style="font-size:10px;">ATS_Applicant_ID__c</span>
+        <div style="padding:0 16px;text-align:center;">
+          <div style="font-size:11px;color:#4caf50;font-weight:700;margin-bottom:4px;">承諾時のみ書込 →</div>
+          <div style="width:80px;height:2px;background:linear-gradient(to right,#7c83fd,#1565c0);"></div>
+          <div style="font-size:11px;color:#1565c0;font-weight:700;margin-top:4px;">← 日次で読取</div>
         </div>
         <div class="hflow-node c-sf" style="text-align:left;padding:12px 16px;">
           <strong>SF: Contact</strong><br>
           <span style="font-size:11px;">Id: "SF-003xxxx"</span><br>
-          <span style="font-size:11px;">ATS_Applicant_ID__c: "ats-uuid-xxxx"</span>
+          <span style="font-size:11px;">ATS_Applicant_ID__c: "ats-uuid-xxxx"</span><br>
+          <span style="font-size:10px;color:#aaa;">← 退職・異動はここで管理</span>
         </div>
       </div>
     </div>
