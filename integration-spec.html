@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ATS 外部連携仕様書</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Hiragino Sans', sans-serif; background: #f0f2f5; color: #1a1a2e; display:flex; flex-direction:column; min-height:100vh; }
+  .page { max-width: 1200px; margin: 0 auto; padding: 32px 24px; width:100%; }
+  h1 { font-size: 22px; font-weight: 700; margin-bottom: 4px; }
+  h2 { font-size: 15px; font-weight: 700; color: #1a1a2e; margin-bottom: 14px; padding-left: 12px; border-left: 4px solid #7c83fd; }
+  h3 { font-size: 13px; font-weight: 700; color: #444; margin-bottom: 8px; }
+  .meta { font-size: 12px; color: #999; margin-bottom: 28px; display:flex; gap:16px; align-items:center; }
+
+  .tabs { display:flex; gap:0; border-bottom:2px solid #e8eaf0; margin-bottom:22px; flex-wrap:wrap; }
+  .tab { padding:10px 18px; font-size:13px; cursor:pointer; color:#888; border-bottom:2px solid transparent; margin-bottom:-2px; transition:all .15s; white-space:nowrap; }
+  .tab.active { color:#7c83fd; border-bottom-color:#7c83fd; font-weight:600; }
+  .tab-content { display:none; }
+  .tab-content.active { display:block; }
+
+  .sub-tabs { display:flex; gap:0; border-bottom:1px solid #e8eaf0; margin-bottom:18px; flex-wrap:wrap; }
+  .sub-tab { padding:8px 14px; font-size:12px; cursor:pointer; color:#aaa; border-bottom:2px solid transparent; margin-bottom:-1px; transition:all .15s; white-space:nowrap; }
+  .sub-tab.active { color:#7c83fd; border-bottom-color:#7c83fd; font-weight:600; }
+  .sub-content { display:none; }
+  .sub-content.active { display:block; }
+
+  .section { background: #fff; border-radius: 12px; padding: 22px 24px; margin-bottom: 20px; box-shadow: 0 1px 4px rgba(0,0,0,.06); }
+  .spec-header { display:flex; align-items:center; gap:8px; margin-bottom:12px; }
+  .spec-icon { width:24px; height:24px; border-radius:6px; display:flex; align-items:center; justify-content:center; font-size:13px; flex-shrink:0; }
+  .spec-icon-blue { background:#eef0ff; }
+  .spec-icon-green { background:#e8f5e9; }
+  .spec-icon-orange { background:#fff8e1; }
+  .spec-icon-red { background:#ffebee; }
+  .spec-title { font-size:13px; font-weight:700; color:#1a1a2e; }
+
+  table { width:100%; border-collapse:collapse; font-size:13px; }
+  th { background:#f8f9fc; padding:9px 12px; text-align:left; font-weight:600; color:#555; font-size:12px; border-bottom:1px solid #e8eaf0; white-space:nowrap; }
+  td { padding:10px 12px; border-bottom:1px solid #f0f2f5; vertical-align:top; line-height:1.6; }
+  tr:last-child td { border-bottom:none; }
+  tr:hover td { background:#fafbff; }
+  .col-name { width:200px; }
+  .col-type { width:80px; }
+  .col-method { width:80px; }
+  .col-path { width:260px; }
+  .col-desc { }
+
+  code { font-family: 'SF Mono', 'Menlo', monospace; font-size:11px; color:#7c83fd; background:#f0f0ff; padding:1px 5px; border-radius:4px; white-space:nowrap; }
+  .method { font-family:monospace; font-size:11px; font-weight:700; padding:2px 7px; border-radius:4px; white-space:nowrap; display:inline-block; }
+  .method-post   { background:#e8f5e9; color:#2e7d32; }
+  .method-get    { background:#e3f2fd; color:#1565c0; }
+  .method-delete { background:#ffebee; color:#b71c1c; }
+  .method-patch  { background:#fff8e1; color:#e65100; }
+  .endpoint { font-family:'SF Mono','Menlo',monospace; font-size:11px; background:#1a1a2e; color:#7c83fd; padding:2px 8px; border-radius:4px; white-space:nowrap; }
+  .db-ref { font-family:'SF Mono','Menlo',monospace; font-size:11px; color:#7c83fd; background:#f0f0ff; padding:1px 5px; border-radius:4px; white-space:nowrap; }
+  .badge { display:inline-block; padding:2px 8px; border-radius:10px; font-size:10px; font-weight:700; white-space:nowrap; }
+  .badge-new  { background:#4caf50; color:#fff; }
+  .badge-tbd  { background:#9e9e9e; color:#fff; }
+  .badge-warn { background:#ff9800; color:#fff; }
+
+  .info-box  { background:#f0f0ff; border:1px solid #c5cae9; border-radius:8px; padding:10px 14px; font-size:12px; color:#3949ab; margin-top:10px; }
+  .warn-box  { background:#fff8e1; border:1px solid #ffcc80; border-radius:8px; padding:10px 14px; font-size:12px; color:#e65100; margin-top:10px; }
+  .tbd-box   { background:#fafafa; border:2px dashed #bdbdbd; border-radius:8px; padding:16px 20px; font-size:13px; color:#757575; margin-top:10px; text-align:center; }
+  .err-msg   { font-family:'SF Mono','Menlo',monospace; font-size:11px; background:#fff5f5; border:1px dashed #ffaaaa; border-radius:4px; padding:4px 8px; color:#c62828; display:inline-block; }
+
+  .flow-steps { display:flex; flex-direction:column; gap:6px; counter-reset:step; }
+  .flow-step { display:flex; gap:12px; align-items:flex-start; font-size:13px; background:#fafbff; border-radius:8px; padding:10px 14px; border-left:3px solid #7c83fd; }
+  .flow-step-num { font-size:11px; font-weight:700; background:#7c83fd; color:#fff; border-radius:50%; width:20px; height:20px; display:flex; align-items:center; justify-content:center; flex-shrink:0; margin-top:1px; }
+  .flow-step-body { flex:1; }
+  .flow-step-label { font-weight:700; color:#1a1a2e; margin-bottom:2px; }
+  .flow-step-detail { color:#666; font-size:12px; }
+
+  .two-col { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+  .scope-chip { display:inline-block; font-family:monospace; font-size:11px; background:#e8eaf6; color:#3949ab; border-radius:4px; padding:2px 8px; margin:2px; }
+
+  ::-webkit-scrollbar { width: 4px; height: 4px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: #ccc; border-radius: 2px; }
+</style>
+</head>
+<body>
+
+<!-- Global Nav -->
+<div style="background:#1a1a2e;height:40px;display:flex;align-items:center;padding:0 20px;gap:24px;font-size:12px;flex-shrink:0;overflow-x:auto;">
+  <span style="color:#7c83fd;font-weight:700;letter-spacing:0.5px;white-space:nowrap;">ATS設計ドキュメント</span>
+  <a href="index.html"             style="color:#aaa;text-decoration:none;opacity:.7;white-space:nowrap;">🖥 ワイヤーフレーム</a>
+  <a href="requirements.html"      style="color:#aaa;text-decoration:none;opacity:.7;white-space:nowrap;">📋 要件定義書</a>
+  <a href="dataflow.html"          style="color:#aaa;text-decoration:none;opacity:.7;white-space:nowrap;">🔀 データフロー設計</a>
+  <a href="roadmap.html"           style="color:#aaa;text-decoration:none;opacity:.7;white-space:nowrap;">🗺️ ロードマップ</a>
+  <a href="screen-spec.html"       style="color:#aaa;text-decoration:none;opacity:.7;white-space:nowrap;">📐 画面仕様書</a>
+  <a href="table-spec.html"        style="color:#aaa;text-decoration:none;opacity:.7;white-space:nowrap;">🗃️ テーブル定義書</a>
+  <a href="integration-spec.html"  style="color:#fff;text-decoration:none;border-bottom:2px solid #7c83fd;padding-bottom:2px;white-space:nowrap;">🔌 外部連携仕様書</a>
+</div>
+
+<div class="page">
+  <h1>新卒採用管理システム（ATS）外部連携仕様書</h1>
+  <div class="meta">
+    <span>v0.1</span>
+    <span>2026-06-05</span>
+    <span>ステータス：設計中</span>
+  </div>
+
+  <div class="tabs">
+    <div class="tab active" onclick="switchTab(this,'tab-line')">💬 LINE Messaging API</div>
+    <div class="tab" onclick="switchTab(this,'tab-google-oauth')">🔐 Google OAuth</div>
+    <div class="tab" onclick="switchTab(this,'tab-gcal')">📅 Google Calendar</div>
+    <div class="tab" onclick="switchTab(this,'tab-sf')">☁️ Salesforce <span class="badge badge-tbd">確認待ち</span></div>
+  </div>
+
+
+  <!-- ================================================================
+       LINE Messaging API
+       ================================================================ -->
+  <div id="tab-line" class="tab-content active">
+
+    <div class="sub-tabs">
+      <div class="sub-tab active" onclick="swSub(this,'sl-webhook')">Webhook受信</div>
+      <div class="sub-tab"       onclick="swSub(this,'sl-send')">メッセージ送信</div>
+      <div class="sub-tab"       onclick="swSub(this,'sl-richmenu')">リッチメニュー管理</div>
+      <div class="sub-tab"       onclick="swSub(this,'sl-liff')">LIFF連携</div>
+    </div>
+
+    <!-- Webhook受信 -->
+    <div id="sl-webhook" class="sub-content active">
+      <div class="section">
+        <div class="spec-header"><div class="spec-icon spec-icon-blue">📡</div><div class="spec-title">Webhookエンドポイント</div></div>
+        <table>
+          <thead><tr><th class="col-method">メソッド</th><th class="col-path">パス</th><th>説明</th></tr></thead>
+          <tbody>
+            <tr>
+              <td><span class="method method-post">POST</span></td>
+              <td><span class="endpoint">/api/webhooks/line</span></td>
+              <td>LINE Platformからのイベント受信口。署名検証（X-Line-Signature）必須</td>
+            </tr>
+          </tbody>
+        </table>
+        <div class="info-box">署名検証: <code>HMAC-SHA256(channel_secret, request_body)</code> を Base64 エンコードした値と <code>X-Line-Signature</code> ヘッダーを比較。不一致は 400 を返す。</div>
+      </div>
+
+      <div class="section">
+        <div class="spec-header"><div class="spec-icon spec-icon-green">📨</div><div class="spec-title">受信イベントと処理フロー</div></div>
+        <table>
+          <thead><tr><th style="width:130px;">イベント種別</th><th style="width:160px;">発生タイミング</th><th>ATS側の処理</th><th>DB操作</th></tr></thead>
+          <tbody>
+            <tr>
+              <td><code>follow</code></td>
+              <td>応募者がLINE公式アカウントを友だち追加</td>
+              <td>① <span class="db-ref">Applicant.line_user_id</span> に LINE user_id を保存（既存トークンがあれば照合）<br>② LINEメッセージで登録案内を送信</td>
+              <td><span class="db-ref">Applicant.line_user_id</span>, <span class="db-ref">line_linked_at</span> 更新</td>
+            </tr>
+            <tr>
+              <td><code>unfollow</code></td>
+              <td>応募者がブロック・友だち削除</td>
+              <td><span class="db-ref">Applicant.line_user_id</span> を NULL に更新。今後のメッセージ送信をスキップ</td>
+              <td><span class="db-ref">Applicant.line_user_id</span>, <span class="db-ref">line_linked_at</span> をNULL化</td>
+            </tr>
+            <tr>
+              <td><code>message</code>（text）</td>
+              <td>応募者からテキストメッセージ受信</td>
+              <td>① <span class="db-ref">LineMessage</span> に direction=inbound で保存<br>② ダッシュボードの未読カウントをインクリメント（リアルタイム通知）</td>
+              <td><span class="db-ref">LineMessage</span> INSERT</td>
+            </tr>
+            <tr>
+              <td><code>message</code>（image等）</td>
+              <td>応募者から画像・スタンプ受信</td>
+              <td><span class="db-ref">LineMessage</span> に message_type・content（メディアURL or スタンプID）を保存</td>
+              <td><span class="db-ref">LineMessage</span> INSERT</td>
+            </tr>
+            <tr>
+              <td><code>postback</code></td>
+              <td>リッチメニューのボタンタップ or LIFFアクション</td>
+              <td>data パラメータを解析してアクションを実行（アンケート回答の保存、カレンダー予約など）</td>
+              <td>アクション内容に応じて各テーブルを更新</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="section">
+        <div class="spec-header"><div class="spec-icon spec-icon-orange">🔗</div><div class="spec-title">LINE友だち登録フロー（QRコード経由）</div></div>
+        <div class="flow-steps">
+          <div class="flow-step"><div class="flow-step-num">1</div><div class="flow-step-body"><div class="flow-step-label">QRスキャン</div><div class="flow-step-detail">応募者が QRCode の LIFF URL をスキャン。qr_id パラメータを含む</div></div></div>
+          <div class="flow-step"><div class="flow-step-num">2</div><div class="flow-step-body"><div class="flow-step-label">LIFF起動・LINE認証</div><div class="flow-step-detail">LIFF アプリが起動。LINE ログイン状態を確認（未ログインの場合は LINE 認証へリダイレクト）</div></div></div>
+          <div class="flow-step"><div class="flow-step-num">3</div><div class="flow-step-body"><div class="flow-step-label">トークン照合</div><div class="flow-step-detail">URL 内の <code>token</code> と <span class="db-ref">LineRegistrationToken</span> を照合。expires_at・used_at を確認</div></div></div>
+          <div class="flow-step"><div class="flow-step-num">4</div><div class="flow-step-body"><div class="flow-step-label">LINE user_id 紐づけ</div><div class="flow-step-detail"><span class="db-ref">Applicant.line_user_id</span> を更新。<span class="db-ref">LineRegistrationToken.used_at</span> に現在時刻をセット</div></div></div>
+          <div class="flow-step"><div class="flow-step-num">5</div><div class="flow-step-body"><div class="flow-step-label">自動タグ付与</div><div class="flow-step-detail"><span class="db-ref">QRCode.auto_tags</span> 配列のタグを <span class="db-ref">ApplicantTag</span> に追加。<span class="db-ref">QRCode.scan_count</span> をインクリメント</div></div></div>
+          <div class="flow-step"><div class="flow-step-num">6</div><div class="flow-step-body"><div class="flow-step-label">完了メッセージ送信</div><div class="flow-step-detail">LINE で登録完了メッセージを送信。リッチメニューを自動適用（RichMenuRule を評価）</div></div></div>
+        </div>
+        <div class="warn-box" style="margin-top:12px;">
+          トークンエラー処理:<br>
+          ・期限切れ（expires_at 超過）: <span class="err-msg">登録URLの有効期限が切れています。担当者にお問い合わせください。</span><br>
+          ・使用済み（used_at が非NULL）: <span class="err-msg">このURLはすでに使用済みです。</span>
+        </div>
+      </div>
+    </div><!-- /sl-webhook -->
+
+    <!-- メッセージ送信 -->
+    <div id="sl-send" class="sub-content">
+      <div class="section">
+        <div class="spec-header"><div class="spec-icon spec-icon-blue">📤</div><div class="spec-title">送信 API エンドポイント（ATS内部）</div></div>
+        <table>
+          <thead><tr><th class="col-method">メソッド</th><th class="col-path">パス</th><th>説明</th></tr></thead>
+          <tbody>
+            <tr><td><span class="method method-post">POST</span></td><td><span class="endpoint">/api/line/messages/individual</span></td><td>個別送信。body: <code>{applicant_id, message}</code></td></tr>
+            <tr><td><span class="method method-post">POST</span></td><td><span class="endpoint">/api/line/messages/bulk</span></td><td>一斉送信。body: <code>{applicant_ids[], message, schedule_at?}</code></td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="section">
+        <div class="spec-header"><div class="spec-icon spec-icon-green">📋</div><div class="spec-title">送信処理フロー</div></div>
+        <div class="flow-steps">
+          <div class="flow-step"><div class="flow-step-num">1</div><div class="flow-step-body"><div class="flow-step-label">送信対象チェック</div><div class="flow-step-detail"><span class="db-ref">Applicant.line_user_id</span> が NULL の場合は送信スキップ（エラーではなくスキップ件数にカウント）</div></div></div>
+          <div class="flow-step"><div class="flow-step-num">2</div><div class="flow-step-body"><div class="flow-step-label">LINE API呼び出し</div><div class="flow-step-detail">個別: <code>POST /v2/bot/message/push</code>（to: line_user_id）<br>一斉: <code>POST /v2/bot/message/multicast</code>（to[]: line_user_id配列、最大500件/リクエスト）</div></div></div>
+          <div class="flow-step"><div class="flow-step-num">3</div><div class="flow-step-body"><div class="flow-step-label">送信履歴保存</div><div class="flow-step-detail"><span class="db-ref">LineMessage</span> に direction=outbound で INSERT。AuditLogに line_send を記録</div></div></div>
+        </div>
+        <div class="info-box">一斉送信 500件超の場合: 500件ずつ分割して順次送信。全件完了後に結果サマリーをレスポンス。</div>
+      </div>
+
+      <div class="section">
+        <div class="spec-header"><div class="spec-icon spec-icon-red">⚠️</div><div class="spec-title">エラーハンドリング</div></div>
+        <table>
+          <thead><tr><th style="width:180px;">LINE APIエラーコード</th><th>原因</th><th>ATS側の処理</th></tr></thead>
+          <tbody>
+            <tr><td><code>400 - Invalid reply token</code></td><td>replyToken 期限切れ（1分）</td><td>push 送信に切り替えてリトライ</td></tr>
+            <tr><td><code>429 - Rate limit exceeded</code></td><td>レート制限（1000件/分）</td><td>Exponential backoff でリトライ（最大3回）</td></tr>
+            <tr><td><code>500 - LINE側エラー</code></td><td>LINE Platform 障害</td><td>送信キューに積んで5分後にリトライ。3回失敗でスタッフに通知</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div><!-- /sl-send -->
+
+    <!-- リッチメニュー管理 -->
+    <div id="sl-richmenu" class="sub-content">
+      <div class="section">
+        <div class="spec-header"><div class="spec-icon spec-icon-blue">🎛️</div><div class="spec-title">リッチメニュー API エンドポイント</div></div>
+        <table>
+          <thead><tr><th class="col-method">メソッド</th><th class="col-path">LINE API</th><th>ATSでの呼び出しタイミング</th></tr></thead>
+          <tbody>
+            <tr><td><span class="method method-post">POST</span></td><td><span class="endpoint">/v2/bot/richmenu</span></td><td>SCR-08 でメニューを「アクティブ化」したとき。レスポンスの richMenuId を <span class="db-ref">RichMenu.line_menu_id</span> に保存</td></tr>
+            <tr><td><span class="method method-post">POST</span></td><td><span class="endpoint">/v2/bot/richmenu/{id}/content</span></td><td>メニュー画像のアップロード（アクティブ化フローの一部）</td></tr>
+            <tr><td><span class="method method-post">POST</span></td><td><span class="endpoint">/v2/bot/user/{userId}/richmenu/{richMenuId}</span></td><td>応募者へのメニュー適用。RichMenuRule を評価して適切なメニューを選択</td></tr>
+            <tr><td><span class="method method-delete">DELETE</span></td><td><span class="endpoint">/v2/bot/richmenu/{id}</span></td><td>SCR-08 でメニューを「アーカイブ」したとき</td></tr>
+            <tr><td><span class="method method-post">POST</span></td><td><span class="endpoint">/v2/bot/richmenu/bulk/link</span></td><td>一斉メニュー切替（タグ変更時のリッチメニュー自動切替）。最大500件/リクエスト</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="section">
+        <div class="spec-header"><div class="spec-icon spec-icon-green">🔄</div><div class="spec-title">自動切替ロジック</div></div>
+        <div class="flow-steps">
+          <div class="flow-step"><div class="flow-step-num">1</div><div class="flow-step-body"><div class="flow-step-label">トリガー</div><div class="flow-step-detail">応募者へのタグ付与・削除、ステージ変更のいずれかが発生したとき</div></div></div>
+          <div class="flow-step"><div class="flow-step-num">2</div><div class="flow-step-body"><div class="flow-step-label">ルール評価</div><div class="flow-step-detail"><span class="db-ref">RichMenuRule</span> を <span class="db-ref">RichMenu.priority</span> 昇順で評価。最初に一致したメニューを選択。すべて不一致なら <span class="db-ref">RichMenu.is_default=true</span> のメニューを使用</div></div></div>
+          <div class="flow-step"><div class="flow-step-num">3</div><div class="flow-step-body"><div class="flow-step-label">メニュー切替</div><div class="flow-step-detail">現在のメニューと異なる場合のみ LINE API を呼び出す。同じなら API コール不要</div></div></div>
+        </div>
+        <div class="info-box">line_user_id が NULL（未連携）の応募者はスキップ。LINE API エラーは非同期ジョブで最大3回リトライ。</div>
+      </div>
+    </div><!-- /sl-richmenu -->
+
+    <!-- LIFF連携 -->
+    <div id="sl-liff" class="sub-content">
+      <div class="section">
+        <div class="spec-header"><div class="spec-icon spec-icon-blue">📱</div><div class="spec-title">LIFFアプリ一覧</div></div>
+        <table>
+          <thead><tr><th class="col-name">アプリ名</th><th style="width:200px;">URL</th><th>用途</th><th>関連テーブル</th></tr></thead>
+          <tbody>
+            <tr>
+              <td>LINE友だち登録フォーム</td>
+              <td><code>/liff/register?token={token}&qr_id={qr_id}</code></td>
+              <td>QRコードスキャン後の LINE アカウント連携。token を照合して Applicant と line_user_id を紐づける</td>
+              <td><span class="db-ref">LineRegistrationToken</span><br><span class="db-ref">Applicant</span></td>
+            </tr>
+            <tr>
+              <td>アンケート回答フォーム</td>
+              <td><code>/liff/survey?survey_id={id}</code></td>
+              <td>LINEアプリ内でアンケートを表示・回答送信。回答は SurveyResponse / SurveyResponseItem に保存</td>
+              <td><span class="db-ref">Survey</span><br><span class="db-ref">SurveyQuestion</span><br><span class="db-ref">SurveyResponse</span><br><span class="db-ref">SurveyResponseItem</span></td>
+            </tr>
+            <tr>
+              <td>面接枠予約フォーム</td>
+              <td><code>/liff/calendar?applicant_id={id}</code></td>
+              <td>応募者が空き枠を選択して予約。CalendarSlot.is_booked を true に変更し Interview を作成</td>
+              <td><span class="db-ref">CalendarSlot</span><br><span class="db-ref">Interview</span></td>
+            </tr>
+          </tbody>
+        </table>
+        <div class="info-box">LIFF サイズ: Full。LINE ログイン必須（liff.getProfile() で line_user_id を取得）。HTTPS 必須。</div>
+      </div>
+
+      <div class="section">
+        <div class="spec-header"><div class="spec-icon spec-icon-orange">🔒</div><div class="spec-title">アンケート送信 API</div></div>
+        <table>
+          <thead><tr><th class="col-method">メソッド</th><th class="col-path">パス</th><th>処理</th></tr></thead>
+          <tbody>
+            <tr>
+              <td><span class="method method-post">POST</span></td>
+              <td><span class="endpoint">/api/liff/survey/submit</span></td>
+              <td>body: <code>{survey_id, line_user_id, answers: [{question_id, answer}]}</code><br>line_user_id から Applicant を特定。SurveyResponse + SurveyResponseItem を INSERT</td>
+            </tr>
+          </tbody>
+        </table>
+        <div class="warn-box">同一 applicant_id × survey_id の重複送信は許容（再送信可）。重複時は既存レスポンスをそのまま保持し、新レコードを追加する。</div>
+      </div>
+    </div><!-- /sl-liff -->
+
+  </div><!-- /tab-line -->
+
+
+  <!-- ================================================================
+       Google OAuth
+       ================================================================ -->
+  <div id="tab-google-oauth" class="tab-content">
+
+    <div class="section">
+      <div class="spec-header"><div class="spec-icon spec-icon-blue">🔑</div><div class="spec-title">OAuth2 スコープ定義</div></div>
+      <table>
+        <thead><tr><th class="col-name">スコープ</th><th>用途</th><th>必須/任意</th></tr></thead>
+        <tbody>
+          <tr><td><span class="scope-chip">openid</span></td><td>OpenID Connect による身元確認</td><td>必須</td></tr>
+          <tr><td><span class="scope-chip">email</span></td><td>Google Workspace メールアドレス取得。<span class="db-ref">Staff.email</span> に保存</td><td>必須</td></tr>
+          <tr><td><span class="scope-chip">profile</span></td><td>表示名・プロフィール画像取得。<span class="db-ref">Staff.name</span> の初期値に使用</td><td>必須</td></tr>
+          <tr><td><span class="scope-chip">https://www.googleapis.com/auth/calendar</span></td><td>Google Calendar の読み取り・書き込み・イベント管理</td><td>必須（カレンダー連携時）</td></tr>
+        </tbody>
+      </table>
+      <div class="info-box">スコープはログイン時に一括付与。Calendar スコープが拒否された場合もログイン自体は成功とし、カレンダー連携機能のみ「未連携」として表示する。</div>
+    </div>
+
+    <div class="section">
+      <div class="spec-header"><div class="spec-icon spec-icon-green">🔄</div><div class="spec-title">認証フロー（Authorization Code Flow）</div></div>
+      <div class="flow-steps">
+        <div class="flow-step"><div class="flow-step-num">1</div><div class="flow-step-body"><div class="flow-step-label">ログインボタン押下</div><div class="flow-step-detail">ATS が Google の認可エンドポイントへリダイレクト（state パラメータで CSRF 対策）</div></div></div>
+        <div class="flow-step"><div class="flow-step-num">2</div><div class="flow-step-body"><div class="flow-step-label">Google 認証・同意画面</div><div class="flow-step-detail">ユーザーが Google アカウントでログイン。組織外アカウントはエラー（hd パラメータでドメイン制限）</div></div></div>
+        <div class="flow-step"><div class="flow-step-num">3</div><div class="flow-step-body"><div class="flow-step-label">認可コード受信</div><div class="flow-step-detail">ATS の <span class="endpoint">/api/auth/google/callback</span> に code を受信。state を検証</div></div></div>
+        <div class="flow-step"><div class="flow-step-num">4</div><div class="flow-step-body"><div class="flow-step-label">トークン交換</div><div class="flow-step-detail">Google Token Endpoint に code を送り access_token・refresh_token・id_token を取得</div></div></div>
+        <div class="flow-step"><div class="flow-step-num">5</div><div class="flow-step-body"><div class="flow-step-label">Staff レコード作成 or 照合</div><div class="flow-step-detail">id_token の sub 値で <span class="db-ref">Staff.google_id</span> を検索。初回ログインは Staff を INSERT（role='recruiter'）。is_active=false はアクセス拒否</div></div></div>
+        <div class="flow-step"><div class="flow-step-num">6</div><div class="flow-step-body"><div class="flow-step-label">セッション発行</div><div class="flow-step-detail"><span class="db-ref">StaffSession</span> に INSERT。セッションIDを HttpOnly Cookie で発行。AuditLog に login を記録</div></div></div>
+      </div>
+    </div>
+
+    <div class="two-col">
+      <div class="section">
+        <div class="spec-header"><div class="spec-icon spec-icon-orange">🔑</div><div class="spec-title">トークン管理</div></div>
+        <table>
+          <thead><tr><th>トークン</th><th>TTL</th><th>保存場所</th></tr></thead>
+          <tbody>
+            <tr><td>access_token</td><td>1時間</td><td>サーバーサイドのセッションストア（Redis 等）。クライアントには渡さない</td></tr>
+            <tr><td>refresh_token</td><td>長期（失効まで）</td><td>サーバーサイドの暗号化ストレージ。access_token 失効時に自動更新</td></tr>
+            <tr><td>id_token</td><td>1時間</td><td>検証後に破棄。sub・email・name の抽出にのみ使用</td></tr>
+            <tr><td>セッションID</td><td>8時間（非操作時は30分で失効）</td><td>HttpOnly・Secure Cookie。<span class="db-ref">StaffSession</span> で管理</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="section">
+        <div class="spec-header"><div class="spec-icon spec-icon-red">⚠️</div><div class="spec-title">エラーハンドリング</div></div>
+        <table>
+          <thead><tr><th>ケース</th><th>処理</th></tr></thead>
+          <tbody>
+            <tr><td>組織外ドメイン</td><td><span class="err-msg">組織のGoogleアカウントでログインしてください。</span></td></tr>
+            <tr><td>is_active=false</td><td><span class="err-msg">このアカウントは無効化されています。管理者にお問い合わせください。</span></td></tr>
+            <tr><td>refresh_token 失効</td><td>再ログインを促す（セッション破棄）</td></tr>
+            <tr><td>Calendar スコープ拒否</td><td>ログイン成功。カレンダー連携機能のみ「未連携」表示</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </div><!-- /tab-google-oauth -->
+
+
+  <!-- ================================================================
+       Google Calendar
+       ================================================================ -->
+  <div id="tab-gcal" class="tab-content">
+
+    <div class="sub-tabs">
+      <div class="sub-tab active" onclick="swSub(this,'sgc-push')">ATS → Calendar 同期</div>
+      <div class="sub-tab"       onclick="swSub(this,'sgc-webhook')">Push Notifications（Calendar → ATS）</div>
+      <div class="sub-tab"       onclick="swSub(this,'sgc-conflict')">競合解決ルール</div>
+    </div>
+
+    <!-- ATS → Calendar 同期 -->
+    <div id="sgc-push" class="sub-content active">
+      <div class="section">
+        <div class="spec-header"><div class="spec-icon spec-icon-blue">📤</div><div class="spec-title">ATS側操作 → Calendar API 呼び出し対応表</div></div>
+        <table>
+          <thead><tr><th style="width:180px;">ATS側操作</th><th class="col-method">HTTP</th><th class="col-path">Calendar API</th><th>備考</th></tr></thead>
+          <tbody>
+            <tr>
+              <td>CalendarSlot 作成</td>
+              <td><span class="method method-post">POST</span></td>
+              <td><span class="endpoint">/calendars/{calendarId}/events</span></td>
+              <td>レスポンスの <code>id</code> を <span class="db-ref">CalendarSlot.google_calendar_event_id</span> に保存</td>
+            </tr>
+            <tr>
+              <td>CalendarSlot 更新（日時・タイプ変更）</td>
+              <td><span class="method method-patch">PATCH</span></td>
+              <td><span class="endpoint">/calendars/{calendarId}/events/{eventId}</span></td>
+              <td><span class="db-ref">CalendarSlot.google_synced_at</span> を現在時刻に更新</td>
+            </tr>
+            <tr>
+              <td>CalendarSlot 削除</td>
+              <td><span class="method method-delete">DELETE</span></td>
+              <td><span class="endpoint">/calendars/{calendarId}/events/{eventId}</span></td>
+              <td>is_booked=true の枠は削除不可（ATS画面側でガード済み）</td>
+            </tr>
+            <tr>
+              <td>Interview 作成（面接予約確定）</td>
+              <td><span class="method method-patch">PATCH</span></td>
+              <td><span class="endpoint">/calendars/{calendarId}/events/{eventId}</span></td>
+              <td>イベント概要に応募者名を追記。summary: "面接: {氏名}" に更新</td>
+            </tr>
+          </tbody>
+        </table>
+        <div class="info-box">Calendar API 呼び出しは非同期ジョブ（キュー処理）。ATS の DB 更新は即時、Google Calendar への反映は数秒〜数十秒のラグが発生する場合あり。</div>
+      </div>
+
+      <div class="section">
+        <div class="spec-header"><div class="spec-icon spec-icon-green">📋</div><div class="spec-title">イベント作成時のフィールドマッピング</div></div>
+        <table>
+          <thead><tr><th style="width:160px;">Calendar フィールド</th><th>値</th></tr></thead>
+          <tbody>
+            <tr><td><code>summary</code></td><td><code>{slot_type}: {担当者名}</code>（例: "面接: 田中太郎"）。予約後は応募者名を追記</td></tr>
+            <tr><td><code>start.dateTime</code></td><td><span class="db-ref">CalendarSlot.starts_at</span>（ISO 8601 形式）</td></tr>
+            <tr><td><code>end.dateTime</code></td><td><span class="db-ref">CalendarSlot.ends_at</span></td></tr>
+            <tr><td><code>attendees</code></td><td>担当者（<span class="db-ref">Staff.email</span>）を設定。応募者は追加しない</td></tr>
+            <tr><td><code>description</code></td><td>ATS の枠 URL を埋め込み（ディープリンク）</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div><!-- /sgc-push -->
+
+    <!-- Push Notifications -->
+    <div id="sgc-webhook" class="sub-content">
+      <div class="section">
+        <div class="spec-header"><div class="spec-icon spec-icon-blue">📡</div><div class="spec-title">Push Notifications 受信エンドポイント</div></div>
+        <table>
+          <thead><tr><th class="col-method">メソッド</th><th class="col-path">パス</th><th>説明</th></tr></thead>
+          <tbody>
+            <tr>
+              <td><span class="method method-post">POST</span></td>
+              <td><span class="endpoint">/api/webhooks/google-calendar</span></td>
+              <td>Google Calendar からのプッシュ通知受信口。ヘッダー <code>X-Goog-Channel-Token</code> で署名検証</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="section">
+        <div class="spec-header"><div class="spec-icon spec-icon-green">🔄</div><div class="spec-title">Push Notifications チャンネル管理</div></div>
+        <div class="flow-steps">
+          <div class="flow-step"><div class="flow-step-num">1</div><div class="flow-step-body"><div class="flow-step-label">チャンネル登録</div><div class="flow-step-detail">担当者の Google Calendar に対して <code>POST /calendars/{calendarId}/events/watch</code> を呼び出し。有効期限: 7日（最大）</div></div></div>
+          <div class="flow-step"><div class="flow-step-num">2</div><div class="flow-step-body"><div class="flow-step-label">通知受信</div><div class="flow-step-detail">Webhook エンドポイントで <code>X-Goog-Resource-State</code> ヘッダーを確認。sync / exists / not_exists のいずれかを処理</div></div></div>
+          <div class="flow-step"><div class="flow-step-num">3</div><div class="flow-step-body"><div class="flow-step-label">変更内容取得</div><div class="flow-step-detail">通知のみでは変更内容が不明なため、<code>GET /calendars/{calendarId}/events/{eventId}</code> で最新データを取得</div></div></div>
+          <div class="flow-step"><div class="flow-step-num">4</div><div class="flow-step-body"><div class="flow-step-label">ATS側 DB 更新</div><div class="flow-step-detail"><span class="db-ref">google_calendar_event_id</span> で <span class="db-ref">CalendarSlot</span> を特定し、日時・ステータスを更新。<span class="db-ref">google_synced_at</span> を現在時刻に更新</div></div></div>
+          <div class="flow-step"><div class="flow-step-num">5</div><div class="flow-step-body"><div class="flow-step-label">チャンネル更新</div><div class="flow-step-detail">期限切れ3日前にバッチ処理でチャンネルを再登録（<code>POST /calendars/{calendarId}/events/watch</code>）</div></div></div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="spec-header"><div class="spec-icon spec-icon-red">⚠️</div><div class="spec-title">エラーハンドリング</div></div>
+        <table>
+          <thead><tr><th style="width:200px;">ケース</th><th>処理</th></tr></thead>
+          <tbody>
+            <tr><td>署名検証失敗</td><td>400 を返して処理中断。ログに記録</td></tr>
+            <tr><td>CalendarSlot が見つからない（ATS側で削除済み）</td><td>スキップ。Calendar 側イベントはそのまま（孤立イベント）</td></tr>
+            <tr><td>Calendar API 呼び出し失敗</td><td>Exponential backoff でリトライ（最大3回）。失敗時はスタッフへ通知</td></tr>
+            <tr><td>チャンネル登録エラー（Google側障害）</td><td>1時間後に再試行。スタッフへ警告バナーを表示</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div><!-- /sgc-webhook -->
+
+    <!-- 競合解決ルール -->
+    <div id="sgc-conflict" class="sub-content">
+      <div class="section">
+        <div class="spec-header"><div class="spec-icon spec-icon-orange">⚖️</div><div class="spec-title">競合解決ルール</div></div>
+        <div class="info-box" style="margin-bottom:12px;">ATS と Google Calendar の両方で同一イベントが変更された場合（二重編集）の解決方針</div>
+        <table>
+          <thead><tr><th style="width:200px;">ケース</th><th>判定基準</th><th>処理</th></tr></thead>
+          <tbody>
+            <tr>
+              <td>ATS編集 vs Google Calendar編集（同時）</td>
+              <td><span class="db-ref">CalendarSlot.updated_at</span>（ATS） vs Google Calendar イベントの <code>updated</code> 時刻を比較</td>
+              <td>新しい方を優先して両方に反映。古い変更を上書き</td>
+            </tr>
+            <tr>
+              <td>Google Calendar 側でイベント削除</td>
+              <td><code>X-Goog-Resource-State: not_exists</code> 受信</td>
+              <td>is_booked=false の場合のみ ATS 側の CalendarSlot も削除。is_booked=true の場合はスタッフへ警告通知（面接予約が紐づいているため自動削除しない）</td>
+            </tr>
+            <tr>
+              <td>Google Calendar 側でイベント日時を過去に変更</td>
+              <td>Google イベントの start < 現在時刻</td>
+              <td>ATS の CalendarSlot は更新せずスタッフへ通知。日時の過去変更は手動確認が必要</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div><!-- /sgc-conflict -->
+
+  </div><!-- /tab-gcal -->
+
+
+  <!-- ================================================================
+       Salesforce（確認待ち）
+       ================================================================ -->
+  <div id="tab-sf" class="tab-content">
+
+    <div class="section">
+      <div class="spec-header"><div class="spec-icon spec-icon-orange">☁️</div><div class="spec-title">Salesforce 連携仕様</div></div>
+      <div class="tbd-box">
+        <div style="font-size:24px;margin-bottom:8px;">🔍</div>
+        <div style="font-weight:700;font-size:15px;margin-bottom:8px;">クライアント確認待ち</div>
+        <div style="font-size:12px;color:#888;line-height:1.8;">
+          以下の項目についてクライアントへの確認が必要です。確認後にこのドキュメントを更新します。
+        </div>
+        <div style="margin-top:16px;text-align:left;display:inline-block;">
+          <table style="font-size:12px;">
+            <thead><tr><th style="width:200px;">確認項目</th><th>現状</th></tr></thead>
+            <tbody>
+              <tr><td>利用するSFオブジェクト</td><td>Contact / Account / Custom Object を想定。要確認</td></tr>
+              <tr><td>同期方向</td><td>ATS→SF / SF→ATS / 双方向のいずれか</td></tr>
+              <tr><td>同期タイミング</td><td>リアルタイム（Platform Event）/ バッチ（夜間）のいずれか</td></tr>
+              <tr><td>認証方式</td><td>OAuth2（JWT Bearer Flow）を想定。Connected App のクライアントID等は要入手</td></tr>
+              <tr><td>フィールドマッピング</td><td>ATS ↔ SF の項目対応表が必要</td></tr>
+              <tr><td>サンドボックス環境</td><td>開発・テスト用SF環境の提供有無</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="warn-box" style="margin-top:12px;">
+        現時点で確定している実装のみ: <span class="db-ref">Applicant.sf_contact_id</span>（SF Contact ID の保存カラム）・<span class="db-ref">Applicant.sf_employment_cache</span>（SF採用状況キャッシュ、30分TTL）の2カラムをテーブルに確保済み。連携仕様確定後に table-spec・dataflow を更新する。
+      </div>
+    </div>
+
+  </div><!-- /tab-sf -->
+
+</div><!-- /page -->
+
+<script>
+function switchTab(el, id) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById(id).classList.add('active');
+}
+function swSub(el, id) {
+  const parent = document.getElementById(id).parentElement;
+  parent.querySelectorAll('.sub-content').forEach(c => c.classList.remove('active'));
+  el.parentElement.querySelectorAll('.sub-tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById(id).classList.add('active');
+}
+</script>
+</body>
+</html>

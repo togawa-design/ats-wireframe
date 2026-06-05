@@ -2647,7 +2647,7 @@
             <tr><td>目標承諾数</td><td>内定承諾（result='acceptance' または Selection.result='passed' at acceptance stage）の目標件数</td><td><span class="badge badge-must">必須</span> 正の整数</td></tr>
           </tbody>
         </table>
-        <div class="warn-box" style="margin-top:10px;">目標値はシステム設定テーブルが未実装のため、暫定的に <span class="db-ref">Staff.google_calendar_id</span> と同様のパターンでサーバーサイド設定ファイル（環境変数）に格納。テーブル定義は v0.2 で追加予定。</div>
+        <div class="ok-box" style="margin-top:10px;">目標値は <span class="db-ref">RecruitmentGoal</span> テーブルに格納（table-spec 参照）。graduation_year に UNIQUE 制約で1年度1レコードを保証。</div>
       </div>
     </div><!-- /ss-goal -->
 

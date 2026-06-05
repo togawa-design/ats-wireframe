@@ -138,7 +138,7 @@
   <!-- Overview -->
   <div class="overview-grid">
     <div class="overview-card">
-      <div class="overview-card-val">26</div>
+      <div class="overview-card-val">27</div>
       <div class="overview-card-label">総テーブル数</div>
     </div>
     <div class="overview-card">
@@ -319,6 +319,11 @@
           <div class="toc-item-jp">書類テンプレート</div>
           <div class="toc-item-cols">4 columns</div>
         </div>
+        <div class="toc-item toc-f" onclick="goTab('tab-f')">
+          <div class="toc-item-name">RecruitmentGoal <span class="badge badge-new">NEW</span></div>
+          <div class="toc-item-jp">採用目標</div>
+          <div class="toc-item-cols">7 columns</div>
+        </div>
       </div>
     </div>
 
@@ -361,9 +366,9 @@
           </tr>
           <tr>
             <td><strong style="color:#f57f17;">F. 媒体・マスター</strong></td>
-            <td>Media / QRCode / Document（3）</td>
-            <td>求人媒体・QRコード・書類テンプレートのマスター管理</td>
-            <td>Documentは内定通知書等のテンプレート格納</td>
+            <td>Media / QRCode / Document / RecruitmentGoal（4）</td>
+            <td>求人媒体・QRコード・書類テンプレート・採用目標のマスター管理</td>
+            <td>RecruitmentGoalは分析画面（SCR-06）の達成率算出に使用</td>
           </tr>
         </tbody>
       </table>
@@ -1120,6 +1125,33 @@
           <tr><td><code>template_body</code></td><td>TEXT</td><td>NO</td><td>—</td><td>差し込み変数（{{氏名}}, {{入社日}}等）を含むHTMLテンプレート</td></tr>
         </tbody>
       </table>
+    </div>
+
+    <!-- RecruitmentGoal -->
+    <div class="section group-f">
+      <div class="tbl-header">
+        <div class="tbl-icon">🎯</div>
+        <div>
+          <div class="tbl-name">RecruitmentGoal <span class="badge badge-new">NEW</span></div>
+          <div class="tbl-jp">採用目標テーブル</div>
+        </div>
+        <div class="tbl-count">7 columns</div>
+      </div>
+      <table>
+        <thead>
+          <tr><th class="col-col">カラム名</th><th class="col-type">型</th><th class="col-null">NULL</th><th class="col-default">デフォルト</th><th>制約・説明</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><code>id</code></td><td>UUID</td><td>NO</td><td>gen_random_uuid()</td><td><span class="badge badge-pk">PK</span></td></tr>
+          <tr><td><code>graduation_year</code></td><td>SMALLINT</td><td>NO</td><td>—</td><td><span class="badge badge-uk">UQ</span> 対象年度（例: 2027）。Applicant.graduation_year に対応</td></tr>
+          <tr><td><code>target_entries</code></td><td>INTEGER</td><td>YES</td><td>NULL</td><td>目標エントリー数。NULL の場合は目標未設定</td></tr>
+          <tr><td><code>target_offers</code></td><td>INTEGER</td><td>NO</td><td>—</td><td>目標内定数</td></tr>
+          <tr><td><code>target_acceptances</code></td><td>INTEGER</td><td>NO</td><td>—</td><td>目標承諾数。target_offers 以下であること</td></tr>
+          <tr><td><code>updated_by</code></td><td>UUID</td><td>NO</td><td>—</td><td><span class="badge badge-fk">FK</span> → <span class="fk-ref">Staff.id</span> 最終更新者</td></tr>
+          <tr><td><code>updated_at</code></td><td>TIMESTAMP</td><td>NO</td><td>CURRENT_TIMESTAMP</td><td>更新トリガーで自動更新</td></tr>
+        </tbody>
+      </table>
+      <div class="info-box" style="margin-top:12px;">SCR-12「採用目標」タブで年度ごとに設定。SCR-06「内定承諾分析」タブの達成率算出（目標数に対する実績の割合）で参照。graduation_year に UNIQUE 制約を付与し、1年度1レコードを保証する。</div>
     </div>
 
   </div>
