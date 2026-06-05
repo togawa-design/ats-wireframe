@@ -1,0 +1,2679 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ATS 画面仕様書</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Hiragino Sans', sans-serif; background: #f0f2f5; color: #1a1a2e; display:flex; flex-direction:column; min-height:100vh; }
+  .page { max-width: 1200px; margin: 0 auto; padding: 32px 24px; width:100%; }
+  h1 { font-size: 22px; font-weight: 700; margin-bottom: 4px; }
+  h2 { font-size: 15px; font-weight: 700; color: #1a1a2e; margin-bottom: 14px; padding-left: 12px; border-left: 4px solid #7c83fd; }
+  h3 { font-size: 13px; font-weight: 700; color: #444; margin-bottom: 8px; }
+  .meta { font-size: 12px; color: #999; margin-bottom: 28px; display:flex; gap:16px; }
+
+  /* Screen tabs (top-level) */
+  .screen-tabs { display:flex; gap:0; border-bottom:2px solid #e8eaf0; margin-bottom:22px; flex-wrap:wrap; }
+  .screen-tab { padding:10px 16px; font-size:13px; cursor:pointer; color:#888; border-bottom:2px solid transparent; margin-bottom:-2px; transition:all .15s; white-space:nowrap; }
+  .screen-tab.active { color:#7c83fd; border-bottom-color:#7c83fd; font-weight:600; }
+  .screen-content { display:none; }
+  .screen-content.active { display:block; }
+
+  /* Sub tabs */
+  .sub-tabs { display:flex; gap:0; border-bottom:1px solid #e8eaf0; margin-bottom:18px; flex-wrap:wrap; }
+  .sub-tab { padding:8px 14px; font-size:12px; cursor:pointer; color:#aaa; border-bottom:2px solid transparent; margin-bottom:-1px; transition:all .15s; white-space:nowrap; }
+  .sub-tab.active { color:#7c83fd; border-bottom-color:#7c83fd; font-weight:600; }
+  .sub-content { display:none; }
+  .sub-content.active { display:block; }
+
+  /* Section card */
+  .section { background: #fff; border-radius: 12px; padding: 22px 24px; margin-bottom: 20px; box-shadow: 0 1px 4px rgba(0,0,0,.06); }
+  .section-sm { background: #fff; border-radius: 10px; padding: 16px 20px; margin-bottom: 14px; box-shadow: 0 1px 3px rgba(0,0,0,.05); }
+
+  /* Spec section header */
+  .spec-header { display:flex; align-items:center; gap:8px; margin-bottom:12px; }
+  .spec-icon { width:24px; height:24px; border-radius:6px; display:flex; align-items:center; justify-content:center; font-size:13px; flex-shrink:0; }
+  .spec-icon-blue { background:#eef0ff; }
+  .spec-icon-green { background:#e8f5e9; }
+  .spec-icon-orange { background:#fff8e1; }
+  .spec-icon-red { background:#ffebee; }
+  .spec-title { font-size:13px; font-weight:700; color:#1a1a2e; }
+
+  /* Table */
+  table { width:100%; border-collapse:collapse; font-size:13px; }
+  th { background:#f8f9fc; padding:9px 12px; text-align:left; font-weight:600; color:#555; font-size:12px; border-bottom:1px solid #e8eaf0; }
+  td { padding:10px 12px; border-bottom:1px solid #f0f2f5; vertical-align:top; line-height:1.6; }
+  tr:last-child td { border-bottom:none; }
+  tr:hover td { background:#fafbff; }
+  .col-field  { width:160px; }
+  .col-src    { width:200px; }
+  .col-type   { width:80px; }
+  .col-rule   { }
+  .col-btn    { width:150px; }
+  .col-nav    { width:160px; }
+  .col-api    { width:180px; }
+  .col-err    { width:160px; }
+
+  /* Monospace for table/column refs */
+  .db-ref { font-family: 'SF Mono', 'Menlo', monospace; font-size:11px; color:#7c83fd; background:#f0f0ff; padding:1px 5px; border-radius:4px; white-space:nowrap; }
+
+  /* Badges */
+  .badge { display:inline-block; padding:2px 8px; border-radius:10px; font-size:10px; font-weight:700; white-space:nowrap; }
+  .badge-must   { background:#ff6b6b; color:#fff; }
+  .badge-rec    { background:#ff9800; color:#fff; }
+  .badge-opt    { background:#bdbdbd; color:#fff; }
+  .badge-new    { background:#7c83fd; color:#fff; }
+  .badge-info   { background:#29b6f6; color:#fff; }
+  .badge-ok     { background:#4caf50; color:#fff; }
+  .badge-warn   { background:#ff9800; color:#fff; }
+  .badge-err    { background:#ff6b6b; color:#fff; }
+
+  /* Validation legend */
+  .legend { display:flex; gap:14px; font-size:12px; align-items:center; padding:10px 14px; background:#fafbff; border-radius:8px; border:1px solid #e8eaf0; margin-bottom:14px; }
+  .legend-item { display:flex; align-items:center; gap:5px; }
+
+  /* Info / warn / error boxes */
+  .info-box  { background:#f0f0ff; border:1px solid #c5cae9; border-radius:8px; padding:10px 14px; font-size:12px; color:#3949ab; margin-top:10px; }
+  .warn-box  { background:#fff8e1; border:1px solid #ffcc80; border-radius:8px; padding:10px 14px; font-size:12px; color:#e65100; margin-top:10px; }
+  .ok-box    { background:#e8f5e9; border:1px solid #a5d6a7; border-radius:8px; padding:10px 14px; font-size:12px; color:#2e7d32; margin-top:10px; }
+  .err-box   { background:#ffebee; border:1px solid #ef9a9a; border-radius:8px; padding:10px 14px; font-size:12px; color:#b71c1c; }
+
+  /* Two col grid */
+  .two-col { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+  .three-col { display:grid; grid-template-columns:1fr 1fr 1fr; gap:14px; }
+
+  /* Screen overview card */
+  .overview-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:12px; margin-bottom:20px; }
+  .overview-card { background:#fff; border-radius:10px; padding:14px 16px; box-shadow:0 1px 4px rgba(0,0,0,.06); border-top:3px solid #7c83fd; }
+  .overview-card-label { font-size:11px; color:#888; margin-bottom:4px; }
+  .overview-card-val { font-size:13px; font-weight:700; color:#1a1a2e; }
+
+  /* Button pill */
+  .btn-pill { display:inline-block; padding:3px 10px; border-radius:12px; font-size:11px; font-weight:600; border:1px solid; margin:1px; white-space:nowrap; }
+  .btn-primary  { background:#7c83fd; color:#fff; border-color:#7c83fd; }
+  .btn-secondary{ background:#fff; color:#7c83fd; border-color:#7c83fd; }
+  .btn-danger   { background:#ff6b6b; color:#fff; border-color:#ff6b6b; }
+  .btn-ghost    { background:#f5f5f5; color:#555; border-color:#ddd; }
+
+  /* Screen label */
+  .screen-label { font-size:11px; font-weight:700; background:#7c83fd; color:#fff; border-radius:4px; padding:2px 8px; }
+
+  /* fr-id monospace */
+  .fr-id { font-family:monospace; font-size:11px; color:#7c83fd; font-weight:700; }
+
+  /* Error message display */
+  .err-msg { font-family:'SF Mono','Menlo',monospace; font-size:11px; background:#fff5f5; border:1px dashed #ffaaaa; border-radius:4px; padding:4px 8px; color:#c62828; display:inline-block; }
+
+  /* API call pill */
+  .api-pill { font-family:monospace; font-size:10px; background:#1a1a2e; color:#7c83fd; padding:2px 7px; border-radius:4px; white-space:nowrap; }
+
+  /* Subtab group heading */
+  .sub-group-head { font-size:12px; font-weight:700; color:#7c83fd; background:#f0f0ff; border-radius:6px; padding:6px 12px; margin-bottom:10px; }
+
+  /* Cat header */
+  .cat-header { background:#f8f9fc; border-radius:8px; padding:8px 14px; font-size:12px; font-weight:700; color:#555; margin:14px 0 8px; border-left:3px solid #7c83fd; }
+</style>
+</head>
+<body>
+
+<!-- Global Nav -->
+<div style="background:#1a1a2e;height:40px;display:flex;align-items:center;padding:0 20px;gap:24px;font-size:12px;flex-shrink:0;">
+  <span style="color:#7c83fd;font-weight:700;letter-spacing:0.5px;">ATS設計ドキュメント</span>
+  <a href="index.html"          style="color:#aaa;text-decoration:none;opacity:.7;">🖥 ワイヤーフレーム</a>
+  <a href="requirements.html"   style="color:#aaa;text-decoration:none;opacity:.7;">📋 要件定義書</a>
+  <a href="dataflow.html"       style="color:#aaa;text-decoration:none;opacity:.7;">🔀 データフロー設計</a>
+  <a href="roadmap.html"        style="color:#aaa;text-decoration:none;opacity:.7;">🗺️ ロードマップ</a>
+  <a href="screen-spec.html"    style="color:#fff;text-decoration:none;border-bottom:2px solid #7c83fd;padding-bottom:2px;">📐 画面仕様書</a>
+  <a href="table-spec.html"     style="color:#aaa;text-decoration:none;opacity:.7;">🗃️ テーブル定義書</a>
+  <a href="integration-spec.html" style="color:#aaa;text-decoration:none;opacity:.7;">🔌 外部連携仕様書</a>
+</div>
+
+<div class="page">
+  <h1>新卒採用管理システム（ATS）画面仕様書</h1>
+  <div class="meta">
+    <span>v0.2</span>
+    <span>2026-06-05</span>
+    <span>ステータス：設計中</span>
+    <span style="color:#7c83fd;font-weight:700;">12画面</span>
+  </div>
+
+  <!-- Legend -->
+  <div class="legend">
+    <span style="font-weight:700;color:#555;font-size:12px;">バリデーション凡例：</span>
+    <span class="legend-item"><span>🔴</span><span class="badge badge-must">必須</span><span style="color:#888;">入力必須</span></span>
+    <span class="legend-item"><span>🟡</span><span class="badge badge-rec">推奨</span><span style="color:#888;">入力を推奨（未入力でも保存可）</span></span>
+    <span class="legend-item"><span>⚪</span><span class="badge badge-opt">任意</span><span style="color:#888;">任意入力</span></span>
+    <span style="margin-left:auto;font-size:11px;color:#aaa;">各画面の入力バリデーションで参照</span>
+  </div>
+
+  <!-- Screen-level tabs -->
+  <div class="screen-tabs">
+    <div class="screen-tab active"  onclick="swScreen(this,'s-dashboard')">① ダッシュボード</div>
+    <div class="screen-tab"         onclick="swScreen(this,'s-list')">② 学生一覧</div>
+    <div class="screen-tab"         onclick="swScreen(this,'s-detail')">③ 学生詳細</div>
+    <div class="screen-tab"         onclick="swScreen(this,'s-pipeline')">④ 選考管理</div>
+    <div class="screen-tab"         onclick="swScreen(this,'s-line')">⑤ LINE送信</div>
+    <div class="screen-tab"         onclick="swScreen(this,'s-analytics')">⑥ 分析・レポート</div>
+    <div class="screen-tab"         onclick="swScreen(this,'s-calendar')">⑦ カレンダー</div>
+    <div class="screen-tab"         onclick="swScreen(this,'s-richmenu')">⑧ リッチメニュー</div>
+    <div class="screen-tab"         onclick="swScreen(this,'s-media')">⑨ 媒体管理</div>
+    <div class="screen-tab"         onclick="swScreen(this,'s-documents')">⑩ 書類管理</div>
+    <div class="screen-tab"         onclick="swScreen(this,'s-users')">⑪ ユーザー管理</div>
+    <div class="screen-tab"         onclick="swScreen(this,'s-settings')">⑫ システム設定</div>
+  </div>
+
+
+  <!-- =====================================================================
+       ① ダッシュボード
+       ===================================================================== -->
+  <div id="s-dashboard" class="screen-content active">
+
+    <div class="overview-grid">
+      <div class="overview-card">
+        <div class="overview-card-label">画面ID</div>
+        <div class="overview-card-val">SCR-01</div>
+      </div>
+      <div class="overview-card">
+        <div class="overview-card-label">ルート</div>
+        <div class="overview-card-val">/dashboard</div>
+      </div>
+      <div class="overview-card">
+        <div class="overview-card-label">アクセス権限</div>
+        <div class="overview-card-val">採用担当者・管理者</div>
+      </div>
+      <div class="overview-card">
+        <div class="overview-card-label">初期表示</div>
+        <div class="overview-card-val">ログイン直後のトップ画面</div>
+      </div>
+    </div>
+
+    <!-- 表示項目 -->
+    <div class="section">
+      <div class="spec-header">
+        <div class="spec-icon spec-icon-blue">📋</div>
+        <div class="spec-title">① 表示項目</div>
+      </div>
+      <table>
+        <thead>
+          <tr>
+            <th class="col-field">表示項目</th>
+            <th class="col-src">データソース（テーブル.カラム）</th>
+            <th>集計ロジック / 補足</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>KPIカード：総エントリー数</strong></td>
+            <td><span class="db-ref">Applicant</span></td>
+            <td><code>COUNT(*)</code> 全件。当該採用年度フィルタ適用</td>
+          </tr>
+          <tr>
+            <td><strong>KPIカード：内定者数</strong></td>
+            <td><span class="db-ref">Selection.current_stage_id</span></td>
+            <td><span class="db-ref">SelectionStage.stage_type = 'offer_accepted'</span> に到達した件数</td>
+          </tr>
+          <tr>
+            <td><strong>KPIカード：内定承諾率</strong></td>
+            <td><span class="db-ref">Selection</span></td>
+            <td>内定者数 / オファー送付数 × 100（%）。小数点第1位まで表示</td>
+          </tr>
+          <tr>
+            <td><strong>KPIカード：本日の面接数</strong></td>
+            <td><span class="db-ref">CalendarSlot</span> + <span class="db-ref">Interview</span></td>
+            <td><code>scheduled_at::date = CURRENT_DATE</code> かつ <code>status != 'cancelled'</code></td>
+          </tr>
+          <tr>
+            <td><strong>ファネルチャート</strong></td>
+            <td><span class="db-ref">Selection</span> + <span class="db-ref">SelectionStage</span></td>
+            <td>各ステージの在籍者数を <code>GROUP BY current_stage_id</code> で集計。バイパスカウントロジックを適用（通過ステージ補完）</td>
+          </tr>
+          <tr>
+            <td><strong>本日のスケジュール</strong></td>
+            <td><span class="db-ref">CalendarSlot</span> + <span class="db-ref">Interview</span> + <span class="db-ref">Applicant</span></td>
+            <td><code>scheduled_at::date = CURRENT_DATE</code> ORDER BY <code>scheduled_at</code> ASC。学生氏名・面接官名を JOIN 表示</td>
+          </tr>
+          <tr>
+            <td><strong>最近のエントリー（5件）</strong></td>
+            <td><span class="db-ref">Applicant</span></td>
+            <td><code>ORDER BY created_at DESC LIMIT 5</code>。氏名・学校名・エントリー日時を表示</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 入力バリデーション -->
+    <div class="section">
+      <div class="spec-header">
+        <div class="spec-icon spec-icon-green">✅</div>
+        <div class="spec-title">② 入力バリデーション</div>
+      </div>
+      <div class="ok-box" style="margin-top:0;">ダッシュボードには入力フォームがありません。フィルタ操作（年度切替）のみ行います。</div>
+      <table style="margin-top:12px;">
+        <thead>
+          <tr>
+            <th class="col-field">項目</th>
+            <th class="col-type">区分</th>
+            <th>ルール</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>年度フィルタ</td>
+            <td><span class="badge badge-opt">任意</span></td>
+            <td>プルダウン選択のみ。テキスト入力なし。デフォルト：システム設定の現採用年度</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- ボタン動作 -->
+    <div class="section">
+      <div class="spec-header">
+        <div class="spec-icon spec-icon-orange">🖱️</div>
+        <div class="spec-title">③ ボタン動作</div>
+      </div>
+      <table>
+        <thead>
+          <tr>
+            <th class="col-btn">ボタン</th>
+            <th class="col-nav">遷移先 / 動作</th>
+            <th class="col-api">API / 処理</th>
+            <th>備考</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><span class="btn-pill btn-primary">＋ 学生追加</span></td>
+            <td>学生一覧画面（新規登録モーダルを開いた状態）</td>
+            <td>—</td>
+            <td>右上固定配置</td>
+          </tr>
+          <tr>
+            <td><span class="btn-pill btn-secondary">LINE送信</span></td>
+            <td>LINE送信画面 <code>/line-message</code></td>
+            <td>—</td>
+            <td>一括メッセージ送信ショートカット</td>
+          </tr>
+          <tr>
+            <td><span class="btn-pill btn-ghost">詳細 →</span>（最近のエントリー）</td>
+            <td>学生詳細画面 <code>/students/:id</code></td>
+            <td><span class="api-pill">GET /api/students/:id</span></td>
+            <td>各行クリックでも同遷移</td>
+          </tr>
+          <tr>
+            <td><span class="btn-pill btn-ghost">スケジュール詳細</span></td>
+            <td>面接詳細モーダル（インラインオーバーレイ）</td>
+            <td><span class="api-pill">GET /api/interviews/:id</span></td>
+            <td>—</td>
+          </tr>
+          <tr>
+            <td>年度フィルタ（プルダウン）</td>
+            <td>同画面を選択年度でリフレッシュ</td>
+            <td><span class="api-pill">GET /api/dashboard?year=XXXX</span></td>
+            <td>URLパラメータに反映</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- エラーメッセージ -->
+    <div class="section">
+      <div class="spec-header">
+        <div class="spec-icon spec-icon-red">⚠️</div>
+        <div class="spec-title">④ エラーメッセージ</div>
+      </div>
+      <table>
+        <thead>
+          <tr>
+            <th class="col-field">発生条件</th>
+            <th>表示箇所</th>
+            <th>メッセージ</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>KPIカードのデータ取得失敗（APIエラー5xx）</td>
+            <td>各カード内</td>
+            <td><span class="err-msg">データを取得できませんでした</span></td>
+          </tr>
+          <tr>
+            <td>ファネルチャートのデータ取得失敗</td>
+            <td>チャートエリア</td>
+            <td><span class="err-msg">グラフを読み込めませんでした。再読み込みしてください。</span></td>
+          </tr>
+          <tr>
+            <td>スケジュールデータ取得失敗</td>
+            <td>スケジュールカード内</td>
+            <td><span class="err-msg">スケジュール情報を取得できませんでした</span></td>
+          </tr>
+          <tr>
+            <td>ネットワーク接続なし</td>
+            <td>画面上部バナー</td>
+            <td><span class="err-msg">ネットワークに接続されていません。接続を確認してください。</span></td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="info-box" style="margin-top:12px;">各カードは独立してエラー表示（他カードに影響しない）。リトライボタンをカード単位で配置する。</div>
+    </div>
+
+  </div><!-- /s-dashboard -->
+
+
+  <!-- =====================================================================
+       ② 学生一覧
+       ===================================================================== -->
+  <div id="s-list" class="screen-content">
+
+    <div class="overview-grid">
+      <div class="overview-card">
+        <div class="overview-card-label">画面ID</div>
+        <div class="overview-card-val">SCR-02</div>
+      </div>
+      <div class="overview-card">
+        <div class="overview-card-label">ルート</div>
+        <div class="overview-card-val">/students</div>
+      </div>
+      <div class="overview-card">
+        <div class="overview-card-label">アクセス権限</div>
+        <div class="overview-card-val">採用担当者・管理者・面接官・閲覧ロール（面接官・閲覧ロールは閲覧のみ）</div>
+      </div>
+      <div class="overview-card">
+        <div class="overview-card-label">デフォルトソート</div>
+        <div class="overview-card-val">created_at DESC</div>
+      </div>
+    </div>
+
+    <!-- 表示項目 -->
+    <div class="section">
+      <div class="spec-header">
+        <div class="spec-icon spec-icon-blue">📋</div>
+        <div class="spec-title">① 表示項目（一覧テーブル列）</div>
+      </div>
+      <table>
+        <thead>
+          <tr>
+            <th class="col-field">列名</th>
+            <th class="col-src">データソース</th>
+            <th>表示形式 / 補足</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>氏名</td>
+            <td><span class="db-ref">Applicant.last_name</span> + <span class="db-ref">first_name</span></td>
+            <td>姓名スペース区切り。クリックで学生詳細へ</td>
+          </tr>
+          <tr>
+            <td>学校名</td>
+            <td><span class="db-ref">School.name</span>（<span class="db-ref">Applicant.school_id</span> JOIN）</td>
+            <td>最大20文字で省略＋ツールチップ</td>
+          </tr>
+          <tr>
+            <td>卒業見込み年度</td>
+            <td><span class="db-ref">Applicant.graduation_year</span></td>
+            <td>YYYY年3月卒 形式</td>
+          </tr>
+          <tr>
+            <td>タグ</td>
+            <td><span class="db-ref">ApplicantTag</span> JOIN <span class="db-ref">Tag.name</span> / <span class="db-ref">Tag.color</span></td>
+            <td>カラーバッジで最大3件表示。超過分は +N と省略</td>
+          </tr>
+          <tr>
+            <td>現在のステータス</td>
+            <td><span class="db-ref">Selection.current_stage_id</span> JOIN <span class="db-ref">SelectionStage.name</span></td>
+            <td>ステージ名をカラーバッジで表示。選考フロー別に色分け</td>
+          </tr>
+          <tr>
+            <td>LINE連携状態</td>
+            <td><span class="db-ref">Applicant.line_user_id</span></td>
+            <td>IS NOT NULL → <span class="badge badge-ok">連携済</span>、NULL → <span class="badge badge-opt">未連携</span></td>
+          </tr>
+          <tr>
+            <td>最終アクション日</td>
+            <td><span class="db-ref">SelectionHistory.changed_at</span> MAX</td>
+            <td>YYYY/MM/DD 形式。N日前表示も補足</td>
+          </tr>
+          <tr>
+            <td>応募者区分</td>
+            <td><span class="db-ref">Applicant.applicant_type</span></td>
+            <td>新卒 / 既卒 / 第二新卒バッジ</td>
+          </tr>
+          <tr>
+            <td>流入媒体</td>
+            <td><span class="db-ref">ApplicantSource.media_id</span> JOIN <span class="db-ref">Media.name</span></td>
+            <td>複数ある場合は主媒体（created_at最古）を表示</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="cat-header" style="margin-top:16px;">フィルタ条件</div>
+      <table>
+        <thead>
+          <tr>
+            <th class="col-field">フィルタ項目</th>
+            <th class="col-src">検索対象カラム</th>
+            <th>検索方式</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>氏名検索</td>
+            <td><span class="db-ref">Applicant.last_name</span> + <span class="db-ref">first_name</span>（フリガナも含む）</td>
+            <td><code>ILIKE '%keyword%'</code>（部分一致、大文字小文字無視）</td>
+          </tr>
+          <tr>
+            <td>ステータス</td>
+            <td><span class="db-ref">Selection.current_stage_id</span></td>
+            <td>プルダウン複数選択 → <code>IN (...)</code></td>
+          </tr>
+          <tr>
+            <td>タグ</td>
+            <td><span class="db-ref">ApplicantTag.tag_id</span></td>
+            <td>プルダウン複数選択 → サブクエリで <code>EXISTS</code></td>
+          </tr>
+          <tr>
+            <td>流入媒体</td>
+            <td><span class="db-ref">ApplicantSource.media_id</span></td>
+            <td>プルダウン複数選択</td>
+          </tr>
+          <tr>
+            <td>応募者区分</td>
+            <td><span class="db-ref">Applicant.applicant_type</span></td>
+            <td>チェックボックス（新卒 / 既卒 / 第二新卒）</td>
+          </tr>
+          <tr>
+            <td>卒業年度</td>
+            <td><span class="db-ref">Applicant.graduation_year</span></td>
+            <td>プルダウン単一選択</td>
+          </tr>
+          <tr>
+            <td>LINE連携状態</td>
+            <td><span class="db-ref">Applicant.line_user_id</span></td>
+            <td>ラジオ（全て / 連携済 / 未連携）</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- バリデーション -->
+    <div class="section">
+      <div class="spec-header">
+        <div class="spec-icon spec-icon-green">✅</div>
+        <div class="spec-title">② 入力バリデーション</div>
+      </div>
+      <table>
+        <thead>
+          <tr>
+            <th class="col-field">項目</th>
+            <th class="col-type">区分</th>
+            <th>ルール</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>氏名検索テキスト</td>
+            <td><span class="badge badge-opt">任意</span></td>
+            <td>最大 <strong>100文字</strong>。超過時は入力をブロック（101文字目から入力不可）</td>
+          </tr>
+          <tr>
+            <td>フィルタ各選択肢</td>
+            <td><span class="badge badge-opt">任意</span></td>
+            <td>プルダウン・チェックボックスのみ。テキスト入力なし</td>
+          </tr>
+          <tr>
+            <td>CSVエクスポート対象件数</td>
+            <td>—</td>
+            <td>0件の場合は送信ボタンを非活性化（disabled）。エラーメッセージも表示</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- ボタン動作 -->
+    <div class="section">
+      <div class="spec-header">
+        <div class="spec-icon spec-icon-orange">🖱️</div>
+        <div class="spec-title">③ ボタン動作</div>
+      </div>
+      <table>
+        <thead>
+          <tr>
+            <th class="col-btn">ボタン</th>
+            <th class="col-nav">遷移先 / 動作</th>
+            <th class="col-api">API / 処理</th>
+            <th>備考</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><span class="btn-pill btn-primary">＋ 学生追加</span></td>
+            <td>学生新規登録モーダルをオーバーレイ表示</td>
+            <td><span class="api-pill">POST /api/students</span></td>
+            <td>登録成功後、一覧を先頭に挿入してフラッシュ表示</td>
+          </tr>
+          <tr>
+            <td><span class="btn-pill btn-secondary">LINE送信（チェック選択後）</span></td>
+            <td>LINE送信画面 <code>/line-message</code>（選択済みIDをクエリ引数で渡す）</td>
+            <td>—</td>
+            <td>1件以上チェック必須。LINE未連携者はカウントされない旨をツールチップ表示</td>
+          </tr>
+          <tr>
+            <td><span class="btn-pill btn-ghost">詳細 →</span>（行 or ボタン）</td>
+            <td>学生詳細画面 <code>/students/:id</code></td>
+            <td><span class="api-pill">GET /api/students/:id</span></td>
+            <td>—</td>
+          </tr>
+          <tr>
+            <td><span class="btn-pill btn-ghost">CSVエクスポート</span></td>
+            <td>モーダル表示：「全件 or 絞り込み結果」を選択してダウンロード</td>
+            <td><span class="api-pill">GET /api/students/export?...</span></td>
+            <td>Content-Disposition: attachment。最大件数制限：10,000件</td>
+          </tr>
+          <tr>
+            <td><span class="btn-pill btn-ghost">絞り込みリセット</span></td>
+            <td>フィルタ全項目をクリアして再検索</td>
+            <td><span class="api-pill">GET /api/students（フィルタなし）</span></td>
+            <td>—</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- エラーメッセージ -->
+    <div class="section">
+      <div class="spec-header">
+        <div class="spec-icon spec-icon-red">⚠️</div>
+        <div class="spec-title">④ エラーメッセージ</div>
+      </div>
+      <table>
+        <thead>
+          <tr>
+            <th class="col-field">発生条件</th>
+            <th>表示箇所</th>
+            <th>メッセージ</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>CSVエクスポート対象が0件</td>
+            <td>エクスポートモーダル内</td>
+            <td><span class="err-msg">対象者がいません。絞り込み条件を確認してください。</span></td>
+          </tr>
+          <tr>
+            <td>CSV出力件数が上限（10,000件）超過</td>
+            <td>エクスポートモーダル内</td>
+            <td><span class="err-msg">件数が上限（10,000件）を超えています。絞り込みを行ってから再度エクスポートしてください。</span></td>
+          </tr>
+          <tr>
+            <td>一覧データ取得失敗</td>
+            <td>テーブルエリア中央</td>
+            <td><span class="err-msg">データを取得できませんでした。再読み込みしてください。</span></td>
+          </tr>
+          <tr>
+            <td>LINE送信ボタン押下時に選択0件</td>
+            <td>ボタン付近トースト</td>
+            <td><span class="err-msg">学生を1人以上選択してください。</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+  </div><!-- /s-list -->
+
+
+  <!-- =====================================================================
+       ③ 学生詳細（4サブタブ）
+       ===================================================================== -->
+  <div id="s-detail" class="screen-content">
+
+    <div class="overview-grid">
+      <div class="overview-card">
+        <div class="overview-card-label">画面ID</div>
+        <div class="overview-card-val">SCR-03</div>
+      </div>
+      <div class="overview-card">
+        <div class="overview-card-label">ルート</div>
+        <div class="overview-card-val">/students/:id</div>
+      </div>
+      <div class="overview-card">
+        <div class="overview-card-label">アクセス権限</div>
+        <div class="overview-card-val">採用担当者・管理者・面接官・閲覧ロール（面接官・閲覧ロールは閲覧のみ）</div>
+      </div>
+      <div class="overview-card">
+        <div class="overview-card-label">サブタブ</div>
+        <div class="overview-card-val">4つ（プロフィール / 選考 / LINE / アンケート）</div>
+      </div>
+    </div>
+
+    <!-- Sub tabs for detail -->
+    <div class="sub-tabs">
+      <div class="sub-tab active" onclick="swSub(this,'sd-profile','detail')">プロフィール</div>
+      <div class="sub-tab"       onclick="swSub(this,'sd-history','detail')">選考履歴</div>
+      <div class="sub-tab"       onclick="swSub(this,'sd-line','detail')">LINEチャット</div>
+      <div class="sub-tab"       onclick="swSub(this,'sd-survey','detail')">アンケート</div>
+    </div>
+
+    <!-- プロフィール -->
+    <div id="sd-profile" class="sub-content active">
+      <div class="section">
+        <div class="spec-header">
+          <div class="spec-icon spec-icon-blue">📋</div>
+          <div class="spec-title">① 表示項目（プロフィールタブ）</div>
+        </div>
+        <table>
+          <thead>
+            <tr>
+              <th class="col-field">表示項目</th>
+              <th class="col-src">データソース</th>
+              <th>補足</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td>氏名（漢字）</td><td><span class="db-ref">Applicant.last_name</span> + <span class="db-ref">first_name</span></td><td></td></tr>
+            <tr><td>氏名（フリガナ）</td><td><span class="db-ref">Applicant.last_name_kana</span> + <span class="db-ref">first_name_kana</span></td><td></td></tr>
+            <tr><td>メールアドレス</td><td><span class="db-ref">Applicant.email</span></td><td>クリックでメーラー起動</td></tr>
+            <tr><td>電話番号</td><td><span class="db-ref">Applicant.phone</span></td><td></td></tr>
+            <tr><td>学校名</td><td><span class="db-ref">School.name</span>（<span class="db-ref">Applicant.school_id</span> JOIN）</td><td></td></tr>
+            <tr><td>学部・学科</td><td><span class="db-ref">Applicant.department</span></td><td></td></tr>
+            <tr><td>卒業見込み年度</td><td><span class="db-ref">Applicant.graduation_year</span></td><td>YYYY年3月卒 表示</td></tr>
+            <tr><td>応募者区分</td><td><span class="db-ref">Applicant.applicant_type</span></td><td>新卒 / 既卒 / 第二新卒</td></tr>
+            <tr><td>LINE連携状態</td><td><span class="db-ref">Applicant.line_user_id</span></td><td>NULL非NULL判定</td></tr>
+            <tr><td>タグ</td><td><span class="db-ref">ApplicantTag</span> JOIN <span class="db-ref">Tag</span></td><td>カラーバッジ。編集モードで追加・削除可</td></tr>
+            <tr><td>カスタムフィールド</td><td><span class="db-ref">ApplicantCustomField.field_key</span> + <span class="db-ref">field_value</span></td><td>フィールド定義に基づき動的表示</td></tr>
+            <tr><td>流入媒体</td><td><span class="db-ref">ApplicantSource</span> JOIN <span class="db-ref">Media.name</span></td><td>複数表示</td></tr>
+            <tr><td>エントリー日時</td><td><span class="db-ref">Applicant.created_at</span></td><td>YYYY/MM/DD HH:mm</td></tr>
+            <tr><td>備考・メモ</td><td><span class="db-ref">Applicant.memo</span></td><td>テキストエリア（編集モード）</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="section">
+        <div class="spec-header">
+          <div class="spec-icon spec-icon-green">✅</div>
+          <div class="spec-title">② 入力バリデーション（編集モード）</div>
+        </div>
+        <table>
+          <thead>
+            <tr>
+              <th class="col-field">項目</th>
+              <th class="col-type">区分</th>
+              <th>ルール</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>氏名（姓）</td>
+              <td><span class="badge badge-must">必須</span></td>
+              <td>最大 <strong>25文字</strong>。空欄不可</td>
+            </tr>
+            <tr>
+              <td>氏名（名）</td>
+              <td><span class="badge badge-must">必須</span></td>
+              <td>最大 <strong>25文字</strong>。合計フルネームとして最大50文字相当</td>
+            </tr>
+            <tr>
+              <td>メールアドレス</td>
+              <td><span class="badge badge-must">必須</span></td>
+              <td>RFC5322 準拠のメール形式。最大 <strong>254文字</strong>。UNIQUE（重複登録禁止）</td>
+            </tr>
+            <tr>
+              <td>電話番号</td>
+              <td><span class="badge badge-rec">推奨</span></td>
+              <td>数字・ハイフン（-）のみ許可。最大 <strong>15文字</strong>。例: 090-1234-5678</td>
+            </tr>
+            <tr>
+              <td>卒業見込み年度</td>
+              <td><span class="badge badge-must">必須</span></td>
+              <td>4桁数字のみ。現在年 ± 5年以内（例: 2026年なら2021〜2031）</td>
+            </tr>
+            <tr>
+              <td>学校名</td>
+              <td><span class="badge badge-rec">推奨</span></td>
+              <td>最大 <strong>100文字</strong></td>
+            </tr>
+            <tr>
+              <td>学部・学科</td>
+              <td><span class="badge badge-opt">任意</span></td>
+              <td>最大 <strong>100文字</strong></td>
+            </tr>
+            <tr>
+              <td>備考・メモ</td>
+              <td><span class="badge badge-opt">任意</span></td>
+              <td>最大 <strong>2000文字</strong></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="section">
+        <div class="spec-header">
+          <div class="spec-icon spec-icon-orange">🖱️</div>
+          <div class="spec-title">③ ボタン動作</div>
+        </div>
+        <table>
+          <thead>
+            <tr>
+              <th class="col-btn">ボタン</th>
+              <th class="col-nav">遷移先 / 動作</th>
+              <th class="col-api">API</th>
+              <th>備考</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><span class="btn-pill btn-secondary">編集</span></td>
+              <td>同画面を編集モードへ切替</td>
+              <td>—</td>
+              <td>ラベルが「保存」「キャンセル」に変わる</td>
+            </tr>
+            <tr>
+              <td><span class="btn-pill btn-primary">保存</span></td>
+              <td>編集内容を保存して表示モードへ</td>
+              <td><span class="api-pill">PATCH /api/students/:id</span></td>
+              <td>バリデーションエラー時は保存しない</td>
+            </tr>
+            <tr>
+              <td><span class="btn-pill btn-ghost">キャンセル</span></td>
+              <td>編集内容を破棄して表示モードへ</td>
+              <td>—</td>
+              <td>変更ありの場合は確認ダイアログを表示</td>
+            </tr>
+            <tr>
+              <td><span class="btn-pill btn-danger">削除</span></td>
+              <td>確認ダイアログ → 学生一覧へ</td>
+              <td><span class="api-pill">DELETE /api/students/:id</span></td>
+              <td>論理削除（<code>deleted_at</code> セット）。管理者のみ表示</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="section">
+        <div class="spec-header">
+          <div class="spec-icon spec-icon-red">⚠️</div>
+          <div class="spec-title">④ エラーメッセージ（プロフィールタブ）</div>
+        </div>
+        <table>
+          <thead>
+            <tr>
+              <th class="col-field">発生条件</th>
+              <th>表示箇所</th>
+              <th>メッセージ</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>メールアドレス重複</td>
+              <td>emailフィールド直下</td>
+              <td><span class="err-msg">このメールアドレスはすでに登録されています。</span></td>
+            </tr>
+            <tr>
+              <td>氏名が空欄</td>
+              <td>氏名フィールド直下</td>
+              <td><span class="err-msg">氏名は必須項目です。</span></td>
+            </tr>
+            <tr>
+              <td>電話番号の形式不正</td>
+              <td>電話番号フィールド直下</td>
+              <td><span class="err-msg">電話番号は数字とハイフン（-）のみ入力できます。</span></td>
+            </tr>
+            <tr>
+              <td>卒業年度が範囲外</td>
+              <td>卒業年度フィールド直下</td>
+              <td><span class="err-msg">卒業見込み年度が正しくありません。現在年の±5年以内を入力してください。</span></td>
+            </tr>
+            <tr>
+              <td>保存API失敗（5xx）</td>
+              <td>画面上部トースト</td>
+              <td><span class="err-msg">保存に失敗しました。時間をおいて再試行してください。</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div><!-- /sd-profile -->
+
+    <!-- 選考履歴 -->
+    <div id="sd-history" class="sub-content">
+      <div class="section">
+        <div class="spec-header">
+          <div class="spec-icon spec-icon-blue">📋</div>
+          <div class="spec-title">① 表示項目（選考履歴タブ）</div>
+        </div>
+        <table>
+          <thead>
+            <tr>
+              <th class="col-field">表示項目</th>
+              <th class="col-src">データソース</th>
+              <th>補足</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td>ステータス変更履歴</td><td><span class="db-ref">SelectionHistory</span></td><td><code>ORDER BY changed_at DESC</code>。変更前→変更後ステージ名を矢印で表示</td></tr>
+            <tr><td>変更日時</td><td><span class="db-ref">SelectionHistory.changed_at</span></td><td>YYYY/MM/DD HH:mm</td></tr>
+            <tr><td>変更者</td><td><span class="db-ref">SelectionHistory.changed_by</span> JOIN <span class="db-ref">User.name</span></td><td></td></tr>
+            <tr><td>変更理由・メモ</td><td><span class="db-ref">SelectionHistory.note</span></td><td>任意入力。空欄の場合は「—」表示</td></tr>
+            <tr><td>面接記録</td><td><span class="db-ref">Interview</span></td><td>面接日時・面接官・評価スコア・コメント</td></tr>
+            <tr><td>現在のステージ</td><td><span class="db-ref">Selection.current_stage_id</span> JOIN <span class="db-ref">SelectionStage</span></td><td>画面上部に現在地として強調表示</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="section">
+        <div class="spec-header">
+          <div class="spec-icon spec-icon-orange">🖱️</div>
+          <div class="spec-title">③ ボタン動作</div>
+        </div>
+        <table>
+          <thead>
+            <tr><th class="col-btn">ボタン</th><th class="col-nav">動作</th><th class="col-api">API</th><th>備考</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><span class="btn-pill btn-primary">ステータス変更</span></td>
+              <td>ステータス選択モーダルを開く → 確定でステージ更新</td>
+              <td><span class="api-pill">PATCH /api/selections/:id</span></td>
+              <td><span class="db-ref">SelectionHistory</span> 自動INSERT、<span class="db-ref">AuditLog</span> INSERT（action=status_change）</td>
+            </tr>
+            <tr>
+              <td><span class="btn-pill btn-secondary">面接追加</span></td>
+              <td>面接登録モーダル</td>
+              <td><span class="api-pill">POST /api/interviews</span></td>
+              <td></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="section">
+        <div class="spec-header">
+          <div class="spec-icon spec-icon-red">⚠️</div>
+          <div class="spec-title">④ エラーメッセージ（選考履歴タブ）</div>
+        </div>
+        <table>
+          <thead>
+            <tr><th class="col-field">発生条件</th><th>表示箇所</th><th>メッセージ</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>ステータス変更権限なし</td>
+              <td>モーダル内</td>
+              <td><span class="err-msg">この操作は権限がありません。</span></td>
+            </tr>
+            <tr>
+              <td>履歴データ取得失敗</td>
+              <td>タブコンテンツ内</td>
+              <td><span class="err-msg">選考履歴を取得できませんでした。</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div><!-- /sd-history -->
+
+    <!-- LINEチャット -->
+    <div id="sd-line" class="sub-content">
+      <div class="section">
+        <div class="spec-header">
+          <div class="spec-icon spec-icon-blue">📋</div>
+          <div class="spec-title">① 表示項目（LINEチャットタブ）</div>
+        </div>
+        <div class="warn-box" style="margin-bottom:12px;">⚠️ <span class="db-ref">Applicant.line_user_id</span> が NULL の場合はチャット機能全体を非活性化し、LINE連携案内を表示する</div>
+        <table>
+          <thead>
+            <tr>
+              <th class="col-field">表示項目</th>
+              <th class="col-src">データソース</th>
+              <th>補足</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td>メッセージ一覧</td><td><span class="db-ref">LineMessage</span></td><td>送受信時刻・送信者区分（採用担当/学生）・本文。吹き出し形式</td></tr>
+            <tr><td>送受信日時</td><td><span class="db-ref">LineMessage.sent_at</span></td><td>YYYY/MM/DD HH:mm</td></tr>
+            <tr><td>既読状態</td><td><span class="db-ref">LineMessage.is_read</span></td><td>LINE Webhook の delivery イベント連動</td></tr>
+            <tr><td>メッセージ種別</td><td><span class="db-ref">LineMessage.message_type</span></td><td>テキスト / 画像 / スタンプ / テンプレート</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="section">
+        <div class="spec-header">
+          <div class="spec-icon spec-icon-green">✅</div>
+          <div class="spec-title">② 入力バリデーション</div>
+        </div>
+        <table>
+          <thead>
+            <tr><th class="col-field">項目</th><th class="col-type">区分</th><th>ルール</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>メッセージ本文</td>
+              <td><span class="badge badge-must">必須</span></td>
+              <td>最大 <strong>2000文字</strong>（LINE API制限）。空欄では送信不可</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="section">
+        <div class="spec-header">
+          <div class="spec-icon spec-icon-orange">🖱️</div>
+          <div class="spec-title">③ ボタン動作</div>
+        </div>
+        <table>
+          <thead>
+            <tr><th class="col-btn">ボタン</th><th class="col-nav">動作</th><th class="col-api">API</th><th>備考</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><span class="btn-pill btn-primary">送信</span></td>
+              <td>LINE API 経由で個別メッセージ送信</td>
+              <td><span class="api-pill">POST /api/line/send</span></td>
+              <td>送信成功後、チャット一覧に即追加（オプティミスティックUI）</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="section">
+        <div class="spec-header">
+          <div class="spec-icon spec-icon-red">⚠️</div>
+          <div class="spec-title">④ エラーメッセージ</div>
+        </div>
+        <table>
+          <thead>
+            <tr><th class="col-field">発生条件</th><th>表示箇所</th><th>メッセージ</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>LINE未連携</td>
+              <td>タブコンテンツ全体</td>
+              <td><span class="err-msg">この学生はLINEと連携されていません。LINEマイページから連携を促してください。</span></td>
+            </tr>
+            <tr>
+              <td>LINE API送信失敗</td>
+              <td>チャット入力欄上部</td>
+              <td><span class="err-msg">送信に失敗しました。時間をおいて再試行してください。</span></td>
+            </tr>
+            <tr>
+              <td>LINE API rate limit</td>
+              <td>チャット入力欄上部</td>
+              <td><span class="err-msg">送信制限に達しました。しばらくしてから再試行してください。</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div><!-- /sd-line -->
+
+    <!-- アンケート -->
+    <div id="sd-survey" class="sub-content">
+      <div class="section">
+        <div class="spec-header">
+          <div class="spec-icon spec-icon-blue">📋</div>
+          <div class="spec-title">① 表示項目（アンケートタブ）</div>
+        </div>
+        <table>
+          <thead>
+            <tr>
+              <th class="col-field">表示項目</th>
+              <th class="col-src">データソース</th>
+              <th>補足</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td>アンケートタイトル</td><td><span class="db-ref">Survey.title</span></td><td></td></tr>
+            <tr><td>回答日時</td><td><span class="db-ref">SurveyResponse.responded_at</span></td><td>YYYY/MM/DD HH:mm</td></tr>
+            <tr><td>設問と回答</td><td><span class="db-ref">SurveyQuestion.question_text</span> + <span class="db-ref">SurveyResponseItem.answer</span></td><td>設問順に表示</td></tr>
+            <tr><td>回答ステータス</td><td><span class="db-ref">SurveyResponse.status</span></td><td>未回答 / 回答済 / 回答期限切れ</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="section">
+        <div class="spec-header">
+          <div class="spec-icon spec-icon-orange">🖱️</div>
+          <div class="spec-title">③ ボタン動作</div>
+        </div>
+        <table>
+          <thead>
+            <tr><th class="col-btn">ボタン</th><th class="col-nav">動作</th><th class="col-api">API</th><th>備考</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><span class="btn-pill btn-secondary">アンケート再送信</span></td>
+              <td>LINE経由でアンケートURLを再送</td>
+              <td><span class="api-pill">POST /api/surveys/:survey_id/resend</span></td>
+              <td>回答済みの場合はボタンを非活性</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="section">
+        <div class="spec-header">
+          <div class="spec-icon spec-icon-red">⚠️</div>
+          <div class="spec-title">④ エラーメッセージ</div>
+        </div>
+        <table>
+          <thead>
+            <tr><th class="col-field">発生条件</th><th>表示箇所</th><th>メッセージ</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>アンケートデータ取得失敗</td>
+              <td>タブコンテンツ内</td>
+              <td><span class="err-msg">アンケート情報を取得できませんでした。</span></td>
+            </tr>
+            <tr>
+              <td>アンケート未設定</td>
+              <td>タブコンテンツ内</td>
+              <td><span class="err-msg">この学生に送付されたアンケートはありません。</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div><!-- /sd-survey -->
+
+  </div><!-- /s-detail -->
+
+
+  <!-- =====================================================================
+       ④ 選考管理（パイプライン）
+       ===================================================================== -->
+  <div id="s-pipeline" class="screen-content">
+
+    <div class="overview-grid">
+      <div class="overview-card">
+        <div class="overview-card-label">画面ID</div>
+        <div class="overview-card-val">SCR-04</div>
+      </div>
+      <div class="overview-card">
+        <div class="overview-card-label">ルート</div>
+        <div class="overview-card-val">/pipeline</div>
+      </div>
+      <div class="overview-card">
+        <div class="overview-card-label">アクセス権限</div>
+        <div class="overview-card-val">採用担当者・管理者（面接官は閲覧のみ）</div>
+      </div>
+      <div class="overview-card">
+        <div class="overview-card-label">UI形式</div>
+        <div class="overview-card-val">カンバン（横スクロール）</div>
+      </div>
+    </div>
+
+    <!-- 表示項目 -->
+    <div class="section">
+      <div class="spec-header">
+        <div class="spec-icon spec-icon-blue">📋</div>
+        <div class="spec-title">① 表示項目</div>
+      </div>
+      <table>
+        <thead>
+          <tr>
+            <th class="col-field">表示項目</th>
+            <th class="col-src">データソース</th>
+            <th>補足</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>ステージ列</td>
+            <td><span class="db-ref">SelectionStage</span>（<span class="db-ref">SelectionFlow.id</span> でフィルタ）</td>
+            <td>ステージ順（<span class="db-ref">sort_order</span>）で左から右へ配置</td>
+          </tr>
+          <tr>
+            <td>各列の応募者カード</td>
+            <td><span class="db-ref">Selection</span> GROUP BY <span class="db-ref">current_stage_id</span></td>
+            <td>カード内：氏名・学校・タグ・最終アクション日</td>
+          </tr>
+          <tr>
+            <td>ステージ在籍人数</td>
+            <td><span class="db-ref">Selection</span> COUNT</td>
+            <td>列ヘッダに <code>N名</code> 表示</td>
+          </tr>
+          <tr>
+            <td>フロー選択</td>
+            <td><span class="db-ref">SelectionFlow</span></td>
+            <td>複数フロー切替タブ。プルダウンでも可</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="cat-header" style="margin-top:16px;">フィルタ条件</div>
+      <table>
+        <thead>
+          <tr>
+            <th class="col-field">フィルタ項目</th>
+            <th class="col-src">対象カラム</th>
+            <th>方式</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>フロー選択</td>
+            <td><span class="db-ref">Selection.flow_id</span></td>
+            <td>タブ切替</td>
+          </tr>
+          <tr>
+            <td>タグ</td>
+            <td><span class="db-ref">ApplicantTag.tag_id</span></td>
+            <td>プルダウン複数選択</td>
+          </tr>
+          <tr>
+            <td>流入媒体</td>
+            <td><span class="db-ref">ApplicantSource.media_id</span></td>
+            <td>プルダウン複数選択</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- バリデーション -->
+    <div class="section">
+      <div class="spec-header">
+        <div class="spec-icon spec-icon-green">✅</div>
+        <div class="spec-title">② 入力バリデーション</div>
+      </div>
+      <table>
+        <thead>
+          <tr>
+            <th class="col-field">項目</th>
+            <th class="col-type">区分</th>
+            <th>ルール</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>ステータス変更（ドラッグ or ボタン）</td>
+            <td>—</td>
+            <td>同一ステージへの移動は不可（変更なしとみなし API 非呼出）</td>
+          </tr>
+          <tr>
+            <td>権限チェック</td>
+            <td>—</td>
+            <td>面接官ロールの場合、カードのドラッグ操作・ステータス変更ボタンを非活性</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- ボタン動作 -->
+    <div class="section">
+      <div class="spec-header">
+        <div class="spec-icon spec-icon-orange">🖱️</div>
+        <div class="spec-title">③ ボタン動作</div>
+      </div>
+      <table>
+        <thead>
+          <tr>
+            <th class="col-btn">操作</th>
+            <th class="col-nav">動作</th>
+            <th class="col-api">API</th>
+            <th>副作用（自動処理）</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>カードクリック</td>
+            <td>学生詳細画面 <code>/students/:id</code></td>
+            <td><span class="api-pill">GET /api/students/:id</span></td>
+            <td>—</td>
+          </tr>
+          <tr>
+            <td>ドラッグ＆ドロップ（他列へ）</td>
+            <td>ドロップ先ステージへ移動</td>
+            <td><span class="api-pill">PATCH /api/selections/:id</span></td>
+            <td><span class="db-ref">SelectionHistory</span> INSERT + <span class="db-ref">AuditLog</span> INSERT（action=status_change）</td>
+          </tr>
+          <tr>
+            <td><span class="btn-pill btn-secondary">▼ ステージ変更</span>（カード内ボタン）</td>
+            <td>ステージ選択プルダウン → 確定で更新</td>
+            <td><span class="api-pill">PATCH /api/selections/:id</span></td>
+            <td>同上</td>
+          </tr>
+          <tr>
+            <td><span class="btn-pill btn-ghost">絞り込み</span></td>
+            <td>フィルタパネルを開く / 閉じる</td>
+            <td><span class="api-pill">GET /api/pipeline?...</span></td>
+            <td>—</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- エラーメッセージ -->
+    <div class="section">
+      <div class="spec-header">
+        <div class="spec-icon spec-icon-red">⚠️</div>
+        <div class="spec-title">④ エラーメッセージ</div>
+      </div>
+      <table>
+        <thead>
+          <tr>
+            <th class="col-field">発生条件</th>
+            <th>表示箇所</th>
+            <th>メッセージ</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>権限なしユーザーがステータス変更操作を実施（API レベル拒否）</td>
+            <td>画面上部トースト</td>
+            <td><span class="err-msg">この操作は権限がありません。</span></td>
+          </tr>
+          <tr>
+            <td>ドラッグ＆ドロップ後の API 失敗</td>
+            <td>カードを元の位置に戻し、トーストで通知</td>
+            <td><span class="err-msg">ステータスの更新に失敗しました。再試行してください。</span></td>
+          </tr>
+          <tr>
+            <td>パイプラインデータ取得失敗</td>
+            <td>カンバンエリア中央</td>
+            <td><span class="err-msg">選考データを取得できませんでした。再読み込みしてください。</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+  </div><!-- /s-pipeline -->
+
+
+  <!-- =====================================================================
+       ⑤ LINE メッセージ送信
+       ===================================================================== -->
+  <div id="s-line" class="screen-content">
+
+    <div class="overview-grid">
+      <div class="overview-card">
+        <div class="overview-card-label">画面ID</div>
+        <div class="overview-card-val">SCR-05</div>
+      </div>
+      <div class="overview-card">
+        <div class="overview-card-label">ルート</div>
+        <div class="overview-card-val">/line-message</div>
+      </div>
+      <div class="overview-card">
+        <div class="overview-card-label">アクセス権限</div>
+        <div class="overview-card-val">採用担当者・管理者</div>
+      </div>
+      <div class="overview-card">
+        <div class="overview-card-label">送信方式</div>
+        <div class="overview-card-val">Multicast / Narrowcast</div>
+      </div>
+    </div>
+
+    <!-- 表示項目 -->
+    <div class="section">
+      <div class="spec-header">
+        <div class="spec-icon spec-icon-blue">📋</div>
+        <div class="spec-title">① 表示項目</div>
+      </div>
+      <table>
+        <thead>
+          <tr>
+            <th class="col-field">表示項目</th>
+            <th class="col-src">データソース</th>
+            <th>補足</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>タグ選択UI</td>
+            <td><span class="db-ref">Tag</span> 一覧</td>
+            <td>複数選択可。選択タグを持つ学生が対象に含まれる</td>
+          </tr>
+          <tr>
+            <td>ステータス絞り込み</td>
+            <td><span class="db-ref">SelectionStage</span> 一覧</td>
+            <td>複数選択可</td>
+          </tr>
+          <tr>
+            <td>応募者区分フィルタ</td>
+            <td><span class="db-ref">Applicant.applicant_type</span></td>
+            <td>チェックボックス</td>
+          </tr>
+          <tr>
+            <td>対象人数プレビュー</td>
+            <td><span class="db-ref">Applicant.line_user_id</span></td>
+            <td>LINE連携済みのみカウント。リアルタイムに再計算</td>
+          </tr>
+          <tr>
+            <td>メッセージ種別</td>
+            <td>UI固定選択肢</td>
+            <td>テキスト / テンプレートメッセージ / Flex Message</td>
+          </tr>
+          <tr>
+            <td>差し込み変数ヘルプ</td>
+            <td>—</td>
+            <td><code>{氏名}</code> 等の変数一覧をツールチップ or サイドパネルで表示</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- バリデーション -->
+    <div class="section">
+      <div class="spec-header">
+        <div class="spec-icon spec-icon-green">✅</div>
+        <div class="spec-title">② 入力バリデーション</div>
+      </div>
+      <table>
+        <thead>
+          <tr>
+            <th class="col-field">項目</th>
+            <th class="col-type">区分</th>
+            <th>ルール</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>メッセージ本文</td>
+            <td><span class="badge badge-must">必須</span></td>
+            <td>最大 <strong>2000文字</strong>（LINE API 上限）。入力文字数をリアルタイムカウンター表示（残り文字数形式）</td>
+          </tr>
+          <tr>
+            <td>差し込み変数の整合性</td>
+            <td><span class="badge badge-rec">推奨</span></td>
+            <td>本文に未定義の <code>{変数名}</code> が含まれる場合、警告バナーを表示（送信は可能）</td>
+          </tr>
+          <tr>
+            <td>送信対象人数</td>
+            <td><span class="badge badge-must">必須</span></td>
+            <td>LINE連携済み対象者が0人の場合は送信ボタンを非活性（disabled）</td>
+          </tr>
+          <tr>
+            <td>メッセージ種別</td>
+            <td><span class="badge badge-must">必須</span></td>
+            <td>未選択では送信不可</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- ボタン動作 -->
+    <div class="section">
+      <div class="spec-header">
+        <div class="spec-icon spec-icon-orange">🖱️</div>
+        <div class="spec-title">③ ボタン動作</div>
+      </div>
+      <table>
+        <thead>
+          <tr>
+            <th class="col-btn">ボタン</th>
+            <th class="col-nav">動作</th>
+            <th class="col-api">API</th>
+            <th>備考</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><span class="btn-pill btn-secondary">プレビュー表示</span></td>
+            <td>差し込み変数を置換した実際の送信内容をモーダル表示</td>
+            <td><span class="api-pill">POST /api/line/preview</span></td>
+            <td>送信は行わない</td>
+          </tr>
+          <tr>
+            <td><span class="btn-pill btn-primary">送信実行</span></td>
+            <td>確認ダイアログ → 実行 → LINE API multicast/narrowcast 呼出</td>
+            <td><span class="api-pill">POST /api/line/broadcast</span></td>
+            <td>対象が1000人以下は multicast、超過の場合は narrowcast 自動切替</td>
+          </tr>
+          <tr>
+            <td><span class="btn-pill btn-ghost">テンプレート選択</span></td>
+            <td>既存テンプレート一覧モーダル → 選択で本文に挿入</td>
+            <td><span class="api-pill">GET /api/message-templates</span></td>
+            <td>—</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- エラーメッセージ -->
+    <div class="section">
+      <div class="spec-header">
+        <div class="spec-icon spec-icon-red">⚠️</div>
+        <div class="spec-title">④ エラーメッセージ</div>
+      </div>
+      <table>
+        <thead>
+          <tr>
+            <th class="col-field">発生条件</th>
+            <th>表示箇所</th>
+            <th>メッセージ</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>LINE API 送信失敗（5xx）</td>
+            <td>画面上部バナー</td>
+            <td><span class="err-msg">送信に失敗しました。時間をおいて再試行してください。</span></td>
+          </tr>
+          <tr>
+            <td>送信対象が0人（LINE連携済み）</td>
+            <td>対象人数プレビュー欄</td>
+            <td><span class="err-msg">送信対象がいません。絞り込みを確認してください。</span></td>
+          </tr>
+          <tr>
+            <td>本文が空欄のまま送信ボタン押下</td>
+            <td>本文テキストエリア直下</td>
+            <td><span class="err-msg">メッセージ本文を入力してください。</span></td>
+          </tr>
+          <tr>
+            <td>本文が2000文字超過</td>
+            <td>文字数カウンター付近</td>
+            <td><span class="err-msg">メッセージは2,000文字以内で入力してください。</span></td>
+          </tr>
+          <tr>
+            <td>未定義の差し込み変数が含まれる（警告）</td>
+            <td>本文入力欄上部</td>
+            <td><span class="err-msg" style="background:#fff8e1;border-color:#ffcc80;color:#e65100;">未定義の変数が含まれています: {XXX}。送信するとそのまま送られます。</span></td>
+          </tr>
+          <tr>
+            <td>LINE API トークン失効</td>
+            <td>画面上部バナー</td>
+            <td><span class="err-msg">LINE連携の認証が切れています。管理者に連絡してください。</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+  </div><!-- /s-line -->
+
+
+  <!-- =====================================================================
+       ⑥ 分析・レポート
+       ===================================================================== -->
+  <div id="s-analytics" class="screen-content">
+
+    <div class="overview-grid">
+      <div class="overview-card">
+        <div class="overview-card-label">画面ID</div>
+        <div class="overview-card-val">SCR-06</div>
+      </div>
+      <div class="overview-card">
+        <div class="overview-card-label">ルート</div>
+        <div class="overview-card-val">/analytics</div>
+      </div>
+      <div class="overview-card">
+        <div class="overview-card-label">アクセス権限</div>
+        <div class="overview-card-val">採用担当者・管理者</div>
+      </div>
+      <div class="overview-card">
+        <div class="overview-card-label">サブタブ</div>
+        <div class="overview-card-val">6つ</div>
+      </div>
+    </div>
+
+    <!-- グローバルフィルタ -->
+    <div class="section">
+      <div class="spec-header">
+        <div class="spec-icon spec-icon-blue">🔍</div>
+        <div class="spec-title">グローバルフィルタ（全サブタブ共通）</div>
+      </div>
+      <table>
+        <thead>
+          <tr>
+            <th class="col-field">フィルタ項目</th>
+            <th class="col-src">対象カラム</th>
+            <th>方式</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>採用年度</td>
+            <td><span class="db-ref">Applicant.graduation_year</span></td>
+            <td>プルダウン単一選択。デフォルト：現在年度</td>
+          </tr>
+          <tr>
+            <td>応募者区分</td>
+            <td><span class="db-ref">Applicant.applicant_type</span></td>
+            <td>チェックボックス複数選択</td>
+          </tr>
+          <tr>
+            <td>流入媒体</td>
+            <td><span class="db-ref">ApplicantSource.media_id</span></td>
+            <td>プルダウン複数選択</td>
+          </tr>
+          <tr>
+            <td>選考フロー</td>
+            <td><span class="db-ref">Selection.flow_id</span></td>
+            <td>プルダウン複数選択</td>
+          </tr>
+          <tr>
+            <td>期間（日付範囲）</td>
+            <td><span class="db-ref">SelectionHistory.changed_at</span> / <span class="db-ref">Applicant.created_at</span></td>
+            <td>日付ピッカー（開始〜終了）</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Sub tabs for analytics -->
+    <div class="sub-tabs">
+      <div class="sub-tab active" onclick="swSub(this,'sa-funnel','analytics')">ファネル分析</div>
+      <div class="sub-tab"       onclick="swSub(this,'sa-media','analytics')">媒体別分析</div>
+      <div class="sub-tab"       onclick="swSub(this,'sa-school','analytics')">学校別分析</div>
+      <div class="sub-tab"       onclick="swSub(this,'sa-time','analytics')">日程・処理速度</div>
+      <div class="sub-tab"       onclick="swSub(this,'sa-offer','analytics')">内定承諾分析</div>
+      <div class="sub-tab"       onclick="swSub(this,'sa-export','analytics')">CSVエクスポート</div>
+    </div>
+
+    <!-- ファネル分析 -->
+    <div id="sa-funnel" class="sub-content active">
+      <div class="section">
+        <div class="spec-header">
+          <div class="spec-icon spec-icon-blue">📋</div>
+          <div class="spec-title">① 表示項目（ファネル分析）</div>
+        </div>
+        <table>
+          <thead>
+            <tr>
+              <th class="col-field">表示項目</th>
+              <th class="col-src">データソース</th>
+              <th>集計ロジック</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>ステージ別在籍・通過数</td>
+              <td><span class="db-ref">Selection</span> + <span class="db-ref">SelectionHistory</span></td>
+              <td>現在そのステージにいる人数（在籍）と、そのステージを通過した総人数（累計）の両方を表示</td>
+            </tr>
+            <tr>
+              <td>通過率（ステージ間）</td>
+              <td><span class="db-ref">SelectionHistory</span></td>
+              <td>前ステージ通過数 / 当ステージ通過数 × 100（%）。バイパスカウントロジック適用：スキップされたステージは通過済みとして補完</td>
+            </tr>
+            <tr>
+              <td>前年同期比</td>
+              <td><span class="db-ref">Selection</span> + <span class="db-ref">Applicant.graduation_year</span></td>
+              <td>前年度同月のデータと並列表示（折れ線グラフ重ね）</td>
+            </tr>
+            <tr>
+              <td>ファネル視覚化</td>
+              <td>—</td>
+              <td>棒グラフ or ファネルチャート。ホバーで人数・率をツールチップ表示</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="section">
+        <div class="spec-header">
+          <div class="spec-icon spec-icon-orange">🖱️</div>
+          <div class="spec-title">③ ボタン動作</div>
+        </div>
+        <table>
+          <thead>
+            <tr><th class="col-btn">ボタン</th><th class="col-nav">動作</th><th class="col-api">API</th><th>備考</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><span class="btn-pill btn-secondary">CSVエクスポート</span></td>
+              <td>ファネル集計データをCSV形式でダウンロード</td>
+              <td><span class="api-pill">GET /api/analytics/funnel/export</span></td>
+              <td>フィルタ条件をクエリパラメータに反映</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="section">
+        <div class="spec-header">
+          <div class="spec-icon spec-icon-red">⚠️</div>
+          <div class="spec-title">④ エラーメッセージ</div>
+        </div>
+        <table>
+          <thead>
+            <tr><th class="col-field">発生条件</th><th>表示箇所</th><th>メッセージ</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>データ取得失敗</td>
+              <td>チャートエリア</td>
+              <td><span class="err-msg">データを取得できませんでした。フィルタを確認して再読み込みしてください。</span></td>
+            </tr>
+            <tr>
+              <td>対象データ0件</td>
+              <td>チャートエリア</td>
+              <td><span class="err-msg">選択した条件に該当するデータがありません。</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div><!-- /sa-funnel -->
+
+    <!-- 媒体別分析 -->
+    <div id="sa-media" class="sub-content">
+      <div class="section">
+        <div class="spec-header">
+          <div class="spec-icon spec-icon-blue">📋</div>
+          <div class="spec-title">① 表示項目（媒体別分析）</div>
+        </div>
+        <table>
+          <thead>
+            <tr>
+              <th class="col-field">表示項目</th>
+              <th class="col-src">データソース</th>
+              <th>集計ロジック</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>媒体別エントリー数</td>
+              <td><span class="db-ref">ApplicantSource.media_id</span> GROUP BY</td>
+              <td>媒体ごとのエントリー総数</td>
+            </tr>
+            <tr>
+              <td>媒体別内定承諾率</td>
+              <td><span class="db-ref">Selection</span> + <span class="db-ref">ApplicantSource</span></td>
+              <td>各媒体からのエントリーのうち内定承諾に至った割合</td>
+            </tr>
+            <tr>
+              <td>媒体別CPA（コストパーアクション）</td>
+              <td><span class="db-ref">Media.cost</span> / 各媒体エントリー数</td>
+              <td>媒体ごとの費用対効果。Media.cost が未設定の場合は「—」表示</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="section">
+        <div class="spec-header">
+          <div class="spec-icon spec-icon-orange">🖱️</div>
+          <div class="spec-title">③ ボタン動作</div>
+        </div>
+        <table>
+          <thead>
+            <tr><th class="col-btn">ボタン</th><th class="col-nav">動作</th><th class="col-api">API</th><th>備考</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><span class="btn-pill btn-secondary">CSVエクスポート</span></td>
+              <td>媒体別集計データをCSVダウンロード</td>
+              <td><span class="api-pill">GET /api/analytics/media/export</span></td>
+              <td></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="section">
+        <div class="spec-header">
+          <div class="spec-icon spec-icon-red">⚠️</div>
+          <div class="spec-title">④ エラーメッセージ</div>
+        </div>
+        <table>
+          <thead>
+            <tr><th class="col-field">発生条件</th><th>表示箇所</th><th>メッセージ</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>データ取得失敗</td>
+              <td>チャートエリア</td>
+              <td><span class="err-msg">データを取得できませんでした。再読み込みしてください。</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div><!-- /sa-media -->
+
+    <!-- 学校別分析 -->
+    <div id="sa-school" class="sub-content">
+      <div class="section">
+        <div class="spec-header">
+          <div class="spec-icon spec-icon-blue">📋</div>
+          <div class="spec-title">① 表示項目（学校別分析）</div>
+        </div>
+        <table>
+          <thead>
+            <tr>
+              <th class="col-field">表示項目</th>
+              <th class="col-src">データソース</th>
+              <th>集計ロジック</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>学校別エントリー数</td>
+              <td><span class="db-ref">Applicant.school_id</span> GROUP BY</td>
+              <td>学校ごとのエントリー総数。上位N校を棒グラフで表示</td>
+            </tr>
+            <tr>
+              <td>学校別内定承諾数</td>
+              <td><span class="db-ref">Selection</span> + <span class="db-ref">Applicant.school_id</span></td>
+              <td>内定承諾ステージに到達した数</td>
+            </tr>
+            <tr>
+              <td>学校区分（旧帝大/早慶/その他）</td>
+              <td><span class="db-ref">School.category</span></td>
+              <td>カテゴリ別に色分け。カテゴリ未設定の場合は「その他」</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="section">
+        <div class="spec-header">
+          <div class="spec-icon spec-icon-orange">🖱️</div>
+          <div class="spec-title">③ ボタン動作</div>
+        </div>
+        <table>
+          <thead>
+            <tr><th class="col-btn">ボタン</th><th class="col-nav">動作</th><th class="col-api">API</th><th>備考</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><span class="btn-pill btn-secondary">CSVエクスポート</span></td>
+              <td>学校別集計データをCSVダウンロード</td>
+              <td><span class="api-pill">GET /api/analytics/school/export</span></td>
+              <td></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="section">
+        <div class="spec-header">
+          <div class="spec-icon spec-icon-red">⚠️</div>
+          <div class="spec-title">④ エラーメッセージ</div>
+        </div>
+        <table>
+          <thead>
+            <tr><th class="col-field">発生条件</th><th>表示箇所</th><th>メッセージ</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>データ取得失敗</td>
+              <td>チャートエリア</td>
+              <td><span class="err-msg">データを取得できませんでした。再読み込みしてください。</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div><!-- /sa-school -->
+
+    <!-- 日程・処理速度 -->
+    <div id="sa-time" class="sub-content">
+      <div class="section">
+        <div class="spec-header">
+          <div class="spec-icon spec-icon-blue">📋</div>
+          <div class="spec-title">① 表示項目（日程・処理速度分析）</div>
+        </div>
+        <table>
+          <thead>
+            <tr>
+              <th class="col-field">表示項目</th>
+              <th class="col-src">データソース</th>
+              <th>集計ロジック</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>ステージ滞在日数（平均・中央値）</td>
+              <td><span class="db-ref">SelectionHistory.changed_at</span> DIFF</td>
+              <td>連続するステージ変更レコード間の日数差を集計</td>
+            </tr>
+            <tr>
+              <td>エントリー〜内定承諾日数（平均）</td>
+              <td><span class="db-ref">Applicant.created_at</span> vs <span class="db-ref">SelectionHistory.changed_at</span>（承諾ステージ）</td>
+              <td>内定承諾に至ったレコードのみ対象</td>
+            </tr>
+            <tr>
+              <td>週別エントリー推移</td>
+              <td><span class="db-ref">Applicant.created_at</span> GROUP BY week</td>
+              <td>折れ線グラフ。週単位の集計</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="section">
+        <div class="spec-header">
+          <div class="spec-icon spec-icon-orange">🖱️</div>
+          <div class="spec-title">③ ボタン動作</div>
+        </div>
+        <table>
+          <thead>
+            <tr><th class="col-btn">ボタン</th><th class="col-nav">動作</th><th class="col-api">API</th><th>備考</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><span class="btn-pill btn-secondary">CSVエクスポート</span></td>
+              <td>日程・速度分析データをCSVダウンロード</td>
+              <td><span class="api-pill">GET /api/analytics/timeline/export</span></td>
+              <td></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="section">
+        <div class="spec-header">
+          <div class="spec-icon spec-icon-red">⚠️</div>
+          <div class="spec-title">④ エラーメッセージ</div>
+        </div>
+        <table>
+          <thead>
+            <tr><th class="col-field">発生条件</th><th>表示箇所</th><th>メッセージ</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>データ取得失敗</td>
+              <td>チャートエリア</td>
+              <td><span class="err-msg">データを取得できませんでした。再読み込みしてください。</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div><!-- /sa-time -->
+
+    <!-- 内定承諾分析 -->
+    <div id="sa-offer" class="sub-content">
+      <div class="section">
+        <div class="spec-header">
+          <div class="spec-icon spec-icon-blue">📋</div>
+          <div class="spec-title">① 表示項目（内定承諾分析）</div>
+        </div>
+        <table>
+          <thead>
+            <tr>
+              <th class="col-field">表示項目</th>
+              <th class="col-src">データソース</th>
+              <th>集計ロジック</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>内定承諾率推移（月別）</td>
+              <td><span class="db-ref">SelectionHistory</span> + <span class="db-ref">Selection</span></td>
+              <td>月次で承諾数 / オファー数 を折れ線グラフ表示</td>
+            </tr>
+            <tr>
+              <td>辞退理由分類</td>
+              <td><span class="db-ref">SelectionHistory.note</span> / <span class="db-ref">decline_reason</span></td>
+              <td>辞退ステージ移行時の理由コードを円グラフで表示</td>
+            </tr>
+            <tr>
+              <td>承諾 vs 辞退 学校別内訳</td>
+              <td><span class="db-ref">Selection</span> + <span class="db-ref">Applicant.school_id</span></td>
+              <td>積み上げ棒グラフ</td>
+            </tr>
+            <tr>
+              <td>KPI達成状況</td>
+              <td>目標値はシステム設定テーブル + 実績集計</td>
+              <td>目標内定数・承諾率に対する達成割合をゲージで表示</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="section">
+        <div class="spec-header">
+          <div class="spec-icon spec-icon-orange">🖱️</div>
+          <div class="spec-title">③ ボタン動作</div>
+        </div>
+        <table>
+          <thead>
+            <tr><th class="col-btn">ボタン</th><th class="col-nav">動作</th><th class="col-api">API</th><th>備考</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><span class="btn-pill btn-secondary">CSVエクスポート</span></td>
+              <td>内定承諾分析データをCSVダウンロード</td>
+              <td><span class="api-pill">GET /api/analytics/offer/export</span></td>
+              <td></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="section">
+        <div class="spec-header">
+          <div class="spec-icon spec-icon-red">⚠️</div>
+          <div class="spec-title">④ エラーメッセージ</div>
+        </div>
+        <table>
+          <thead>
+            <tr><th class="col-field">発生条件</th><th>表示箇所</th><th>メッセージ</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>データ取得失敗</td>
+              <td>チャートエリア</td>
+              <td><span class="err-msg">データを取得できませんでした。再読み込みしてください。</span></td>
+            </tr>
+            <tr>
+              <td>目標値未設定</td>
+              <td>KPI達成状況ゲージ</td>
+              <td><span class="err-msg" style="background:#fff8e1;border-color:#ffcc80;color:#e65100;">目標値が設定されていません。設定画面から目標を入力してください。</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div><!-- /sa-offer -->
+
+    <!-- CSVエクスポート -->
+    <div id="sa-export" class="sub-content">
+      <div class="section">
+        <div class="spec-header">
+          <div class="spec-icon spec-icon-blue">📋</div>
+          <div class="spec-title">① 表示項目（CSVエクスポートタブ）</div>
+        </div>
+        <table>
+          <thead>
+            <tr>
+              <th class="col-field">エクスポート種別</th>
+              <th class="col-src">データソース</th>
+              <th>含まれる列</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>全応募者データ</td>
+              <td><span class="db-ref">Applicant</span> + <span class="db-ref">School</span> + <span class="db-ref">ApplicantTag</span></td>
+              <td>氏名・学校・媒体・区分・ステータス・登録日・LINE連携状態 等</td>
+            </tr>
+            <tr>
+              <td>選考履歴データ</td>
+              <td><span class="db-ref">SelectionHistory</span> + <span class="db-ref">Applicant</span></td>
+              <td>氏名・変更日時・変更前後ステージ・変更者・メモ</td>
+            </tr>
+            <tr>
+              <td>面接記録データ</td>
+              <td><span class="db-ref">Interview</span> + <span class="db-ref">Applicant</span></td>
+              <td>面接日時・面接官・評価スコア・コメント</td>
+            </tr>
+            <tr>
+              <td>ファネル集計データ</td>
+              <td>集計クエリ結果</td>
+              <td>ステージ名・在籍数・通過数・通過率・前年比</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="section">
+        <div class="spec-header">
+          <div class="spec-icon spec-icon-green">✅</div>
+          <div class="spec-title">② 入力バリデーション</div>
+        </div>
+        <table>
+          <thead>
+            <tr><th class="col-field">項目</th><th class="col-type">区分</th><th>ルール</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>エクスポート種別</td>
+              <td><span class="badge badge-must">必須</span></td>
+              <td>1種別以上選択必須</td>
+            </tr>
+            <tr>
+              <td>対象期間</td>
+              <td><span class="badge badge-rec">推奨</span></td>
+              <td>未指定の場合は全件対象。最大エクスポート件数：50,000件</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="section">
+        <div class="spec-header">
+          <div class="spec-icon spec-icon-orange">🖱️</div>
+          <div class="spec-title">③ ボタン動作</div>
+        </div>
+        <table>
+          <thead>
+            <tr><th class="col-btn">ボタン</th><th class="col-nav">動作</th><th class="col-api">API</th><th>備考</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><span class="btn-pill btn-primary">CSVダウンロード</span></td>
+              <td>選択した種別・フィルタ条件でCSVを生成しダウンロード</td>
+              <td><span class="api-pill">GET /api/analytics/export?type=...</span></td>
+              <td>ファイル名：<code>ats_export_YYYYMMDD.csv</code>。文字コード：UTF-8 BOM付き（Excel対応）</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="section">
+        <div class="spec-header">
+          <div class="spec-icon spec-icon-red">⚠️</div>
+          <div class="spec-title">④ エラーメッセージ</div>
+        </div>
+        <table>
+          <thead>
+            <tr><th class="col-field">発生条件</th><th>表示箇所</th><th>メッセージ</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>対象データ0件</td>
+              <td>ボタン付近</td>
+              <td><span class="err-msg">エクスポート対象のデータがありません。条件を変更してください。</span></td>
+            </tr>
+            <tr>
+              <td>50,000件超過</td>
+              <td>ボタン付近</td>
+              <td><span class="err-msg">データが上限（50,000件）を超えています。期間や条件を絞り込んでください。</span></td>
+            </tr>
+            <tr>
+              <td>CSV生成失敗（サーバーエラー）</td>
+              <td>画面上部バナー</td>
+              <td><span class="err-msg">CSVの生成に失敗しました。時間をおいて再試行してください。</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div><!-- /sa-export -->
+
+  </div><!-- /s-analytics -->
+
+
+  <!-- =====================================================================
+       ⑦ カレンダー
+       ===================================================================== -->
+  <div id="s-calendar" class="screen-content">
+
+    <div class="overview-grid">
+      <div class="overview-card">
+        <div class="overview-card-label">画面ID</div>
+        <div class="overview-card-val">SCR-07</div>
+      </div>
+      <div class="overview-card">
+        <div class="overview-card-label">ルート</div>
+        <div class="overview-card-val">/calendar</div>
+      </div>
+      <div class="overview-card">
+        <div class="overview-card-label">アクセス権限</div>
+        <div class="overview-card-val">採用担当者・管理者（面接官は閲覧のみ）</div>
+      </div>
+      <div class="overview-card">
+        <div class="overview-card-label">サブタブ</div>
+        <div class="overview-card-val">3つ</div>
+      </div>
+    </div>
+
+    <div class="sub-tabs">
+      <div class="sub-tab active" onclick="swSub(this,'sc-week','calendar')">週間カレンダー</div>
+      <div class="sub-tab"       onclick="swSub(this,'sc-slots','calendar')">枠管理（一覧）</div>
+      <div class="sub-tab"       onclick="swSub(this,'sc-sync','calendar')">Google Calendar同期</div>
+    </div>
+
+    <!-- 週間カレンダー -->
+    <div id="sc-week" class="sub-content active">
+      <div class="section">
+        <div class="spec-header"><div class="spec-icon spec-icon-blue">📅</div><div class="spec-title">① 表示項目</div></div>
+        <table>
+          <thead><tr><th class="col-field">表示項目</th><th class="col-src">データソース</th><th>表示仕様</th></tr></thead>
+          <tbody>
+            <tr><td>週間タイムライン</td><td><span class="db-ref">CalendarSlot.starts_at / ends_at</span></td><td>月〜日 × 時間軸。担当者（owner_id）ごとにカラム分け。デフォルト：当週</td></tr>
+            <tr><td>枠タイプ色分け</td><td><span class="db-ref">CalendarSlot.type</span></td><td>interview: 青 / briefing: 緑 / other: グレー</td></tr>
+            <tr><td>予約済みフラグ</td><td><span class="db-ref">CalendarSlot.is_booked</span></td><td>is_booked=true の枠は濃い色・応募者名を重ねて表示</td></tr>
+            <tr><td>Google Calendar同期マーク</td><td><span class="db-ref">CalendarSlot.google_synced_at</span></td><td>同期済み: カレンダーアイコン表示。未同期: 「!」バッジ</td></tr>
+            <tr><td>週ナビゲーション</td><td>—</td><td>前週・次週ボタン、「今週」クイックリンク</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="section">
+        <div class="spec-header"><div class="spec-icon spec-icon-green">🖱️</div><div class="spec-title">② 操作・ボタン</div></div>
+        <table>
+          <thead><tr><th class="col-btn">ボタン</th><th class="col-nav">遷移先・モーダル</th><th>権限</th><th>説明</th></tr></thead>
+          <tbody>
+            <tr><td><span class="btn-pill btn-primary">＋ 枠を追加</span></td><td>枠追加モーダル</td><td>採用担当者・管理者</td><td>日時・タイプ・担当者を入力してCalendarSlotを作成</td></tr>
+            <tr><td>枠クリック</td><td>枠詳細モーダル</td><td>全ロール</td><td>開始〜終了・担当者・紐づく面接（Interview）・応募者名を表示</td></tr>
+            <tr><td><span class="btn-pill btn-ghost">編集</span>（モーダル内）</td><td>枠編集モーダル</td><td>採用担当者・管理者</td><td>日時・タイプ変更。is_booked=trueの枠は日時変更不可</td></tr>
+            <tr><td><span class="btn-pill btn-danger">削除</span>（モーダル内）</td><td>確認ダイアログ</td><td>採用担当者・管理者</td><td>is_booked=trueの場合は削除不可（エラー表示）</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="section">
+        <div class="spec-header"><div class="spec-icon spec-icon-orange">📋</div><div class="spec-title">③ 枠追加モーダル バリデーション</div></div>
+        <table>
+          <thead><tr><th class="col-field">項目</th><th class="col-type">必須</th><th>ルール</th></tr></thead>
+          <tbody>
+            <tr><td>開始日時</td><td><span class="badge badge-must">必須</span></td><td>現在時刻以降のみ選択可。15分単位</td></tr>
+            <tr><td>終了日時</td><td><span class="badge badge-must">必須</span></td><td>開始日時より後であること</td></tr>
+            <tr><td>タイプ</td><td><span class="badge badge-must">必須</span></td><td>interview / briefing / other から選択</td></tr>
+            <tr><td>担当者（owner）</td><td><span class="badge badge-must">必須</span></td><td>is_active=trueのStaffから選択。デフォルト: ログインユーザー</td></tr>
+          </tbody>
+        </table>
+        <div class="err-box" style="margin-top:10px;">同一担当者・同一時間帯に既存枠が存在する場合: <span class="err-msg">この時間帯にはすでに枠が登録されています。</span></div>
+      </div>
+    </div><!-- /sc-week -->
+
+    <!-- 枠管理（一覧） -->
+    <div id="sc-slots" class="sub-content">
+      <div class="section">
+        <div class="spec-header"><div class="spec-icon spec-icon-blue">📋</div><div class="spec-title">① 表示項目（枠一覧テーブル）</div></div>
+        <table>
+          <thead><tr><th class="col-field">カラム</th><th class="col-src">データソース</th><th>備考</th></tr></thead>
+          <tbody>
+            <tr><td>日時</td><td><span class="db-ref">CalendarSlot.starts_at〜ends_at</span></td><td>YYYY/MM/DD HH:mm〜HH:mm 形式</td></tr>
+            <tr><td>タイプ</td><td><span class="db-ref">CalendarSlot.type</span></td><td>バッジ表示</td></tr>
+            <tr><td>担当者</td><td><span class="db-ref">Staff.name（owner_id経由）</span></td><td></td></tr>
+            <tr><td>予約状況</td><td><span class="db-ref">CalendarSlot.is_booked</span></td><td>予約済 / 空き</td></tr>
+            <tr><td>紐づく応募者</td><td><span class="db-ref">Interview → Selection → Applicant.last_name/first_name</span></td><td>is_booked=trueのみ表示</td></tr>
+            <tr><td>GCal同期</td><td><span class="db-ref">CalendarSlot.google_synced_at</span></td><td>同期日時 or 「未同期」</td></tr>
+          </tbody>
+        </table>
+        <div class="info-box">フィルタ: 期間・担当者・タイプ・予約状況。デフォルト: 今日〜1ヶ月後、空き枠のみ。</div>
+      </div>
+    </div><!-- /sc-slots -->
+
+    <!-- Google Calendar同期 -->
+    <div id="sc-sync" class="sub-content">
+      <div class="section">
+        <div class="spec-header"><div class="spec-icon spec-icon-green">🔄</div><div class="spec-title">① 同期設定・状況</div></div>
+        <table>
+          <thead><tr><th class="col-field">項目</th><th class="col-src">データソース</th><th>説明</th></tr></thead>
+          <tbody>
+            <tr><td>連携カレンダーID</td><td><span class="db-ref">Staff.google_calendar_id</span></td><td>担当者ごとに設定。未設定の場合は「未連携」表示</td></tr>
+            <tr><td>最終同期日時</td><td><span class="db-ref">CalendarSlot.google_synced_at</span></td><td>担当者別に最新同期日時を表示</td></tr>
+            <tr><td>未同期枠数</td><td><span class="db-ref">CalendarSlot WHERE google_synced_at IS NULL</span></td><td>警告として件数表示</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="section">
+        <div class="spec-header"><div class="spec-icon spec-icon-orange">🖱️</div><div class="spec-title">② 操作</div></div>
+        <table>
+          <thead><tr><th class="col-btn">ボタン</th><th>説明</th><th>権限</th></tr></thead>
+          <tbody>
+            <tr><td><span class="btn-pill btn-primary">今すぐ同期</span></td><td>全担当者の未同期枠をGoogle Calendar APIにPATCH。完了後に google_synced_at を更新</td><td>管理者・採用担当者</td></tr>
+            <tr><td><span class="btn-pill btn-secondary">カレンダー連携設定</span></td><td>Staff.google_calendar_id の設定モーダルを開く（対象: ログインユーザー自身）</td><td>全ロール（自分のみ）</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div><!-- /sc-sync -->
+
+  </div><!-- /s-calendar -->
+
+
+  <!-- =====================================================================
+       ⑧ リッチメニュー管理
+       ===================================================================== -->
+  <div id="s-richmenu" class="screen-content">
+
+    <div class="overview-grid">
+      <div class="overview-card">
+        <div class="overview-card-label">画面ID</div>
+        <div class="overview-card-val">SCR-08</div>
+      </div>
+      <div class="overview-card">
+        <div class="overview-card-label">ルート</div>
+        <div class="overview-card-val">/line/rich-menus</div>
+      </div>
+      <div class="overview-card">
+        <div class="overview-card-label">アクセス権限</div>
+        <div class="overview-card-val">管理者・採用担当者</div>
+      </div>
+      <div class="overview-card">
+        <div class="overview-card-label">サブタブ</div>
+        <div class="overview-card-val">2つ</div>
+      </div>
+    </div>
+
+    <div class="sub-tabs">
+      <div class="sub-tab active" onclick="swSub(this,'srm-list','richmenu')">メニュー一覧</div>
+      <div class="sub-tab"       onclick="swSub(this,'srm-rules','richmenu')">適用ルール設定</div>
+    </div>
+
+    <!-- メニュー一覧 -->
+    <div id="srm-list" class="sub-content active">
+      <div class="section">
+        <div class="spec-header"><div class="spec-icon spec-icon-blue">📋</div><div class="spec-title">① 表示項目（メニュー一覧）</div></div>
+        <table>
+          <thead><tr><th class="col-field">カラム</th><th class="col-src">データソース</th><th>備考</th></tr></thead>
+          <tbody>
+            <tr><td>メニュー名</td><td><span class="db-ref">RichMenu.name</span></td><td></td></tr>
+            <tr><td>ステータス</td><td><span class="db-ref">RichMenu.status</span></td><td>draft: グレー / active: 緑バッジ / archived: グレー取消線</td></tr>
+            <tr><td>デフォルト</td><td><span class="db-ref">RichMenu.is_default</span></td><td>true の場合「デフォルト」バッジを表示</td></tr>
+            <tr><td>優先度</td><td><span class="db-ref">RichMenu.priority</span></td><td>数値。小さいほど優先</td></tr>
+            <tr><td>LINE側メニューID</td><td><span class="db-ref">RichMenu.line_menu_id</span></td><td>未登録の場合「未デプロイ」表示</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="section">
+        <div class="spec-header"><div class="spec-icon spec-icon-green">🖱️</div><div class="spec-title">② 操作・ボタン</div></div>
+        <table>
+          <thead><tr><th class="col-btn">ボタン</th><th>説明</th></tr></thead>
+          <tbody>
+            <tr><td><span class="btn-pill btn-primary">＋ 新規作成</span></td><td>メニュー名・ボタン定義（JSONB）・優先度を入力してRichMenuを作成。status=draft で作成</td></tr>
+            <tr><td><span class="btn-pill btn-secondary">編集</span></td><td>status=active のメニューは編集不可（一旦アーカイブ後に編集）</td></tr>
+            <tr><td><span class="btn-pill btn-primary">アクティブ化</span></td><td>status を draft → active に変更。LINE API に登録して line_menu_id を取得・保存</td></tr>
+            <tr><td><span class="btn-pill btn-ghost">複製</span></td><td>既存メニューをコピーして新規 draft を作成</td></tr>
+            <tr><td><span class="btn-pill btn-ghost">アーカイブ</span></td><td>status を archived に変更。LINE API からメニューを削除</td></tr>
+          </tbody>
+        </table>
+        <div class="warn-box">active メニューは必ず 1 つ以上存在すること。最後の active をアーカイブしようとした場合はエラー: <span class="err-msg">アクティブなメニューが最低1つ必要です。</span></div>
+      </div>
+    </div><!-- /srm-list -->
+
+    <!-- 適用ルール設定 -->
+    <div id="srm-rules" class="sub-content">
+      <div class="section">
+        <div class="spec-header"><div class="spec-icon spec-icon-blue">📋</div><div class="spec-title">① 表示項目（ルール一覧）</div></div>
+        <table>
+          <thead><tr><th class="col-field">カラム</th><th class="col-src">データソース</th><th>備考</th></tr></thead>
+          <tbody>
+            <tr><td>対象メニュー</td><td><span class="db-ref">RichMenu.name（rich_menu_id経由）</span></td><td></td></tr>
+            <tr><td>条件タグ</td><td><span class="db-ref">Tag.name（tag_id経由）</span></td><td></td></tr>
+            <tr><td>マッチタイプ</td><td><span class="db-ref">RichMenuRule.match_type</span></td><td>has_tag: タグ保持者に適用 / not_has_tag: タグ非保持者に適用</td></tr>
+          </tbody>
+        </table>
+        <div class="info-box">適用優先度は RichMenu.priority の昇順。どのルールにも一致しない応募者には is_default=true のメニューを適用。</div>
+      </div>
+      <div class="section">
+        <div class="spec-header"><div class="spec-icon spec-icon-green">🖱️</div><div class="spec-title">② 操作</div></div>
+        <table>
+          <thead><tr><th class="col-btn">ボタン</th><th>説明</th></tr></thead>
+          <tbody>
+            <tr><td><span class="btn-pill btn-primary">＋ ルール追加</span></td><td>対象メニュー・タグ・マッチタイプを選択してRichMenuRuleを作成</td></tr>
+            <tr><td><span class="btn-pill btn-danger">削除</span></td><td>ルールを削除（メニュー自体は削除しない）</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div><!-- /srm-rules -->
+
+  </div><!-- /s-richmenu -->
+
+
+  <!-- =====================================================================
+       ⑨ 媒体管理
+       ===================================================================== -->
+  <div id="s-media" class="screen-content">
+
+    <div class="overview-grid">
+      <div class="overview-card">
+        <div class="overview-card-label">画面ID</div>
+        <div class="overview-card-val">SCR-09</div>
+      </div>
+      <div class="overview-card">
+        <div class="overview-card-label">ルート</div>
+        <div class="overview-card-val">/media</div>
+      </div>
+      <div class="overview-card">
+        <div class="overview-card-label">アクセス権限</div>
+        <div class="overview-card-val">管理者・採用担当者</div>
+      </div>
+      <div class="overview-card">
+        <div class="overview-card-label">サブタブ</div>
+        <div class="overview-card-val">3つ</div>
+      </div>
+    </div>
+
+    <div class="sub-tabs">
+      <div class="sub-tab active" onclick="swSub(this,'sm-list','media')">媒体一覧</div>
+      <div class="sub-tab"       onclick="swSub(this,'sm-import','media')">CSV取込</div>
+      <div class="sub-tab"       onclick="swSub(this,'sm-history','media')">取込履歴</div>
+    </div>
+
+    <!-- 媒体一覧 -->
+    <div id="sm-list" class="sub-content active">
+      <div class="section">
+        <div class="spec-header"><div class="spec-icon spec-icon-blue">📋</div><div class="spec-title">① 表示項目（媒体マスター一覧）</div></div>
+        <table>
+          <thead><tr><th class="col-field">カラム</th><th class="col-src">データソース</th><th>備考</th></tr></thead>
+          <tbody>
+            <tr><td>媒体名</td><td><span class="db-ref">Media.name</span></td><td></td></tr>
+            <tr><td>同期タイプ</td><td><span class="db-ref">Media.sync_type</span></td><td>api / csv バッジ表示</td></tr>
+            <tr><td>月額費用</td><td><span class="db-ref">Media.cost</span></td><td>NULL の場合「—」表示</td></tr>
+            <tr><td>フィールドマッピング</td><td><span class="db-ref">Media.field_mapping</span></td><td>「確認」ボタンでJSONモーダル表示</td></tr>
+            <tr><td>累計取込件数</td><td><span class="db-ref">COUNT(ApplicantSource WHERE media_id=...)</span></td><td>クリックで取込履歴タブに遷移</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="section">
+        <div class="spec-header"><div class="spec-icon spec-icon-green">🖱️</div><div class="spec-title">② 操作</div></div>
+        <table>
+          <thead><tr><th class="col-btn">ボタン</th><th>説明</th></tr></thead>
+          <tbody>
+            <tr><td><span class="btn-pill btn-secondary">マッピング確認</span></td><td>field_mapping（JSONB）をモーダルで表示・編集（管理者のみ編集可）</td></tr>
+            <tr><td><span class="btn-pill btn-secondary">費用編集</span></td><td>Media.cost の更新モーダル。分析画面のコスト算出に使用</td></tr>
+          </tbody>
+        </table>
+        <div class="info-box">確定4媒体（マイナビ・リクナビ・OfferBox・Re就活）はシステム固定。媒体の追加・削除はシステム管理者がDB直接操作で対応（画面からは不可）。</div>
+      </div>
+    </div><!-- /sm-list -->
+
+    <!-- CSV取込 -->
+    <div id="sm-import" class="sub-content">
+      <div class="section">
+        <div class="spec-header"><div class="spec-icon spec-icon-blue">📤</div><div class="spec-title">① CSV取込フロー</div></div>
+        <table>
+          <thead><tr><th style="width:50px;">STEP</th><th class="col-field">操作</th><th>説明</th></tr></thead>
+          <tbody>
+            <tr><td>1</td><td>媒体選択</td><td>プルダウンでMedia.nameを選択</td></tr>
+            <tr><td>2</td><td>ファイルアップロード</td><td>CSV ファイルをドラッグ&ドロップ or ファイル選択。最大10MB</td></tr>
+            <tr><td>3</td><td>プレビュー確認</td><td>取込予定件数・サンプル5行を表示。field_mappingに基づいてATS項目へのマッピングを確認</td></tr>
+            <tr><td>4</td><td>取込実行</td><td>Applicant / ApplicantSource を作成。重複（email一致）は既存レコードに上書きマージ</td></tr>
+            <tr><td>5</td><td>結果表示</td><td>成功件数・スキップ件数・エラー件数を表示</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="section">
+        <div class="spec-header"><div class="spec-icon spec-icon-red">⚠️</div><div class="spec-title">② バリデーション・エラー</div></div>
+        <table>
+          <thead><tr><th class="col-field">条件</th><th>メッセージ</th></tr></thead>
+          <tbody>
+            <tr><td>CSV以外のファイル</td><td><span class="err-msg">CSVファイルのみアップロードできます。</span></td></tr>
+            <tr><td>10MB超</td><td><span class="err-msg">ファイルサイズが上限（10MB）を超えています。</span></td></tr>
+            <tr><td>必須カラム欠如</td><td><span class="err-msg">必須カラム「{カラム名}」が見つかりません。フォーマットを確認してください。</span></td></tr>
+            <tr><td>emailが空の行</td><td>該当行をスキップ（エラー件数にカウント）</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div><!-- /sm-import -->
+
+    <!-- 取込履歴 -->
+    <div id="sm-history" class="sub-content">
+      <div class="section">
+        <div class="spec-header"><div class="spec-icon spec-icon-blue">📋</div><div class="spec-title">① 取込履歴一覧</div></div>
+        <table>
+          <thead><tr><th class="col-field">カラム</th><th class="col-src">データソース</th><th>備考</th></tr></thead>
+          <tbody>
+            <tr><td>実行日時</td><td><span class="db-ref">AuditLog.created_at（action='export'）</span></td><td>降順ソート</td></tr>
+            <tr><td>媒体名</td><td><span class="db-ref">Media.name</span></td><td></td></tr>
+            <tr><td>実行者</td><td><span class="db-ref">Staff.name（AuditLog.staff_id経由）</span></td><td></td></tr>
+            <tr><td>取込件数</td><td><span class="db-ref">AuditLog.after_value.count</span></td><td>成功 / スキップ / エラー を内訳表示</td></tr>
+          </tbody>
+        </table>
+        <div class="info-box">フィルタ: 媒体・期間。最大表示: 直近100件。</div>
+      </div>
+    </div><!-- /sm-history -->
+
+  </div><!-- /s-media -->
+
+
+  <!-- =====================================================================
+       ⑩ 書類管理
+       ===================================================================== -->
+  <div id="s-documents" class="screen-content">
+
+    <div class="overview-grid">
+      <div class="overview-card">
+        <div class="overview-card-label">画面ID</div>
+        <div class="overview-card-val">SCR-10</div>
+      </div>
+      <div class="overview-card">
+        <div class="overview-card-label">ルート</div>
+        <div class="overview-card-val">/documents</div>
+      </div>
+      <div class="overview-card">
+        <div class="overview-card-label">アクセス権限</div>
+        <div class="overview-card-val">管理者・採用担当者</div>
+      </div>
+      <div class="overview-card">
+        <div class="overview-card-label">サブタブ</div>
+        <div class="overview-card-val">2つ</div>
+      </div>
+    </div>
+
+    <div class="sub-tabs">
+      <div class="sub-tab active" onclick="swSub(this,'sd-templates','documents')">テンプレート管理</div>
+      <div class="sub-tab"       onclick="swSub(this,'sd-output','documents')">書類出力</div>
+    </div>
+
+    <!-- テンプレート管理 -->
+    <div id="sd-templates" class="sub-content active">
+      <div class="section">
+        <div class="spec-header"><div class="spec-icon spec-icon-blue">📋</div><div class="spec-title">① 表示項目（テンプレート一覧）</div></div>
+        <table>
+          <thead><tr><th class="col-field">カラム</th><th class="col-src">データソース</th><th>備考</th></tr></thead>
+          <tbody>
+            <tr><td>書類名</td><td><span class="db-ref">Document.name</span></td><td></td></tr>
+            <tr><td>書類種別</td><td><span class="db-ref">Document.type</span></td><td>offer_letter: 内定通知書 / acceptance: 承諾書 / pledge: 誓約書</td></tr>
+            <tr><td>テンプレート本文（抜粋）</td><td><span class="db-ref">Document.template_body</span></td><td>先頭100文字をプレビュー表示</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="section">
+        <div class="spec-header"><div class="spec-icon spec-icon-green">🖱️</div><div class="spec-title">② 操作</div></div>
+        <table>
+          <thead><tr><th class="col-btn">ボタン</th><th>説明</th></tr></thead>
+          <tbody>
+            <tr><td><span class="btn-pill btn-primary">＋ テンプレート作成</span></td><td>書類名・種別・HTMLテンプレートを入力してDocument作成。差し込み変数: <span class="db-ref">{{氏名}}</span> <span class="db-ref">{{入社日}}</span> <span class="db-ref">{{会社名}}</span> 等</td></tr>
+            <tr><td><span class="btn-pill btn-secondary">編集</span></td><td>HTMLエディタ（コードエディタ形式）でtemplate_bodyを更新</td></tr>
+            <tr><td><span class="btn-pill btn-ghost">プレビュー</span></td><td>差し込み変数をサンプル値で置換してブラウザ表示</td></tr>
+            <tr><td><span class="btn-pill btn-danger">削除</span></td><td>確認ダイアログ後にDocumentを削除。出力済み書類は影響なし</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div><!-- /sd-templates -->
+
+    <!-- 書類出力 -->
+    <div id="sd-output" class="sub-content">
+      <div class="section">
+        <div class="spec-header"><div class="spec-icon spec-icon-blue">📤</div><div class="spec-title">① 書類出力フロー</div></div>
+        <table>
+          <thead><tr><th style="width:50px;">STEP</th><th class="col-field">操作</th><th>説明</th></tr></thead>
+          <tbody>
+            <tr><td>1</td><td>テンプレート選択</td><td>プルダウンでDocument.nameを選択</td></tr>
+            <tr><td>2</td><td>対象応募者選択</td><td>学生一覧から複数選択 or 応募者IDを直接指定</td></tr>
+            <tr><td>3</td><td>差し込みプレビュー</td><td>選択した応募者の実データで差し込み変数を置換してプレビュー表示。複数名の場合は先頭1名分を表示</td></tr>
+            <tr><td>4</td><td>PDF出力</td><td>応募者ごとに個別PDFを生成。複数名の場合は ZIP でまとめてダウンロード。AuditLogに document_export を記録</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="section">
+        <div class="spec-header"><div class="spec-icon spec-icon-red">⚠️</div><div class="spec-title">② エラー</div></div>
+        <table>
+          <thead><tr><th class="col-field">条件</th><th>メッセージ</th></tr></thead>
+          <tbody>
+            <tr><td>対象応募者未選択</td><td><span class="err-msg">出力対象の応募者を選択してください。</span></td></tr>
+            <tr><td>テンプレート未選択</td><td><span class="err-msg">テンプレートを選択してください。</span></td></tr>
+            <tr><td>PDF生成失敗</td><td><span class="err-msg">書類の生成に失敗しました。時間をおいて再試行してください。</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div><!-- /sd-output -->
+
+  </div><!-- /s-documents -->
+
+
+  <!-- =====================================================================
+       ⑪ ユーザー管理
+       ===================================================================== -->
+  <div id="s-users" class="screen-content">
+
+    <div class="overview-grid">
+      <div class="overview-card">
+        <div class="overview-card-label">画面ID</div>
+        <div class="overview-card-val">SCR-11</div>
+      </div>
+      <div class="overview-card">
+        <div class="overview-card-label">ルート</div>
+        <div class="overview-card-val">/admin/users</div>
+      </div>
+      <div class="overview-card">
+        <div class="overview-card-label">アクセス権限</div>
+        <div class="overview-card-val">管理者のみ</div>
+      </div>
+      <div class="overview-card">
+        <div class="overview-card-label">サブタブ</div>
+        <div class="overview-card-val">なし（単一画面）</div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="spec-header"><div class="spec-icon spec-icon-blue">📋</div><div class="spec-title">① 表示項目（スタッフ一覧）</div></div>
+      <table>
+        <thead><tr><th class="col-field">カラム</th><th class="col-src">データソース</th><th>備考</th></tr></thead>
+        <tbody>
+          <tr><td>氏名</td><td><span class="db-ref">Staff.name</span></td><td></td></tr>
+          <tr><td>メールアドレス</td><td><span class="db-ref">Staff.email</span></td><td>Google Workspace アドレス</td></tr>
+          <tr><td>ロール</td><td><span class="db-ref">Staff.role</span></td><td>admin / recruiter / interviewer / viewer をバッジで表示。プルダウンでインライン変更可</td></tr>
+          <tr><td>Google Calendar連携</td><td><span class="db-ref">Staff.google_calendar_id</span></td><td>設定済み / 未設定</td></tr>
+          <tr><td>最終ログイン</td><td><span class="db-ref">StaffSession.logged_in_at（最新）</span></td><td>YYYY/MM/DD HH:mm 形式</td></tr>
+          <tr><td>ステータス</td><td><span class="db-ref">Staff.is_active</span></td><td>有効 / 無効バッジ</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="section">
+      <div class="spec-header"><div class="spec-icon spec-icon-green">🖱️</div><div class="spec-title">② 操作・ボタン</div></div>
+      <table>
+        <thead><tr><th class="col-btn">ボタン</th><th>説明</th></tr></thead>
+        <tbody>
+          <tr><td><span class="btn-pill btn-primary">＋ ユーザー招待</span></td><td>Google Workspace のメールアドレスを入力。初回ログイン時（Google OAuth）に Staff レコードが作成される。ロールのデフォルト: recruiter</td></tr>
+          <tr><td>ロール変更（インライン）</td><td>プルダウンでロールを変更。変更は即時反映。AuditLogに edit_applicant（対象: staff_id）を記録</td></tr>
+          <tr><td><span class="btn-pill btn-ghost">無効化</span></td><td>Staff.is_active を false に変更。ログイン不可になる。自分自身は無効化不可</td></tr>
+          <tr><td><span class="btn-pill btn-secondary">有効化</span></td><td>is_active=false のスタッフを再有効化</td></tr>
+        </tbody>
+      </table>
+      <div class="warn-box">管理者（admin）ロールのスタッフが1名のみの場合、そのスタッフのロール変更・無効化は禁止。<span class="err-msg">管理者が最低1名必要です。</span></div>
+    </div>
+
+    <div class="section">
+      <div class="spec-header"><div class="spec-icon spec-icon-red">⚠️</div><div class="spec-title">③ バリデーション・エラー</div></div>
+      <table>
+        <thead><tr><th class="col-field">条件</th><th>メッセージ</th></tr></thead>
+        <tbody>
+          <tr><td>Google Workspace 以外のメールアドレス</td><td><span class="err-msg">組織のGoogle Workspaceアカウントのメールアドレスを入力してください。</span></td></tr>
+          <tr><td>すでに存在するメールアドレス</td><td><span class="err-msg">このメールアドレスはすでに登録されています。</span></td></tr>
+          <tr><td>自分自身を無効化</td><td><span class="err-msg">自分自身のアカウントは無効化できません。</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+  </div><!-- /s-users -->
+
+
+  <!-- =====================================================================
+       ⑫ システム設定
+       ===================================================================== -->
+  <div id="s-settings" class="screen-content">
+
+    <div class="overview-grid">
+      <div class="overview-card">
+        <div class="overview-card-label">画面ID</div>
+        <div class="overview-card-val">SCR-12</div>
+      </div>
+      <div class="overview-card">
+        <div class="overview-card-label">ルート</div>
+        <div class="overview-card-val">/admin/settings</div>
+      </div>
+      <div class="overview-card">
+        <div class="overview-card-label">アクセス権限</div>
+        <div class="overview-card-val">管理者のみ</div>
+      </div>
+      <div class="overview-card">
+        <div class="overview-card-label">サブタブ</div>
+        <div class="overview-card-val">4つ</div>
+      </div>
+    </div>
+
+    <div class="sub-tabs">
+      <div class="sub-tab active" onclick="swSub(this,'ss-flow','settings')">選考フロー</div>
+      <div class="sub-tab"       onclick="swSub(this,'ss-tags','settings')">タグ管理</div>
+      <div class="sub-tab"       onclick="swSub(this,'ss-qr','settings')">QRコード</div>
+      <div class="sub-tab"       onclick="swSub(this,'ss-goal','settings')">採用目標</div>
+    </div>
+
+    <!-- 選考フロー -->
+    <div id="ss-flow" class="sub-content active">
+      <div class="section">
+        <div class="spec-header"><div class="spec-icon spec-icon-blue">📋</div><div class="spec-title">① 選考フロー一覧</div></div>
+        <table>
+          <thead><tr><th class="col-field">カラム</th><th class="col-src">データソース</th><th>備考</th></tr></thead>
+          <tbody>
+            <tr><td>フロー名</td><td><span class="db-ref">SelectionFlow.name</span></td><td></td></tr>
+            <tr><td>デフォルト</td><td><span class="db-ref">SelectionFlow.is_default</span></td><td>デフォルトフロー（1つのみ）はバッジ表示</td></tr>
+            <tr><td>有効/無効</td><td><span class="db-ref">SelectionFlow.is_active</span></td><td></td></tr>
+            <tr><td>ステージ一覧</td><td><span class="db-ref">SelectionStage.name / order / stage_type</span></td><td>展開ビューで表示。順序はドラッグ&ドロップで変更</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="section">
+        <div class="spec-header"><div class="spec-icon spec-icon-green">🖱️</div><div class="spec-title">② 操作</div></div>
+        <table>
+          <thead><tr><th class="col-btn">ボタン</th><th>説明</th></tr></thead>
+          <tbody>
+            <tr><td><span class="btn-pill btn-primary">＋ フロー作成</span></td><td>フロー名を入力してSelectionFlowを作成。初期ステージ（entry / screening / offer / acceptance）を自動生成</td></tr>
+            <tr><td><span class="btn-pill btn-secondary">ステージ追加</span></td><td>フロー内に SelectionStage を追加。stage_type・表示名・順番を設定</td></tr>
+            <tr><td>ドラッグ&ドロップ</td><td>SelectionStage.order を更新</td></tr>
+            <tr><td><span class="btn-pill btn-ghost">デフォルト設定</span></td><td>is_default を true に変更（既存のデフォルトは自動で false に）</td></tr>
+            <tr><td><span class="btn-pill btn-ghost">無効化</span></td><td>is_active=false に変更。新規応募者への割り当て不可。既存の選考中レコードには影響なし</td></tr>
+          </tbody>
+        </table>
+        <div class="warn-box">使用中の SelectionStage（Selectionが紐づいている）は削除不可。<span class="err-msg">このステージは使用中のため削除できません。</span></div>
+      </div>
+    </div><!-- /ss-flow -->
+
+    <!-- タグ管理 -->
+    <div id="ss-tags" class="sub-content">
+      <div class="section">
+        <div class="spec-header"><div class="spec-icon spec-icon-blue">📋</div><div class="spec-title">① タグ一覧</div></div>
+        <table>
+          <thead><tr><th class="col-field">カラム</th><th class="col-src">データソース</th><th>備考</th></tr></thead>
+          <tbody>
+            <tr><td>タグ名</td><td><span class="db-ref">Tag.name</span></td><td></td></tr>
+            <tr><td>カラー</td><td><span class="db-ref">Tag.color</span></td><td>16進数カラーコードのカラーチップで表示</td></tr>
+            <tr><td>作成者</td><td><span class="db-ref">Staff.name（created_by経由）</span></td><td></td></tr>
+            <tr><td>使用件数</td><td><span class="db-ref">COUNT(ApplicantTag WHERE tag_id=...)</span></td><td>クリックで学生一覧をタグでフィルタ</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="section">
+        <div class="spec-header"><div class="spec-icon spec-icon-green">🖱️</div><div class="spec-title">② 操作</div></div>
+        <table>
+          <thead><tr><th class="col-btn">ボタン</th><th>説明</th></tr></thead>
+          <tbody>
+            <tr><td><span class="btn-pill btn-primary">＋ タグ作成</span></td><td>タグ名（必須・重複不可）・カラーコード（カラーピッカー）を入力してTagを作成</td></tr>
+            <tr><td><span class="btn-pill btn-secondary">編集</span></td><td>タグ名・カラーを変更。既にApplicantTagが存在していても変更可</td></tr>
+            <tr><td><span class="btn-pill btn-danger">削除</span></td><td>使用中（ApplicantTag 件数 > 0）の場合は削除不可。<span class="err-msg">このタグは {n} 件の応募者に使用中のため削除できません。</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div><!-- /ss-tags -->
+
+    <!-- QRコード -->
+    <div id="ss-qr" class="sub-content">
+      <div class="section">
+        <div class="spec-header"><div class="spec-icon spec-icon-blue">📋</div><div class="spec-title">① QRコード一覧</div></div>
+        <table>
+          <thead><tr><th class="col-field">カラム</th><th class="col-src">データソース</th><th>備考</th></tr></thead>
+          <tbody>
+            <tr><td>ラベル</td><td><span class="db-ref">QRCode.label</span></td><td>例: "東京校 2026秋"</td></tr>
+            <tr><td>LIFF URL</td><td><span class="db-ref">QRCode.liff_url</span></td><td>短縮表示。コピーボタン付き</td></tr>
+            <tr><td>自動付与タグ</td><td><span class="db-ref">Tag.name（auto_tags配列経由）</span></td><td>スキャン時に自動付与されるタグをバッジ表示</td></tr>
+            <tr><td>スキャン数</td><td><span class="db-ref">QRCode.scan_count</span></td><td>累計スキャン数</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="section">
+        <div class="spec-header"><div class="spec-icon spec-icon-green">🖱️</div><div class="spec-title">② 操作</div></div>
+        <table>
+          <thead><tr><th class="col-btn">ボタン</th><th>説明</th></tr></thead>
+          <tbody>
+            <tr><td><span class="btn-pill btn-primary">＋ QR作成</span></td><td>ラベル（必須）・自動付与タグ（複数選択可）を入力してQRCodeを作成。LIFF URLは自動生成（?qr_id=UUID付き）</td></tr>
+            <tr><td><span class="btn-pill btn-ghost">QR画像ダウンロード</span></td><td>LIFF URLをエンコードしたQRコード画像（PNG）をダウンロード</td></tr>
+            <tr><td><span class="btn-pill btn-secondary">編集</span></td><td>ラベル・自動付与タグを変更。scan_countはリセット不可</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div><!-- /ss-qr -->
+
+    <!-- 採用目標 -->
+    <div id="ss-goal" class="sub-content">
+      <div class="section">
+        <div class="spec-header"><div class="spec-icon spec-icon-blue">🎯</div><div class="spec-title">① 採用目標設定</div></div>
+        <div class="info-box" style="margin-bottom:12px;">目標値は分析画面（SCR-06）の内定承諾分析タブで達成率の計算に使用されます。年度ごとに設定します。</div>
+        <table>
+          <thead><tr><th class="col-field">設定項目</th><th>説明</th><th class="col-type">バリデーション</th></tr></thead>
+          <tbody>
+            <tr><td>対象年度</td><td>卒業予定年（例: 2027）。Applicant.graduation_year に対応</td><td><span class="badge badge-must">必須</span></td></tr>
+            <tr><td>目標エントリー数</td><td>エントリー（stage_type='entry'）の目標件数</td><td><span class="badge badge-opt">任意</span> 正の整数</td></tr>
+            <tr><td>目標内定数</td><td>内定（result='offer_declined'以外 + stage_type='offer'）の目標件数</td><td><span class="badge badge-must">必須</span> 正の整数</td></tr>
+            <tr><td>目標承諾数</td><td>内定承諾（result='acceptance' または Selection.result='passed' at acceptance stage）の目標件数</td><td><span class="badge badge-must">必須</span> 正の整数</td></tr>
+          </tbody>
+        </table>
+        <div class="warn-box" style="margin-top:10px;">目標値はシステム設定テーブルが未実装のため、暫定的に <span class="db-ref">Staff.google_calendar_id</span> と同様のパターンでサーバーサイド設定ファイル（環境変数）に格納。テーブル定義は v0.2 で追加予定。</div>
+      </div>
+    </div><!-- /ss-goal -->
+
+  </div><!-- /s-settings -->
+
+
+</div><!-- /page -->
+
+<script>
+// Screen tabs switching
+function swScreen(el, id) {
+  document.querySelectorAll('.screen-tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.screen-content').forEach(c => c.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById(id).classList.add('active');
+}
+
+// Sub tabs switching (scoped by group key to avoid cross-screen conflicts)
+function swSub(el, id, group) {
+  const parent = document.getElementById(id).parentElement;
+  parent.querySelectorAll('.sub-content').forEach(c => c.classList.remove('active'));
+  // Only deactivate sub-tabs within the same sub-tab group
+  el.parentElement.querySelectorAll('.sub-tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById(id).classList.add('active');
+}
+</script>
+</body>
+</html>
