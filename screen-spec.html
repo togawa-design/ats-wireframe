@@ -852,7 +852,7 @@
           <tbody>
             <tr><td>ステータス変更履歴</td><td><span class="db-ref">SelectionHistory</span></td><td><code>ORDER BY changed_at DESC</code>。変更前→変更後ステージ名を矢印で表示</td></tr>
             <tr><td>変更日時</td><td><span class="db-ref">SelectionHistory.changed_at</span></td><td>YYYY/MM/DD HH:mm</td></tr>
-            <tr><td>変更者</td><td><span class="db-ref">SelectionHistory.changed_by</span> JOIN <span class="db-ref">User.name</span></td><td></td></tr>
+            <tr><td>変更者</td><td><span class="db-ref">SelectionHistory.changed_by</span> JOIN <span class="db-ref">Staff.name</span></td><td></td></tr>
             <tr><td>変更理由・メモ</td><td><span class="db-ref">SelectionHistory.note</span></td><td>任意入力。空欄の場合は「—」表示</td></tr>
             <tr><td>面接記録</td><td><span class="db-ref">Interview</span></td><td>面接日時・面接官・評価スコア・コメント</td></tr>
             <tr><td>現在のステージ</td><td><span class="db-ref">Selection.current_stage_id</span> JOIN <span class="db-ref">SelectionStage</span></td><td>画面上部に現在地として強調表示</td></tr>
@@ -1017,9 +1017,9 @@
           </thead>
           <tbody>
             <tr><td>アンケートタイトル</td><td><span class="db-ref">Survey.title</span></td><td></td></tr>
-            <tr><td>回答日時</td><td><span class="db-ref">SurveyResponse.responded_at</span></td><td>YYYY/MM/DD HH:mm</td></tr>
+            <tr><td>回答日時</td><td><span class="db-ref">SurveyResponse.submitted_at</span></td><td>YYYY/MM/DD HH:mm</td></tr>
             <tr><td>設問と回答</td><td><span class="db-ref">SurveyQuestion.question_text</span> + <span class="db-ref">SurveyResponseItem.answer</span></td><td>設問順に表示</td></tr>
-            <tr><td>回答ステータス</td><td><span class="db-ref">SurveyResponse.status</span></td><td>未回答 / 回答済 / 回答期限切れ</td></tr>
+            <tr><td>回答ステータス</td><td><span class="db-ref">SurveyResponse</span> の存在有無で判定</td><td>レコードあり: 回答済 / なし: 未回答</td></tr>
           </tbody>
         </table>
       </div>
