@@ -139,7 +139,7 @@
   <!-- Overview -->
   <div class="overview-grid">
     <div class="overview-card">
-      <div class="overview-card-val">27</div>
+      <div class="overview-card-val">29</div>
       <div class="overview-card-label">総テーブル数</div>
     </div>
     <div class="overview-card">
@@ -188,7 +188,7 @@
         <div class="toc-item toc-a" onclick="goTab('tab-a')">
           <div class="toc-item-name">Staff</div>
           <div class="toc-item-jp">担当者</div>
-          <div class="toc-item-cols">9 columns</div>
+          <div class="toc-item-cols">10 columns</div>
         </div>
         <div class="toc-item toc-a" onclick="goTab('tab-a')">
           <div class="toc-item-name">StaffSession <span class="badge badge-new">NEW</span></div>
@@ -204,7 +204,7 @@
         <div class="toc-item toc-b" onclick="goTab('tab-b')">
           <div class="toc-item-name">Applicant</div>
           <div class="toc-item-jp">応募者</div>
-          <div class="toc-item-cols">19 columns</div>
+          <div class="toc-item-cols">21 columns</div>
         </div>
         <div class="toc-item toc-b" onclick="goTab('tab-b')">
           <div class="toc-item-name">ApplicantSource</div>
@@ -325,6 +325,16 @@
           <div class="toc-item-jp">採用目標</div>
           <div class="toc-item-cols">7 columns</div>
         </div>
+        <div class="toc-item toc-f" onclick="goTab('tab-f')">
+          <div class="toc-item-name">Agency <span class="badge badge-new">NEW</span></div>
+          <div class="toc-item-jp">紹介会社マスター</div>
+          <div class="toc-item-cols">3 columns</div>
+        </div>
+        <div class="toc-item toc-f" onclick="goTab('tab-f')">
+          <div class="toc-item-name">AgencyContact <span class="badge badge-new">NEW</span></div>
+          <div class="toc-item-jp">エージェント担当者</div>
+          <div class="toc-item-cols">8 columns</div>
+        </div>
       </div>
     </div>
 
@@ -367,9 +377,9 @@
           </tr>
           <tr>
             <td><strong style="color:#f57f17;">F. 媒体・マスター</strong></td>
-            <td>Media / QRCode / Document / RecruitmentGoal（4）</td>
-            <td>求人媒体・QRコード・書類テンプレート・採用目標のマスター管理</td>
-            <td>RecruitmentGoalは分析画面（SCR-06）の達成率算出に使用</td>
+            <td>Media / QRCode / Document / RecruitmentGoal / Agency / AgencyContact（6）</td>
+            <td>求人媒体・QRコード・書類テンプレート・採用目標・紹介会社のマスター管理</td>
+            <td>Agency/AgencyContactは今回新規追加。Applicant.agency_contact_idで紐づけ</td>
           </tr>
         </tbody>
       </table>
@@ -400,6 +410,8 @@
               <tr><td style="font-weight:600;"><code>slot_type</code></td><td>interview / briefing / other</td></tr>
               <tr><td style="font-weight:600;"><code>media_sync_type</code></td><td>api / csv</td></tr>
               <tr><td style="font-weight:600;"><code>audit_action</code></td><td>login / logout / export / status_change / offer / acceptance / line_send / edit_applicant / document_export</td></tr>
+              <tr><td style="font-weight:600;"><code>position_type</code></td><td>sogo（総合職） / gino（技能職）</td></tr>
+              <tr><td style="font-weight:600;"><code>staff_position_access</code></td><td>sogo / gino / both（両職種担当）</td></tr>
             </tbody>
           </table>
         </div>
@@ -418,7 +430,7 @@
           <div class="tbl-name">Staff</div>
           <div class="tbl-jp">担当者テーブル</div>
         </div>
-        <div class="tbl-count">9 columns</div>
+        <div class="tbl-count">10 columns</div>
       </div>
       <table>
         <thead>
@@ -432,6 +444,7 @@
           <tr><td><code>google_calendar_id</code></td><td>VARCHAR(255)</td><td>YES</td><td>NULL</td><td><span class="badge badge-new">NEW</span> Google Calendar のリソースID（連携後に設定）</td></tr>
           <tr><td><code>role</code></td><td>staff_role</td><td>NO</td><td>'recruiter'</td><td><span class="badge badge-enum">ENUM</span> admin / recruiter / interviewer / viewer</td></tr>
           <tr><td><code>is_active</code></td><td>BOOLEAN</td><td>NO</td><td>true</td><td>退職・アカウント停止時にfalse</td></tr>
+          <tr><td><code>position_type_access</code></td><td>staff_position_access</td><td>NO</td><td>'both'</td><td><span class="badge badge-enum">ENUM</span> <span class="badge badge-new">NEW</span> sogo / gino / both。担当職種区分。both は全職種を閲覧・操作可</td></tr>
           <tr><td><code>created_at</code></td><td>TIMESTAMP</td><td>NO</td><td>CURRENT_TIMESTAMP</td><td></td></tr>
           <tr><td><code>updated_at</code></td><td>TIMESTAMP</td><td>NO</td><td>CURRENT_TIMESTAMP</td><td>更新トリガーで自動更新</td></tr>
         </tbody>
@@ -525,7 +538,7 @@
           <div class="tbl-name">Applicant</div>
           <div class="tbl-jp">応募者テーブル（コアエンティティ）</div>
         </div>
-        <div class="tbl-count">19 columns</div>
+        <div class="tbl-count">21 columns</div>
       </div>
       <table>
         <thead>
@@ -546,6 +559,8 @@
           <tr><td><code>line_user_id</code></td><td>VARCHAR(50)</td><td>YES</td><td>NULL</td><td><span class="badge badge-uk">UQ</span> LINE連携後に設定。未連携はNULL</td></tr>
           <tr><td><code>line_linked_at</code></td><td>TIMESTAMP</td><td>YES</td><td>NULL</td><td>LINE連携完了日時</td></tr>
           <tr><td><code>primary_source_id</code></td><td>UUID</td><td>YES</td><td>NULL</td><td><span class="badge badge-fk">FK</span> → <span class="fk-ref">ApplicantSource.id</span> 主流入元</td></tr>
+          <tr><td><code>agency_contact_id</code></td><td>UUID</td><td>YES</td><td>NULL</td><td><span class="badge badge-fk">FK</span> → <span class="fk-ref">AgencyContact.id</span> <span class="badge badge-new">NEW</span> 紹介元エージェント担当者。直接応募はNULL</td></tr>
+          <tr><td><code>position_type</code></td><td>position_type</td><td>YES</td><td>NULL</td><td><span class="badge badge-enum">ENUM</span> <span class="badge badge-new">NEW</span> sogo（総合職）/ gino（技能職）。未分類はNULL</td></tr>
           <tr><td><code>memo</code></td><td>TEXT</td><td>YES</td><td>NULL</td><td><span class="badge badge-new">NEW</span> 担当者メモ（自由記述）</td></tr>
           <tr><td><code>sf_contact_id</code></td><td>VARCHAR(20)</td><td>YES</td><td>NULL</td><td>Salesforce Contact ID（18桁）。SF連携後に設定</td></tr>
           <tr><td><code>sf_employment_cache</code></td><td>JSONB</td><td>YES</td><td>NULL</td><td>SF側の採用状況キャッシュ（30分TTL）</td></tr>
@@ -1153,6 +1168,52 @@
         </tbody>
       </table>
       <div class="info-box" style="margin-top:12px;">SCR-12「採用目標」タブで年度ごとに設定。SCR-06「内定承諾分析」タブの達成率算出（目標数に対する実績の割合）で参照。graduation_year に UNIQUE 制約を付与し、1年度1レコードを保証する。</div>
+    </div>
+
+    <!-- Agency / AgencyContact -->
+    <div class="two-col">
+      <div class="section group-f">
+        <div class="tbl-header">
+          <div class="tbl-icon">🏢</div>
+          <div>
+            <div class="tbl-name">Agency <span class="badge badge-new">NEW</span></div>
+            <div class="tbl-jp">紹介会社（エージェント）マスター</div>
+          </div>
+          <div class="tbl-count">3 columns</div>
+        </div>
+        <table>
+          <thead><tr><th class="col-col">カラム名</th><th class="col-type">型</th><th class="col-null">NULL</th><th>制約・説明</th></tr></thead>
+          <tbody>
+            <tr><td><code>id</code></td><td>UUID</td><td>NO</td><td><span class="badge badge-pk">PK</span></td></tr>
+            <tr><td><code>name</code></td><td>VARCHAR(200)</td><td>NO</td><td><span class="badge badge-uk">UQ</span> 紹介会社名（例: 〇〇エージェント）</td></tr>
+            <tr><td><code>created_at</code></td><td>TIMESTAMP</td><td>NO</td><td>DEFAULT CURRENT_TIMESTAMP</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="section group-f">
+        <div class="tbl-header">
+          <div class="tbl-icon">👤</div>
+          <div>
+            <div class="tbl-name">AgencyContact <span class="badge badge-new">NEW</span></div>
+            <div class="tbl-jp">エージェント担当者テーブル</div>
+          </div>
+          <div class="tbl-count">8 columns</div>
+        </div>
+        <table>
+          <thead><tr><th class="col-col">カラム名</th><th class="col-type">型</th><th class="col-null">NULL</th><th>制約・説明</th></tr></thead>
+          <tbody>
+            <tr><td><code>id</code></td><td>UUID</td><td>NO</td><td><span class="badge badge-pk">PK</span></td></tr>
+            <tr><td><code>agency_id</code></td><td>UUID</td><td>NO</td><td><span class="badge badge-fk">FK</span> → <span class="fk-ref">Agency.id</span> ON DELETE CASCADE</td></tr>
+            <tr><td><code>name</code></td><td>VARCHAR(100)</td><td>NO</td><td>担当者名</td></tr>
+            <tr><td><code>email</code></td><td>VARCHAR(255)</td><td>NO</td><td><span class="badge badge-idx">IDX</span> 合否連絡メール送信先・ポータルログイン識別子</td></tr>
+            <tr><td><code>area</code></td><td>VARCHAR(100)</td><td>YES</td><td>担当エリア（例: 関東・東海）。同一会社で複数担当者を分ける軸</td></tr>
+            <tr><td><code>portal_token</code></td><td>VARCHAR(64)</td><td>NO</td><td><span class="badge badge-uk">UQ</span> エージェントポータル用マジックリンクトークン</td></tr>
+            <tr><td><code>is_active</code></td><td>BOOLEAN</td><td>NO</td><td>DEFAULT true。無効化でポータルアクセス不可</td></tr>
+            <tr><td><code>created_at</code></td><td>TIMESTAMP</td><td>NO</td><td>DEFAULT CURRENT_TIMESTAMP</td></tr>
+          </tbody>
+        </table>
+        <div class="info-box" style="margin-top:10px;">ポータル URL: <code>/agency/portal?token={portal_token}</code>。ログイン不要のマジックリンク方式。token は UUID v4 をBase64URLエンコードして生成。</div>
+      </div>
     </div>
 
   </div>

@@ -162,6 +162,8 @@
     <div class="screen-tab"         onclick="swScreen(this,'s-documents')">⑩ 書類管理</div>
     <div class="screen-tab"         onclick="swScreen(this,'s-users')">⑪ ユーザー管理</div>
     <div class="screen-tab"         onclick="swScreen(this,'s-settings')">⑫ システム設定</div>
+    <div class="screen-tab"         onclick="swScreen(this,'s-agency')">⑬ エージェント管理</div>
+    <div class="screen-tab"         onclick="swScreen(this,'s-agency-portal')">⑭ エージェントポータル</div>
   </div>
 
 
@@ -2653,6 +2655,158 @@
     </div><!-- /ss-goal -->
 
   </div><!-- /s-settings -->
+
+
+  <!-- =====================================================================
+       ⑬ エージェント管理
+       ===================================================================== -->
+  <div id="s-agency" class="screen-content">
+    <div class="overview-grid">
+      <div class="overview-card"><div class="overview-card-label">画面ID</div><div class="overview-card-val">SCR-13</div></div>
+      <div class="overview-card"><div class="overview-card-label">ルート</div><div class="overview-card-val">/admin/agencies</div></div>
+      <div class="overview-card"><div class="overview-card-label">アクセス権限</div><div class="overview-card-val">管理者・採用担当者</div></div>
+      <div class="overview-card"><div class="overview-card-label">サブタブ</div><div class="overview-card-val">2つ</div></div>
+    </div>
+
+    <div class="sub-tabs">
+      <div class="sub-tab active" onclick="swSub(this,'sag-list','agency')">紹介会社・担当者一覧</div>
+      <div class="sub-tab"       onclick="swSub(this,'sag-notify','agency')">合否連絡送信</div>
+    </div>
+
+    <!-- 紹介会社・担当者一覧 -->
+    <div id="sag-list" class="sub-content active">
+      <div class="section">
+        <div class="spec-header"><div class="spec-icon spec-icon-blue">📋</div><div class="spec-title">① 表示項目</div></div>
+        <table>
+          <thead><tr><th class="col-field">カラム</th><th class="col-src">データソース</th><th>備考</th></tr></thead>
+          <tbody>
+            <tr><td>紹介会社名</td><td><span class="db-ref">Agency.name</span></td><td></td></tr>
+            <tr><td>担当者名</td><td><span class="db-ref">AgencyContact.name</span></td><td>会社ごとに複数行で展開表示</td></tr>
+            <tr><td>担当エリア</td><td><span class="db-ref">AgencyContact.area</span></td><td>例: 関東・東海</td></tr>
+            <tr><td>メールアドレス</td><td><span class="db-ref">AgencyContact.email</span></td><td>合否連絡の送信先</td></tr>
+            <tr><td>紹介学生数</td><td><span class="db-ref">COUNT(Applicant WHERE agency_contact_id=...)</span></td><td>クリックで学生一覧へ遷移（職種フィルタ付き）</td></tr>
+            <tr><td>ポータルURL</td><td><span class="db-ref">AgencyContact.portal_token</span></td><td>クリックでコピー。URLは <code>/agency/portal?token=xxxx</code></td></tr>
+            <tr><td>ステータス</td><td><span class="db-ref">AgencyContact.is_active</span></td><td>有効 / 無効バッジ</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="section">
+        <div class="spec-header"><div class="spec-icon spec-icon-green">🖱️</div><div class="spec-title">② 操作</div></div>
+        <table>
+          <thead><tr><th class="col-btn">ボタン</th><th>説明</th></tr></thead>
+          <tbody>
+            <tr><td><span class="btn-pill btn-primary">＋ 紹介会社追加</span></td><td>Agency.name を入力して Agency を作成</td></tr>
+            <tr><td><span class="btn-pill btn-primary">＋ 担当者追加</span></td><td>AgencyContact の name / email / area を入力。portal_token は自動生成（UUID v4 の Base64URL）</td></tr>
+            <tr><td><span class="btn-pill btn-ghost">URLコピー</span></td><td>ポータル URL をクリップボードにコピー。エージェントへ共有する用</td></tr>
+            <tr><td><span class="btn-pill btn-ghost">URLを再発行</span></td><td>portal_token を再生成。旧 URL は即時無効化</td></tr>
+            <tr><td><span class="btn-pill btn-ghost">無効化</span></td><td>AgencyContact.is_active を false に変更。ポータルアクセス不可・合否連絡送信対象外になる</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div><!-- /sag-list -->
+
+    <!-- 合否連絡送信 -->
+    <div id="sag-notify" class="sub-content">
+      <div class="section">
+        <div class="spec-header"><div class="spec-icon spec-icon-blue">📤</div><div class="spec-title">① 合否連絡送信フロー（FR093・FR094）</div></div>
+        <table>
+          <thead><tr><th style="width:50px;">STEP</th><th class="col-field">操作</th><th>説明</th></tr></thead>
+          <tbody>
+            <tr><td>1</td><td>対象学生を選択</td><td>agency_contact_id が設定されている学生を一覧から選択（複数選択可）</td></tr>
+            <tr><td>2</td><td>合否を選択</td><td>合格 / 不合格 / 内定 から選択。内定の場合は内定通知書テンプレートを選択</td></tr>
+            <tr><td>3</td><td>メール本文確認</td><td>送信先（AgencyContact.email）・送信元（担当者個人アドレス）・本文プレビューを表示</td></tr>
+            <tr><td>4</td><td>送信実行</td><td>Microsoft Graph API 経由で送信。内定の場合は内定通知書 PDF を生成して添付</td></tr>
+            <tr><td>5</td><td>送信完了</td><td>AuditLog に document_export を記録。SelectionHistory.note に「合否連絡送信済」を記録</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="section">
+        <div class="spec-header"><div class="spec-icon spec-icon-red">⚠️</div><div class="spec-title">② エラー</div></div>
+        <table>
+          <thead><tr><th class="col-field">条件</th><th>メッセージ</th></tr></thead>
+          <tbody>
+            <tr><td>対象学生に agency_contact_id が未設定</td><td><span class="err-msg">紹介会社が未設定の学生が含まれています。除外して続けますか？</span></td></tr>
+            <tr><td>Microsoft Graph API 送信失敗</td><td><span class="err-msg">メール送信に失敗しました。時間をおいて再試行してください。</span></td></tr>
+            <tr><td>内定通知書テンプレート未選択（内定時）</td><td><span class="err-msg">内定通知書テンプレートを選択してください。</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div><!-- /sag-notify -->
+
+  </div><!-- /s-agency -->
+
+
+  <!-- =====================================================================
+       ⑭ エージェントポータル（外部向け）
+       ===================================================================== -->
+  <div id="s-agency-portal" class="screen-content">
+    <div class="overview-grid">
+      <div class="overview-card"><div class="overview-card-label">画面ID</div><div class="overview-card-val">SCR-14</div></div>
+      <div class="overview-card"><div class="overview-card-label">ルート</div><div class="overview-card-val">/agency/portal?token=xxxx</div></div>
+      <div class="overview-card"><div class="overview-card-label">アクセス</div><div class="overview-card-val">ログイン不要（マジックリンク）</div></div>
+      <div class="overview-card"><div class="overview-card-label">対象</div><div class="overview-card-val">エージェント担当者（外部）</div></div>
+    </div>
+
+    <div class="info-box" style="margin-bottom:16px;">このページはスタッフ向けのATS画面ではなく、外部のエージェント担当者向けの閲覧専用ポータルです。<code>AgencyContact.portal_token</code> が一致するURLでのみアクセス可能。認証不要ですがトークンが無効・未設定の場合は404を返します。</div>
+
+    <div class="sub-tabs">
+      <div class="sub-tab active" onclick="swSub(this,'sap-students','portal')">紹介学生一覧</div>
+      <div class="sub-tab"       onclick="swSub(this,'sap-register','portal')">学生登録フォーム</div>
+    </div>
+
+    <!-- 紹介学生一覧 -->
+    <div id="sap-students" class="sub-content active">
+      <div class="section">
+        <div class="spec-header"><div class="spec-icon spec-icon-blue">📋</div><div class="spec-title">① 表示項目（FR092）</div></div>
+        <table>
+          <thead><tr><th class="col-field">カラム</th><th class="col-src">データソース</th><th>備考</th></tr></thead>
+          <tbody>
+            <tr><td>氏名</td><td><span class="db-ref">Applicant.last_name + first_name</span></td><td></td></tr>
+            <tr><td>現在のステージ</td><td><span class="db-ref">SelectionStage.name（current_stage_id経由）</span></td><td>例: 「二次面接」</td></tr>
+            <tr><td>面接日時</td><td><span class="db-ref">Interview.scheduled_at（直近）</span></td><td>予定がない場合は「—」</td></tr>
+            <tr><td>ステータス</td><td><span class="db-ref">Selection.result</span></td><td>選考中 / 合格通過 / 不合格 / 内定 / 辞退 をバッジで表示</td></tr>
+            <tr><td>最終更新日</td><td><span class="db-ref">SelectionHistory.changed_at（最新）</span></td><td></td></tr>
+          </tbody>
+        </table>
+        <div class="warn-box">非表示（外部に見せない情報）: 評価スコア / 面接コメント / 面接官名 / 担当者内部メモ / 他エージェント紹介の学生</div>
+      </div>
+    </div><!-- /sap-students -->
+
+    <!-- 学生登録フォーム -->
+    <div id="sap-register" class="sub-content">
+      <div class="section">
+        <div class="spec-header"><div class="spec-icon spec-icon-blue">✏️</div><div class="spec-title">① 入力項目（FR091）</div></div>
+        <table>
+          <thead><tr><th class="col-field">項目</th><th class="col-src">保存先</th><th class="col-type">必須</th><th>備考</th></tr></thead>
+          <tbody>
+            <tr><td>姓・名</td><td><span class="db-ref">Applicant.last_name / first_name</span></td><td><span class="badge badge-must">必須</span></td><td></td></tr>
+            <tr><td>姓・名（フリガナ）</td><td><span class="db-ref">Applicant.last_name_kana / first_name_kana</span></td><td><span class="badge badge-opt">任意</span></td><td></td></tr>
+            <tr><td>メールアドレス</td><td><span class="db-ref">Applicant.email</span></td><td><span class="badge badge-must">必須</span></td><td>重複チェックあり</td></tr>
+            <tr><td>電話番号</td><td><span class="db-ref">Applicant.phone</span></td><td><span class="badge badge-opt">任意</span></td><td></td></tr>
+            <tr><td>学校名</td><td><span class="db-ref">Applicant.school_id</span></td><td><span class="badge badge-rec">推奨</span></td><td>School マスターからサジェスト</td></tr>
+            <tr><td>学部・学科</td><td><span class="db-ref">Applicant.department</span></td><td><span class="badge badge-opt">任意</span></td><td></td></tr>
+            <tr><td>卒業予定年</td><td><span class="db-ref">Applicant.graduation_year</span></td><td><span class="badge badge-must">必須</span></td><td></td></tr>
+            <tr><td>職種区分</td><td><span class="db-ref">Applicant.position_type</span></td><td><span class="badge badge-must">必須</span></td><td>総合職 / 技能職 から選択</td></tr>
+            <tr><td>履歴書（PDF）</td><td>Firebase Storage → <span class="db-ref">Applicant.resume_url</span></td><td><span class="badge badge-rec">推奨</span></td><td>最大10MB。PDF のみ</td></tr>
+          </tbody>
+        </table>
+        <div class="info-box">登録完了後、agency_contact_id・primary_source_id・applicant_type='新卒' を自動セット。ATS 側の担当者に通知（メール or ダッシュボード通知）。</div>
+      </div>
+      <div class="section">
+        <div class="spec-header"><div class="spec-icon spec-icon-red">⚠️</div><div class="spec-title">② バリデーション・エラー</div></div>
+        <table>
+          <thead><tr><th class="col-field">条件</th><th>メッセージ</th></tr></thead>
+          <tbody>
+            <tr><td>メールアドレス重複</td><td><span class="err-msg">このメールアドレスはすでに登録されています。担当者にご確認ください。</span></td></tr>
+            <tr><td>PDF 以外のファイル</td><td><span class="err-msg">履歴書は PDF 形式でアップロードしてください。</span></td></tr>
+            <tr><td>10MB 超過</td><td><span class="err-msg">ファイルサイズが上限（10MB）を超えています。</span></td></tr>
+            <tr><td>token 無効 / 無効化済み</td><td>404 ページを表示（エラー内容は開示しない）</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div><!-- /sap-register -->
+
+  </div><!-- /s-agency-portal -->
 
 
 </div><!-- /page -->

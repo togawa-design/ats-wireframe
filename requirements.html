@@ -82,8 +82,8 @@
 <div class="page">
   <h1>新卒採用管理システム（ATS）要件定義書</h1>
   <div class="meta">
-    <span>v0.4</span>
-    <span>2026-06-04</span>
+    <span>v0.5</span>
+    <span>2026-06-09</span>
     <span>ステータス：ヒアリング中</span>
     <span style="color:#4caf50;">確定済み：U-02, U-04</span>
   </div>
@@ -278,6 +278,51 @@
           <tr><td class="fr-id">FR080 <span class="badge badge-update">UPD</span></td><td>担当者・権限管理</td><td>Staff テーブルで管理。Google OAuth と紐付け。担当者もLINE通知受け取り可</td><td><span class="badge badge-high">高</span></td></tr>
           <tr><td class="fr-id">FR081 <span class="badge badge-update">UPD</span></td><td>選考フロー設定</td><td>複数フローの作成・ステージ追加・並び替え・stage_type 設定</td><td><span class="badge badge-high">高</span></td></tr>
           <tr><td class="fr-id">FR082</td><td>タグマスター管理</td><td>タグの作成・色設定・編集・削除。削除時は ApplicantTag の紐付けも解除</td><td><span class="badge badge-mid">中</span></td></tr>
+        </tbody>
+      </table>
+
+      <div class="cat-header">🆕 追加要件（v0.5）― エージェント・職種区分・合否連絡</div>
+      <table>
+        <thead><tr><th style="width:90px;">ID</th><th style="width:220px;">機能</th><th>詳細</th><th style="width:60px;">優先度</th></tr></thead>
+        <tbody>
+          <tr><td class="fr-id">FR090 <span class="badge badge-new">NEW</span></td><td>紹介会社（エージェント）マスター管理</td><td>
+            Agency（紹介会社）と AgencyContact（担当者）の登録・編集・無効化。<br>
+            担当者はエリア別（関東担当・東海担当等）に複数登録可。<br>
+            Applicant.agency_contact_id で学生と担当者を紐づけ。
+          </td><td><span class="badge badge-high">高</span></td></tr>
+          <tr><td class="fr-id">FR091 <span class="badge badge-new">NEW</span></td><td>エージェントによる学生登録（外部フォーム）</td><td>
+            AgencyContact ごとに発行したマジックリンク URL（ログイン不要）から学生情報・履歴書を登録。<br>
+            登録された学生は Applicant テーブルに agency_contact_id 付きで作成。<br>
+            履歴書 PDF は Firebase Storage に格納し、Applicant に URL を保存。
+          </td><td><span class="badge badge-high">高</span></td></tr>
+          <tr><td class="fr-id">FR092 <span class="badge badge-new">NEW</span></td><td>エージェントポータル（選考状況確認）</td><td>
+            AgencyContact.portal_token を使ったマジックリンク URL でアクセス可能な外部向けポータル。<br>
+            表示情報: 現在のステージ・面接日時・ステータス（選考中 / 合格 / 不合格 / 内定 / 辞退）・最終更新日。<br>
+            非表示: 評価スコア・コメント・面接官名・内部メモ。
+          </td><td><span class="badge badge-high">高</span></td></tr>
+          <tr><td class="fr-id">FR093 <span class="badge badge-new">NEW</span></td><td>合否連絡のシステム内送信（Microsoft 365）</td><td>
+            ATS から直接、AgencyContact.email 宛に合否連絡メールを送信。<br>
+            送信手段: Microsoft Graph API（メール環境は Microsoft 365）。<br>
+            送信元: 採用担当者個人のアドレス（tanaka@〇〇.com）。<br>
+            対象: 紹介会社経由の学生の合否確定時。
+          </td><td><span class="badge badge-high">高</span></td></tr>
+          <tr><td class="fr-id">FR094 <span class="badge badge-new">NEW</span></td><td>合否連絡・内定通知書の一括送信</td><td>
+            内定（offer）確定時に合否連絡メール＋内定通知書 PDF を1通にまとめて送信。<br>
+            PDF は Document テーブルのテンプレートから生成し Firebase Storage に保存後に添付。<br>
+            AuditLog に document_export + line_send を記録。
+          </td><td><span class="badge badge-high">高</span></td></tr>
+          <tr><td class="fr-id">FR095 <span class="badge badge-new">NEW</span></td><td>総合職・技能職の職種区分管理</td><td>
+            Applicant.position_type（sogo / gino）で応募者を職種区分で管理。<br>
+            Staff.position_type_access（sogo / gino / both）でスタッフの閲覧・操作範囲を制限。<br>
+            both 以外のスタッフは担当外職種の応募者を閲覧・操作不可。<br>
+            学生一覧・選考管理・分析画面すべてに職種フィルタを追加。
+          </td><td><span class="badge badge-high">高</span></td></tr>
+          <tr><td class="fr-id">FR096 <span class="badge badge-new">NEW</span></td><td>選考ステップの個別カスタマイズ</td><td>
+            個人の状況に応じてステージのスキップ・追加が可能。<br>
+            例: 一次面接をスキップして二次面接から開始 / 役員面接を追加。<br>
+            SelectionFlow のテンプレートをベースに、Selection レコード単位でカスタマイズを記録。<br>
+            SelectionHistory に skip_reason / added_stage を記録して監査可能にする。
+          </td><td><span class="badge badge-mid">中</span></td></tr>
         </tbody>
       </table>
     </div>

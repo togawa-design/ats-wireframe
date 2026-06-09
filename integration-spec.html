@@ -96,8 +96,8 @@
 <div class="page">
   <h1>新卒採用管理システム（ATS）外部連携仕様書</h1>
   <div class="meta">
-    <span>v0.1</span>
-    <span>2026-06-05</span>
+    <span>v0.2</span>
+    <span>2026-06-09</span>
     <span>ステータス：設計中</span>
   </div>
 
@@ -105,6 +105,7 @@
     <div class="tab active" onclick="switchTab(this,'tab-line')">💬 LINE Messaging API</div>
     <div class="tab" onclick="switchTab(this,'tab-google-oauth')">🔐 Google OAuth</div>
     <div class="tab" onclick="switchTab(this,'tab-gcal')">📅 Google Calendar</div>
+    <div class="tab" onclick="switchTab(this,'tab-m365')">📧 Microsoft 365</div>
     <div class="tab" onclick="switchTab(this,'tab-sf')">☁️ Salesforce <span class="badge badge-tbd">確認待ち</span></div>
   </div>
 
@@ -500,6 +501,84 @@
     </div><!-- /sgc-conflict -->
 
   </div><!-- /tab-gcal -->
+
+
+  <!-- ================================================================
+       Microsoft 365
+       ================================================================ -->
+  <div id="tab-m365" class="tab-content">
+
+    <div class="section">
+      <div class="spec-header"><div class="spec-icon spec-icon-blue">🔑</div><div class="spec-title">認証方式（Microsoft Graph API）</div></div>
+      <div class="info-box" style="margin-bottom:12px;">メール環境は Microsoft 365（Exchange Online）。Gmail API ではなく <strong>Microsoft Graph API</strong> を使用してメール送信を行う。Google OAuth とは独立した認証フローで、サービス側で一度設定すれば継続利用可能。</div>
+      <table>
+        <thead><tr><th style="width:200px;">認証方式</th><th>説明</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><strong>Client Credentials Flow</strong><br><span style="font-size:11px;color:#888;">（推奨）</span></td>
+            <td>Azure AD にアプリ登録し、client_id / client_secret でアクセストークンを取得。ユーザーの操作不要でサービスアカウントとして動作。共有メールボックス（recruit@〇〇.com）からの送信に適している</td>
+          </tr>
+          <tr>
+            <td><strong>Delegated Access（OAuth 2.0）</strong></td>
+            <td>担当者個人アドレスからの送信時に使用。各スタッフが初回のみ Microsoft アカウントで認可。access_token / refresh_token を安全に保管して送信時に使用</td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="warn-box" style="margin-top:10px;">合否連絡（FR093）は「担当者個人アドレスから送りたい（できれば）」という要件のため Delegated Access を採用。実装コストが高い場合は共有メールボックス（Client Credentials）にフォールバックも検討。</div>
+    </div>
+
+    <div class="section">
+      <div class="spec-header"><div class="spec-icon spec-icon-green">📤</div><div class="spec-title">メール送信 API</div></div>
+      <table>
+        <thead><tr><th class="col-method">メソッド</th><th class="col-path">Graph API エンドポイント</th><th>用途</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><span class="method method-post">POST</span></td>
+            <td><span class="endpoint">/v1.0/users/{userId}/sendMail</span></td>
+            <td>担当者個人アドレス（Delegated）または共有メールボックス（Client Credentials）からメール送信</td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="info-box" style="margin-top:10px;">ATS 内部エンドポイント: <span class="endpoint">POST /api/email/send</span><br>body: <code>{to, subject, body_html, attachments?: [{filename, content_base64}]}</code></div>
+    </div>
+
+    <div class="section">
+      <div class="spec-header"><div class="spec-icon spec-icon-orange">📋</div><div class="spec-title">合否連絡・内定通知書送信フロー（FR093・FR094）</div></div>
+      <div class="flow-steps">
+        <div class="flow-step"><div class="flow-step-num">1</div><div class="flow-step-body"><div class="flow-step-label">ATS から送信指示</div><div class="flow-step-detail">SCR-13「合否連絡送信」タブで対象学生・合否・テンプレートを選択</div></div></div>
+        <div class="flow-step"><div class="flow-step-num">2</div><div class="flow-step-body"><div class="flow-step-label">内定通知書 PDF 生成（内定時のみ）</div><div class="flow-step-detail">Document テンプレートに応募者情報を差し込んで PDF 生成 → Firebase Storage に保存 → 署名付き URL を取得</div></div></div>
+        <div class="flow-step"><div class="flow-step-num">3</div><div class="flow-step-body"><div class="flow-step-label">Graph API でメール送信</div><div class="flow-step-detail"><code>POST /v1.0/users/{staffEmail}/sendMail</code> を呼び出し。to: AgencyContact.email。内定時は PDF を base64 エンコードして attachments に追加</div></div></div>
+        <div class="flow-step"><div class="flow-step-num">4</div><div class="flow-step-body"><div class="flow-step-label">送信結果の記録</div><div class="flow-step-detail">AuditLog に document_export を記録。SelectionHistory.note に「合否連絡送信済 ({timestamp})」を追記</div></div></div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="spec-header"><div class="spec-icon spec-icon-grey">🔧</div><div class="spec-title">Azure AD 設定（初期セットアップ）</div></div>
+      <table>
+        <thead><tr><th style="width:220px;">設定項目</th><th>値・説明</th></tr></thead>
+        <tbody>
+          <tr><td>アプリ登録名</td><td>ATS-Email-Sender</td></tr>
+          <tr><td>必要な API 権限</td><td><span class="scope-chip">Mail.Send</span> <span class="scope-chip">Mail.Send.Shared</span>（Delegated または Application）</td></tr>
+          <tr><td>管理者の同意</td><td>Application 権限の場合は Azure AD 管理者による同意が必要</td></tr>
+          <tr><td>シークレット管理</td><td>client_secret は Firebase App Hosting のシークレットに格納。定期ローテーション（年1回推奨）</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="section">
+      <div class="spec-header"><div class="spec-icon spec-icon-red">⚠️</div><div class="spec-title">エラーハンドリング</div></div>
+      <table>
+        <thead><tr><th style="width:200px;">エラー</th><th>原因</th><th>ATS側の処理</th></tr></thead>
+        <tbody>
+          <tr><td><code>401 Unauthorized</code></td><td>access_token 期限切れ</td><td>refresh_token でトークン更新してリトライ（Delegated）/ client_credentials で再取得（Client Credentials）</td></tr>
+          <tr><td><code>403 Forbidden</code></td><td>Mail.Send 権限未付与</td><td>管理者へアラート通知。送信を中断してキューに積む</td></tr>
+          <tr><td><code>429 Too Many Requests</code></td><td>レート制限</td><td>Retry-After ヘッダーの秒数待機後にリトライ（最大3回）</td></tr>
+          <tr><td><code>500 / 503</code></td><td>Microsoft 側障害</td><td>5分後にリトライ。3回失敗でスタッフへ通知</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+  </div><!-- /tab-m365 -->
 
 
   <!-- ================================================================

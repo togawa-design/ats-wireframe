@@ -197,7 +197,7 @@
           </div>
           <div class="arch-box layer-db">
             <span class="arch-box-text">🗄️ Cloud SQL</span>
-            <span class="arch-box-sub">PostgreSQL 16 / 27テーブル</span>
+            <span class="arch-box-sub">PostgreSQL 16 / 29テーブル</span>
           </div>
           <div class="arch-box layer-storage">
             <span class="arch-box-text">🗂️ Firebase Storage</span>
@@ -219,6 +219,10 @@
           <div class="arch-box layer-external">
             <span class="arch-box-text">📅 Google Calendar API</span>
             <span class="arch-box-sub">Push Notifications / Events</span>
+          </div>
+          <div class="arch-box layer-external">
+            <span class="arch-box-text">📧 Microsoft 365</span>
+            <span class="arch-box-sub">Graph API / メール送信</span>
           </div>
           <div class="arch-box layer-external" style="border-style:dashed;opacity:.6;">
             <span class="arch-box-text">☁️ Salesforce</span>
@@ -265,6 +269,12 @@
             <td><span class="badge badge-oss">OSS</span></td>
             <td>BFF層。LINE Webhook・Google Calendar Webhook の受け口も兼ねる</td>
             <td>—（App Hosting上で動作）</td>
+          </tr>
+          <tr>
+            <td><strong>Microsoft 365 / Graph API</strong></td>
+            <td><span class="badge badge-new">NEW</span></td>
+            <td>合否連絡・内定通知書のメール送信。エージェント（AgencyContact）へ担当者個人アドレスから送信</td>
+            <td>Microsoft（別途 Azure AD 設定）</td>
           </tr>
           <tr>
             <td><strong>LINE Messaging API</strong></td>
