@@ -105,8 +105,8 @@
   <div class="tabs">
     <div class="tab active" onclick="switchTab(this,'tab-line')">💬 LINE Messaging API</div>
     <div class="tab" onclick="switchTab(this,'tab-google-oauth')">🔐 Google OAuth</div>
-    <div class="tab" onclick="switchTab(this,'tab-gcal')">📅 Google Calendar</div>
-    <div class="tab" onclick="switchTab(this,'tab-m365')">📧 Microsoft 365</div>
+    <div class="tab" onclick="switchTab(this,'tab-gcal')">📅 ガルーン（カレンダー）</div>
+    <div class="tab" onclick="switchTab(this,'tab-m365')">📧 メール送信（サイバーメール）</div>
     <div class="tab" onclick="switchTab(this,'tab-sf')">☁️ Salesforce <span class="badge badge-tbd">確認待ち</span></div>
   </div>
 
@@ -322,7 +322,6 @@
           <tr><td><span class="scope-chip">openid</span></td><td>OpenID Connect による身元確認</td><td>必須</td></tr>
           <tr><td><span class="scope-chip">email</span></td><td>Google Workspace メールアドレス取得。<span class="db-ref">Staff.email</span> に保存</td><td>必須</td></tr>
           <tr><td><span class="scope-chip">profile</span></td><td>表示名・プロフィール画像取得。<span class="db-ref">Staff.name</span> の初期値に使用</td><td>必須</td></tr>
-          <tr><td><span class="scope-chip">https://www.googleapis.com/auth/calendar</span></td><td>Google Calendar の読み取り・書き込み・イベント管理</td><td>必須（カレンダー連携時）</td></tr>
         </tbody>
       </table>
       <div class="info-box">スコープはログイン時に一括付与。Calendar スコープが拒否された場合もログイン自体は成功とし、カレンダー連携機能のみ「未連携」として表示する。</div>
@@ -371,197 +370,76 @@
 
 
   <!-- ================================================================
-       Google Calendar
+       ガルーン（カレンダー）
        ================================================================ -->
   <div id="tab-gcal" class="tab-content">
 
-    <div class="sub-tabs">
-      <div class="sub-tab active" onclick="swSub(this,'sgc-push')">ATS → Calendar 同期</div>
-      <div class="sub-tab"       onclick="swSub(this,'sgc-webhook')">Push Notifications（Calendar → ATS）</div>
-      <div class="sub-tab"       onclick="swSub(this,'sgc-conflict')">競合解決ルール</div>
+    <div class="section">
+      <div class="spec-header"><div class="spec-icon spec-icon-blue">ℹ️</div><div class="spec-title">ガルーン連携の方針</div></div>
+      <div class="warn-box">ガルーン（サイボウズ クラウド版）には Push Notifications 相当の Webhook 機能がありません。そのため <strong>ATS → ガルーンへの一方向同期</strong> を採用します。ガルーン上で直接変更した内容は ATS に自動反映されません。<strong>ATSを正として管理</strong>してください。</div>
     </div>
 
-    <!-- ATS → Calendar 同期 -->
-    <div id="sgc-push" class="sub-content active">
-      <div class="section">
-        <div class="spec-header"><div class="spec-icon spec-icon-blue">📤</div><div class="spec-title">ATS側操作 → Calendar API 呼び出し対応表</div></div>
-        <table>
-          <thead><tr><th style="width:180px;">ATS側操作</th><th class="col-method">HTTP</th><th class="col-path">Calendar API</th><th>備考</th></tr></thead>
-          <tbody>
-            <tr>
-              <td>CalendarSlot 作成</td>
-              <td><span class="method method-post">POST</span></td>
-              <td><span class="endpoint">/calendars/{calendarId}/events</span></td>
-              <td>レスポンスの <code>id</code> を <span class="db-ref">CalendarSlot.google_calendar_event_id</span> に保存</td>
-            </tr>
-            <tr>
-              <td>CalendarSlot 更新（日時・タイプ変更）</td>
-              <td><span class="method method-patch">PATCH</span></td>
-              <td><span class="endpoint">/calendars/{calendarId}/events/{eventId}</span></td>
-              <td><span class="db-ref">CalendarSlot.google_synced_at</span> を現在時刻に更新</td>
-            </tr>
-            <tr>
-              <td>CalendarSlot 削除</td>
-              <td><span class="method method-delete">DELETE</span></td>
-              <td><span class="endpoint">/calendars/{calendarId}/events/{eventId}</span></td>
-              <td>is_booked=true の枠は削除不可（ATS画面側でガード済み）</td>
-            </tr>
-            <tr>
-              <td>Interview 作成（面接予約確定）</td>
-              <td><span class="method method-patch">PATCH</span></td>
-              <td><span class="endpoint">/calendars/{calendarId}/events/{eventId}</span></td>
-              <td>イベント概要に応募者名を追記。summary: "面接: {氏名}" に更新</td>
-            </tr>
-          </tbody>
-        </table>
-        <div class="info-box">Calendar API 呼び出しは非同期ジョブ（キュー処理）。ATS の DB 更新は即時、Google Calendar への反映は数秒〜数十秒のラグが発生する場合あり。</div>
-      </div>
-
-      <div class="section">
-        <div class="spec-header"><div class="spec-icon spec-icon-green">📋</div><div class="spec-title">イベント作成時のフィールドマッピング</div></div>
-        <table>
-          <thead><tr><th style="width:160px;">Calendar フィールド</th><th>値</th></tr></thead>
-          <tbody>
-            <tr><td><code>summary</code></td><td><code>{slot_type}: {担当者名}</code>（例: "面接: 田中太郎"）。予約後は応募者名を追記</td></tr>
-            <tr><td><code>start.dateTime</code></td><td><span class="db-ref">CalendarSlot.starts_at</span>（ISO 8601 形式）</td></tr>
-            <tr><td><code>end.dateTime</code></td><td><span class="db-ref">CalendarSlot.ends_at</span></td></tr>
-            <tr><td><code>attendees</code></td><td>担当者（<span class="db-ref">Staff.email</span>）を設定。応募者は追加しない</td></tr>
-            <tr><td><code>description</code></td><td>ATS の枠 URL を埋め込み（ディープリンク）</td></tr>
-          </tbody>
-        </table>
-      </div>
-    </div><!-- /sgc-push -->
-
-    <!-- Push Notifications -->
-    <div id="sgc-webhook" class="sub-content">
-      <div class="section">
-        <div class="spec-header"><div class="spec-icon spec-icon-blue">📡</div><div class="spec-title">Push Notifications 受信エンドポイント</div></div>
-        <table>
-          <thead><tr><th class="col-method">メソッド</th><th class="col-path">パス</th><th>説明</th></tr></thead>
-          <tbody>
-            <tr>
-              <td><span class="method method-post">POST</span></td>
-              <td><span class="endpoint">/api/webhooks/google-calendar</span></td>
-              <td>Google Calendar からのプッシュ通知受信口。ヘッダー <code>X-Goog-Channel-Token</code> で署名検証</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-
-      <div class="section">
-        <div class="spec-header"><div class="spec-icon spec-icon-green">🔄</div><div class="spec-title">Push Notifications チャンネル管理</div></div>
-        <div class="flow-steps">
-          <div class="flow-step"><div class="flow-step-num">1</div><div class="flow-step-body"><div class="flow-step-label">チャンネル登録</div><div class="flow-step-detail">担当者の Google Calendar に対して <code>POST /calendars/{calendarId}/events/watch</code> を呼び出し。有効期限: 7日（最大）</div></div></div>
-          <div class="flow-step"><div class="flow-step-num">2</div><div class="flow-step-body"><div class="flow-step-label">通知受信</div><div class="flow-step-detail">Webhook エンドポイントで <code>X-Goog-Resource-State</code> ヘッダーを確認。sync / exists / not_exists のいずれかを処理</div></div></div>
-          <div class="flow-step"><div class="flow-step-num">3</div><div class="flow-step-body"><div class="flow-step-label">変更内容取得</div><div class="flow-step-detail">通知のみでは変更内容が不明なため、<code>GET /calendars/{calendarId}/events/{eventId}</code> で最新データを取得</div></div></div>
-          <div class="flow-step"><div class="flow-step-num">4</div><div class="flow-step-body"><div class="flow-step-label">ATS側 DB 更新</div><div class="flow-step-detail"><span class="db-ref">google_calendar_event_id</span> で <span class="db-ref">CalendarSlot</span> を特定し、日時・ステータスを更新。<span class="db-ref">google_synced_at</span> を現在時刻に更新</div></div></div>
-          <div class="flow-step"><div class="flow-step-num">5</div><div class="flow-step-body"><div class="flow-step-label">チャンネル更新</div><div class="flow-step-detail">期限切れ3日前にバッチ処理でチャンネルを再登録（<code>POST /calendars/{calendarId}/events/watch</code>）</div></div></div>
-        </div>
-      </div>
-
-      <div class="section">
-        <div class="spec-header"><div class="spec-icon spec-icon-red">⚠️</div><div class="spec-title">エラーハンドリング</div></div>
-        <table>
-          <thead><tr><th style="width:200px;">ケース</th><th>処理</th></tr></thead>
-          <tbody>
-            <tr><td>署名検証失敗</td><td>400 を返して処理中断。ログに記録</td></tr>
-            <tr><td>CalendarSlot が見つからない（ATS側で削除済み）</td><td>スキップ。Calendar 側イベントはそのまま（孤立イベント）</td></tr>
-            <tr><td>Calendar API 呼び出し失敗</td><td>Exponential backoff でリトライ（最大3回）。失敗時はスタッフへ通知</td></tr>
-            <tr><td>チャンネル登録エラー（Google側障害）</td><td>1時間後に再試行。スタッフへ警告バナーを表示</td></tr>
-          </tbody>
-        </table>
-      </div>
-    </div><!-- /sgc-webhook -->
-
-    <!-- 競合解決ルール -->
-    <div id="sgc-conflict" class="sub-content">
-      <div class="section">
-        <div class="spec-header"><div class="spec-icon spec-icon-orange">⚖️</div><div class="spec-title">競合解決ルール</div></div>
-        <div class="info-box" style="margin-bottom:12px;">ATS と Google Calendar の両方で同一イベントが変更された場合（二重編集）の解決方針</div>
-        <table>
-          <thead><tr><th style="width:200px;">ケース</th><th>判定基準</th><th>処理</th></tr></thead>
-          <tbody>
-            <tr>
-              <td>ATS編集 vs Google Calendar編集（同時）</td>
-              <td><span class="db-ref">CalendarSlot.updated_at</span>（ATS） vs Google Calendar イベントの <code>updated</code> 時刻を比較</td>
-              <td>新しい方を優先して両方に反映。古い変更を上書き</td>
-            </tr>
-            <tr>
-              <td>Google Calendar 側でイベント削除</td>
-              <td><code>X-Goog-Resource-State: not_exists</code> 受信</td>
-              <td>is_booked=false の場合のみ ATS 側の CalendarSlot も削除。is_booked=true の場合はスタッフへ警告通知（面接予約が紐づいているため自動削除しない）</td>
-            </tr>
-            <tr>
-              <td>Google Calendar 側でイベント日時を過去に変更</td>
-              <td>Google イベントの start < 現在時刻</td>
-              <td>ATS の CalendarSlot は更新せずスタッフへ通知。日時の過去変更は手動確認が必要</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </div><!-- /sgc-conflict -->
-
-  </div><!-- /tab-gcal -->
-
-
-  <!-- ================================================================
-       Microsoft 365
-       ================================================================ -->
-  <div id="tab-m365" class="tab-content">
-
     <div class="section">
-      <div class="spec-header"><div class="spec-icon spec-icon-blue">🔑</div><div class="spec-title">認証方式（Microsoft Graph API）</div></div>
-      <div class="info-box" style="margin-bottom:12px;">メール環境は Microsoft 365（Exchange Online）。Gmail API ではなく <strong>Microsoft Graph API</strong> を使用してメール送信を行う。Google OAuth とは独立した認証フローで、サービス側で一度設定すれば継続利用可能。</div>
+      <div class="spec-header"><div class="spec-icon spec-icon-blue">🔑</div><div class="spec-title">認証方式</div></div>
       <table>
-        <thead><tr><th style="width:200px;">認証方式</th><th>説明</th></tr></thead>
+        <thead><tr><th style="width:200px;">方式</th><th>説明</th></tr></thead>
         <tbody>
           <tr>
-            <td><strong>Client Credentials Flow</strong><br><span style="font-size:11px;color:#888;">（推奨）</span></td>
-            <td>Azure AD にアプリ登録し、client_id / client_secret でアクセストークンを取得。ユーザーの操作不要でサービスアカウントとして動作。共有メールボックス（recruit@〇〇.com）からの送信に適している</td>
+            <td><strong>APIトークン認証</strong><br><span style="font-size:11px;color:#888;">（推奨）</span></td>
+            <td>ガルーン管理画面で発行した API トークンを HTTP ヘッダー <code>X-Cybozu-API-Token</code> に付与。サービスアカウントとして動作。Next.js の環境変数に安全に保管</td>
           </tr>
           <tr>
-            <td><strong>Delegated Access（OAuth 2.0）</strong></td>
-            <td>担当者個人アドレスからの送信時に使用。各スタッフが初回のみ Microsoft アカウントで認可。access_token / refresh_token を安全に保管して送信時に使用</td>
+            <td><strong>Basic 認証</strong></td>
+            <td>ガルーンのログイン ID / パスワードを Base64 エンコードして Authorization ヘッダーに付与。シンプルだが推奨しない</td>
           </tr>
         </tbody>
       </table>
-      <div class="warn-box" style="margin-top:10px;">合否連絡（FR093）は「担当者個人アドレスから送りたい（できれば）」という要件のため Delegated Access を採用。実装コストが高い場合は共有メールボックス（Client Credentials）にフォールバックも検討。</div>
     </div>
 
     <div class="section">
-      <div class="spec-header"><div class="spec-icon spec-icon-green">📤</div><div class="spec-title">メール送信 API</div></div>
+      <div class="spec-header"><div class="spec-icon spec-icon-green">📤</div><div class="spec-title">ATS側操作 → ガルーン REST API 対応表</div></div>
       <table>
-        <thead><tr><th class="col-method">メソッド</th><th class="col-path">Graph API エンドポイント</th><th>用途</th></tr></thead>
+        <thead><tr><th style="width:180px;">ATS側操作</th><th class="col-method">HTTP</th><th class="col-path">ガルーン REST API</th><th>備考</th></tr></thead>
         <tbody>
           <tr>
+            <td>CalendarSlot 作成</td>
             <td><span class="method method-post">POST</span></td>
-            <td><span class="endpoint">/v1.0/users/{userId}/sendMail</span></td>
-            <td>担当者個人アドレス（Delegated）または共有メールボックス（Client Credentials）からメール送信</td>
+            <td><span class="endpoint">/api/v1/schedule/events</span></td>
+            <td>レスポンスの <code>id</code> を <span class="db-ref">CalendarSlot.garoon_event_id</span> に保存。<span class="db-ref">garoon_synced_at</span> を更新</td>
+          </tr>
+          <tr>
+            <td>CalendarSlot 更新（日時・タイプ変更）</td>
+            <td><span class="method method-patch">PATCH</span></td>
+            <td><span class="endpoint">/api/v1/schedule/events/{eventId}</span></td>
+            <td><span class="db-ref">CalendarSlot.garoon_synced_at</span> を現在時刻に更新</td>
+          </tr>
+          <tr>
+            <td>CalendarSlot 削除</td>
+            <td><span class="method method-delete">DELETE</span></td>
+            <td><span class="endpoint">/api/v1/schedule/events/{eventId}</span></td>
+            <td>is_booked=true の枠は削除不可（ATS画面側でガード済み）</td>
+          </tr>
+          <tr>
+            <td>Interview 作成（面接予約確定）</td>
+            <td><span class="method method-patch">PATCH</span></td>
+            <td><span class="endpoint">/api/v1/schedule/events/{eventId}</span></td>
+            <td>件名に応募者名を追記。subject: "面接: {氏名}" に更新</td>
           </tr>
         </tbody>
       </table>
-      <div class="info-box" style="margin-top:10px;">ATS 内部エンドポイント: <span class="endpoint">POST /api/email/send</span><br>body: <code>{to, subject, body_html, attachments?: [{filename, content_base64}]}</code></div>
+      <div class="info-box">ガルーン API 呼び出しは非同期ジョブ（キュー処理）。ATS の DB 更新は即時、ガルーンへの反映は数秒〜数十秒のラグが発生する場合あり。</div>
     </div>
 
     <div class="section">
-      <div class="spec-header"><div class="spec-icon spec-icon-orange">📋</div><div class="spec-title">合否連絡・内定通知書送信フロー（FR093・FR094）</div></div>
-      <div class="flow-steps">
-        <div class="flow-step"><div class="flow-step-num">1</div><div class="flow-step-body"><div class="flow-step-label">ATS から送信指示</div><div class="flow-step-detail">SCR-13「合否連絡送信」タブで対象学生・合否・テンプレートを選択</div></div></div>
-        <div class="flow-step"><div class="flow-step-num">2</div><div class="flow-step-body"><div class="flow-step-label">内定通知書 PDF 生成（内定時のみ）</div><div class="flow-step-detail">Document テンプレートに応募者情報を差し込んで PDF 生成 → Firebase Storage に保存 → 署名付き URL を取得</div></div></div>
-        <div class="flow-step"><div class="flow-step-num">3</div><div class="flow-step-body"><div class="flow-step-label">Graph API でメール送信</div><div class="flow-step-detail"><code>POST /v1.0/users/{staffEmail}/sendMail</code> を呼び出し。to: AgencyContact.email。内定時は PDF を base64 エンコードして attachments に追加</div></div></div>
-        <div class="flow-step"><div class="flow-step-num">4</div><div class="flow-step-body"><div class="flow-step-label">送信結果の記録</div><div class="flow-step-detail">AuditLog に document_export を記録。SelectionHistory.note に「合否連絡送信済 ({timestamp})」を追記</div></div></div>
-      </div>
-    </div>
-
-    <div class="section">
-      <div class="spec-header"><div class="spec-icon spec-icon-grey">🔧</div><div class="spec-title">Azure AD 設定（初期セットアップ）</div></div>
+      <div class="spec-header"><div class="spec-icon spec-icon-green">📋</div><div class="spec-title">スケジュール作成時のフィールドマッピング</div></div>
       <table>
-        <thead><tr><th style="width:220px;">設定項目</th><th>値・説明</th></tr></thead>
+        <thead><tr><th style="width:180px;">ガルーン フィールド</th><th>値</th></tr></thead>
         <tbody>
-          <tr><td>アプリ登録名</td><td>ATS-Email-Sender</td></tr>
-          <tr><td>必要な API 権限</td><td><span class="scope-chip">Mail.Send</span> <span class="scope-chip">Mail.Send.Shared</span>（Delegated または Application）</td></tr>
-          <tr><td>管理者の同意</td><td>Application 権限の場合は Azure AD 管理者による同意が必要</td></tr>
-          <tr><td>シークレット管理</td><td>client_secret は Firebase App Hosting のシークレットに格納。定期ローテーション（年1回推奨）</td></tr>
+          <tr><td><code>subject</code></td><td><code>{slot_type}: {担当者名}</code>（例: "面接: 田中太郎"）。予約後は応募者名を追記</td></tr>
+          <tr><td><code>start.dateTime</code></td><td><span class="db-ref">CalendarSlot.starts_at</span>（ISO 8601 形式）</td></tr>
+          <tr><td><code>end.dateTime</code></td><td><span class="db-ref">CalendarSlot.ends_at</span></td></tr>
+          <tr><td><code>attendees[].id</code></td><td>担当者の garoon_user_id（<span class="db-ref">Staff.garoon_user_id</span>）</td></tr>
+          <tr><td><code>notes</code></td><td>ATS の枠 URL を埋め込み（ディープリンク）</td></tr>
         </tbody>
       </table>
     </div>
@@ -569,12 +447,71 @@
     <div class="section">
       <div class="spec-header"><div class="spec-icon spec-icon-red">⚠️</div><div class="spec-title">エラーハンドリング</div></div>
       <table>
+        <thead><tr><th style="width:200px;">ケース</th><th>処理</th></tr></thead>
+        <tbody>
+          <tr><td>401 Unauthorized（トークン無効）</td><td>管理者へアラート。ガルーン管理画面でトークンを再発行して環境変数を更新</td></tr>
+          <tr><td>ガルーン API 呼び出し失敗（5xx）</td><td>Exponential backoff でリトライ（最大3回）。失敗時はスタッフへ通知し、garoon_synced_at を更新しない</td></tr>
+          <tr><td>ガルーン側でスケジュールが削除済み（404）</td><td>ATS側の garoon_event_id をNULLに更新。次回の同期で再作成</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+  </div><!-- /tab-gcal -->
+
+
+  <!-- ================================================================
+       メール送信（サイバーメール SMTP）
+       ================================================================ -->
+  <div id="tab-m365" class="tab-content">
+
+    <div class="section">
+      <div class="spec-header"><div class="spec-icon spec-icon-orange">ℹ️</div><div class="spec-title">メール環境：サイバーメール（SMTP）</div></div>
+      <div class="warn-box">メール環境はNTTコミュニケーションズの<strong>サイバーメール</strong>です。Microsoft Graph API・Gmail API は使用しません。<strong>SMTP リレー</strong>経由でメール送信します。SMTP 接続情報（ホスト・ポート・認証情報）は確認中です。</div>
+    </div>
+
+    <div class="section">
+      <div class="spec-header"><div class="spec-icon spec-icon-blue">🔧</div><div class="spec-title">SMTP 設定（確認待ち）</div></div>
+      <div class="tbd-box">
+        <div style="font-size:20px;margin-bottom:8px;">📧</div>
+        <div style="font-weight:700;font-size:14px;margin-bottom:8px;">SMTP 接続情報 確認待ち</div>
+        <div style="font-size:12px;color:#888;line-height:1.8;">以下の情報をクライアントから取得後にこのドキュメントを更新します。</div>
+        <div style="margin-top:16px;text-align:left;display:inline-block;">
+          <table style="font-size:12px;">
+            <thead><tr><th style="width:200px;">確認項目</th><th>現状</th></tr></thead>
+            <tbody>
+              <tr><td>SMTP ホスト名</td><td>確認中（例: smtp.cybermail.jp）</td></tr>
+              <tr><td>ポート番号</td><td>確認中（587 / 465 / 25 のいずれか）</td></tr>
+              <tr><td>接続暗号化</td><td>確認中（STARTTLS または SSL/TLS）</td></tr>
+              <tr><td>認証方式</td><td>確認中（PLAIN / LOGIN）</td></tr>
+              <tr><td>送信用アカウント</td><td>確認中（担当者個人アドレス or 共有アドレス）</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="spec-header"><div class="spec-icon spec-icon-green">📤</div><div class="spec-title">実装方針（情報取得後に確定）</div></div>
+      <div class="info-box" style="margin-bottom:12px;">Next.js API Routes から <strong>Nodemailer</strong>（Node.js の SMTP ライブラリ）でサイバーメールの SMTP サーバーに接続してメールを送信する方針です。追加契約不要。</div>
+      <table>
+        <thead><tr><th style="width:180px;">項目</th><th>内容</th></tr></thead>
+        <tbody>
+          <tr><td>使用ライブラリ</td><td><code>nodemailer</code>（npm）</td></tr>
+          <tr><td>ATS 内部エンドポイント</td><td><span class="endpoint">POST /api/email/send</span><br>body: <code>{to, subject, body_html, attachments?: [{filename, content_base64}]}</code></td></tr>
+          <tr><td>SMTP 認証情報の管理</td><td>Firebase App Hosting のシークレットに格納（<code>SMTP_HOST</code>, <code>SMTP_PORT</code>, <code>SMTP_USER</code>, <code>SMTP_PASS</code>）</td></tr>
+          <tr><td>合否連絡・内定通知書送信フロー</td><td>SCR-13「合否連絡送信」から呼び出し。内定時は PDF を添付（FR093・FR094）</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="section">
+      <div class="spec-header"><div class="spec-icon spec-icon-red">⚠️</div><div class="spec-title">エラーハンドリング（共通）</div></div>
+      <table>
         <thead><tr><th style="width:200px;">エラー</th><th>原因</th><th>ATS側の処理</th></tr></thead>
         <tbody>
-          <tr><td><code>401 Unauthorized</code></td><td>access_token 期限切れ</td><td>refresh_token でトークン更新してリトライ（Delegated）/ client_credentials で再取得（Client Credentials）</td></tr>
-          <tr><td><code>403 Forbidden</code></td><td>Mail.Send 権限未付与</td><td>管理者へアラート通知。送信を中断してキューに積む</td></tr>
-          <tr><td><code>429 Too Many Requests</code></td><td>レート制限</td><td>Retry-After ヘッダーの秒数待機後にリトライ（最大3回）</td></tr>
-          <tr><td><code>500 / 503</code></td><td>Microsoft 側障害</td><td>5分後にリトライ。3回失敗でスタッフへ通知</td></tr>
+          <tr><td>SMTP 認証失敗</td><td>認証情報が誤っているまたは期限切れ</td><td>管理者へアラート。送信をキューに積んで保留</td></tr>
+          <tr><td>SMTP 接続タイムアウト</td><td>サーバー障害・ネットワーク問題</td><td>5分後にリトライ（最大3回）。3回失敗でスタッフへ通知</td></tr>
+          <tr><td>無効なメールアドレス（550）</td><td>宛先アドレスが存在しない</td><td>AgencyContact.email の更新を促すアラートを表示</td></tr>
         </tbody>
       </table>
     </div>

@@ -536,7 +536,7 @@
           <div class="entity-field"><span>name</span><span class="field-type">VARCHAR</span></div>
           <div class="entity-field" style="background:#fffde7;"><span>★ email</span><span class="field-type">VARCHAR unique</span></div>
           <div class="entity-field" style="background:#e8f5e9;"><span>NEW google_id</span><span class="field-type">VARCHAR unique</span></div>
-          <div class="entity-field" style="background:#e8f5e9;"><span>NEW google_calendar_id</span><span class="field-type nullable">VARCHAR | NULL</span></div>
+          <div class="entity-field" style="background:#e8f5e9;"><span>garoon_user_id</span><span class="field-type nullable">VARCHAR | NULL</span></div>
           <div class="entity-field" style="background:#fffde7;"><span>★ role</span><span class="field-type">ENUM</span></div>
           <div class="entity-field"><span>is_active</span><span class="field-type">BOOL</span></div>
           <div class="entity-field"><span>created_at</span><span class="field-type">TIMESTAMP</span></div>
@@ -707,7 +707,7 @@
             <div class="entity-field"><span>scheduled_at</span><span class="field-type">TIMESTAMP</span></div>
             <div class="entity-field"><span>score</span><span class="field-type">INT</span></div>
             <div class="entity-field"><span>notes</span><span class="field-type">TEXT</span></div>
-            <div class="entity-field" style="background:#e8f5e9;"><span>NEW google_calendar_event_id</span><span class="field-type nullable">VARCHAR | NULL</span></div>
+            <div class="entity-field" style="background:#e8f5e9;"><span>garoon_event_id</span><span class="field-type nullable">VARCHAR | NULL</span></div>
           </div>
         </div>
 
@@ -733,9 +733,9 @@
           <div class="entity-field"><span>starts_at / ends_at</span><span class="field-type">TIMESTAMP</span></div>
           <div class="entity-field"><span>type</span><span class="field-type">ENUM</span></div>
           <div class="entity-field"><span>is_booked</span><span class="field-type">BOOL</span></div>
-          <div class="entity-field" style="background:#e8f5e9;"><span>NEW google_calendar_event_id</span><span class="field-type nullable">VARCHAR | NULL</span></div>
+          <div class="entity-field" style="background:#e8f5e9;"><span>garoon_event_id</span><span class="field-type nullable">VARCHAR | NULL</span></div>
           <div class="entity-field" style="background:#e8f5e9;"><span>NEW google_synced_at</span><span class="field-type nullable">TIMESTAMP | NULL</span></div>
-          <div style="padding:6px 14px;font-size:10px;color:#006064;background:#e0f7fa;">type: interview / briefing / other<br>Google Calendar と双方向同期</div>
+          <div style="padding:6px 14px;font-size:10px;color:#006064;background:#e0f7fa;">type: interview / briefing / other<br>ガルーン REST API と一方向同期（ATS→ガルーン）</div>
         </div>
       </div>
     </div>
@@ -1212,9 +1212,9 @@
             <div class="step">
               <div class="step-num">2</div>
               <div class="step-body">
-                <div class="step-title">Google Calendar API で予定取得</div>
-                <div class="step-desc">選択した担当者のGoogleカレンダーから指定期間の予定一覧を取得<br><code style="font-size:10px;">GET /calendars/{calendarId}/events</code></div>
-                <span class="step-tech">Google Calendar API v3</span>
+                <div class="step-title">ガルーン REST API でスケジュール取得</div>
+                <div class="step-desc">選択した担当者のガルーンスケジュールから指定期間の予定一覧を取得<br><code style="font-size:10px;">GET /api/v1/schedule/events</code></div>
+                <span class="step-tech">ガルーン REST API</span>
               </div>
             </div>
             <div class="step">
@@ -1228,8 +1228,8 @@
               <div class="step-num green">4</div>
               <div class="step-body">
                 <div class="step-title">面接枠を確定</div>
-                <div class="step-desc">担当者が枠を選択 → Interview レコード作成 → Google Calendar に予定を自動追加</div>
-                <span class="step-tech">POST /calendars/{id}/events</span>
+                <div class="step-desc">担当者が枠を選択 → Interview レコード作成 → ガルーンに予定を自動追加</div>
+                <span class="step-tech">POST /api/v1/schedule/events</span>
               </div>
             </div>
             <div class="step">
@@ -1268,9 +1268,9 @@
 
           <h3 style="margin-top:16px;margin-bottom:8px;">CalendarSlot との同期ルール</h3>
           <div style="font-size:12px;line-height:2;background:#f8f9fc;border-radius:8px;padding:12px 14px;">
-            <div>ATS → Google : 面接確定時に予定を作成。<code>google_calendar_event_id</code> に保存</div>
-            <div>Google → ATS : 担当者がGoogleカレンダーで予定を変更・削除した場合、Webhook（Google Calendar Push Notifications）でATSに通知</div>
-            <div>キャンセル時 : ATS側でステータスを変更 → Google Calendar の予定も自動削除</div>
+            <div>ATS → ガルーン : 面接確定時にガルーン REST API で予定を作成。<code>garoon_event_id</code> に保存</div>
+            <div>ガルーン → ATS : Push Notifications なし（一方向のみ）。ATSを正として管理する</div>
+            <div>キャンセル時 : ATS側でステータスを変更 → ガルーン REST API で予定を削除</div>
           </div>
         </div>
       </div>

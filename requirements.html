@@ -264,10 +264,11 @@
             重要操作を AuditLog に記録：データエクスポート・選考ステータス変更・内定/承諾操作・LINE一斉送信・学生情報編集<br>
             管理者のみ閲覧可能
           </td><td><span class="badge badge-high">高</span></td></tr>
-          <tr><td class="fr-id">FR089 <span class="badge badge-new">NEW</span></td><td>Googleカレンダー連携</td><td>
-            複数担当者のGoogleカレンダーをATS上で表示・空き枠を自動検出。<br>
-            面接確定時にGoogleカレンダーへ予定を自動登録。<br>
-            ※ Google Workspace / 個人アカウントで実装方式が変わる（U-11で確認中）
+          <tr><td class="fr-id">FR089 <span class="badge badge-update">UPD</span></td><td>ガルーン連携（カレンダー）</td><td>
+            複数担当者のガルーンスケジュールをATS上で表示・空き枠を検出。<br>
+            面接確定時にガルーン REST API で予定を自動登録。<br>
+            ※ ATS→ガルーンの一方向同期。ガルーン側の変更は ATS に自動反映されない。<br>
+            ※ 認証: ガルーン API トークン（クラウド版）
           </td><td><span class="badge badge-mid">中</span></td></tr>
         </tbody>
       </table>

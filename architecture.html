@@ -218,12 +218,12 @@
             <span class="arch-box-sub">Webhook / Push / LIFF</span>
           </div>
           <div class="arch-box layer-external">
-            <span class="arch-box-text">📅 Google Calendar API</span>
-            <span class="arch-box-sub">Push Notifications / Events</span>
+            <span class="arch-box-text">📅 ガルーン REST API</span>
+            <span class="arch-box-sub">スケジュール同期（ATS→一方向）</span>
           </div>
           <div class="arch-box layer-external">
-            <span class="arch-box-text">📧 Microsoft 365</span>
-            <span class="arch-box-sub">Graph API / メール送信</span>
+            <span class="arch-box-text">📧 サイバーメール（SMTP）</span>
+            <span class="arch-box-sub">Nodemailer / メール送信 ※確認中</span>
           </div>
           <div class="arch-box layer-external" style="border-style:dashed;opacity:.6;">
             <span class="arch-box-text">☁️ Salesforce</span>
@@ -268,14 +268,14 @@
           <tr>
             <td><strong>Next.js API Routes</strong></td>
             <td><span class="badge badge-oss">OSS</span></td>
-            <td>BFF層。LINE Webhook・Google Calendar Webhook の受け口も兼ねる</td>
+            <td>BFF層。LINE Webhook の受け口も兼ねる</td>
             <td>—（App Hosting上で動作）</td>
           </tr>
           <tr>
-            <td><strong>Microsoft 365 / Graph API</strong></td>
+            <td><strong>サイバーメール（SMTP）</strong></td>
             <td><span class="badge badge-new">NEW</span></td>
-            <td>合否連絡・内定通知書のメール送信。エージェント（AgencyContact）へ担当者個人アドレスから送信</td>
-            <td>Microsoft（別途 Azure AD 設定）</td>
+            <td>合否連絡・内定通知書のメール送信。Nodemailer 経由で SMTP 接続。接続情報確認待ち</td>
+            <td>NTTコミュニケーションズ（サイバーメール）</td>
           </tr>
           <tr>
             <td><strong>LINE Messaging API</strong></td>
@@ -284,10 +284,10 @@
             <td>LINE（別途契約）</td>
           </tr>
           <tr>
-            <td><strong>Google Calendar API</strong></td>
-            <td><span class="badge badge-google">Google Cloud</span></td>
-            <td>面接枠の双方向同期・Push Notifications</td>
-            <td>Google（GCP）</td>
+            <td><strong>ガルーン REST API</strong></td>
+            <td>サイボウズ</td>
+            <td>面接枠のスケジュール同期（ATS→ガルーン一方向）。Push Notifications なしのため ATS を正として管理</td>
+            <td>サイボウズ（ガルーン クラウド版）</td>
           </tr>
           <tr>
             <td><strong>Salesforce</strong></td>
@@ -297,7 +297,7 @@
           </tr>
         </tbody>
       </table>
-      <div class="info-box">すべての Google サービス（Firebase・Cloud SQL・Google Calendar API）は<strong>1つの GCP プロジェクト・1つの請求アカウント</strong>で管理。LINE は LINE 社との別途契約。</div>
+      <div class="info-box">すべての Google サービス（Firebase・Cloud SQL）は<strong>1つの GCP プロジェクト・1つの請求アカウント</strong>で管理。ガルーンはサイボウズ、メールはサイバーメール（NTTコム）との別途契約。</div>
     </div>
 
     <!-- データフロー概要 -->
@@ -323,12 +323,8 @@
             <td>ブラウザ → Next.js API Routes → LINE Messaging API → 応募者 LINE</td>
           </tr>
           <tr>
-            <td>カレンダー同期（ATS→GCal）</td>
-            <td>ブラウザ → Next.js API Routes → Cloud SQL（CalendarSlot 更新） → Google Calendar API</td>
-          </tr>
-          <tr>
-            <td>カレンダー同期（GCal→ATS）</td>
-            <td>Google Calendar → <code>POST /api/webhooks/google-calendar</code>（Next.js） → Cloud SQL（CalendarSlot 更新）</td>
+            <td>カレンダー同期（ATS→ガルーン）</td>
+            <td>ブラウザ → Next.js API Routes → Cloud SQL（CalendarSlot 更新） → ガルーン REST API（一方向）</td>
           </tr>
           <tr>
             <td>書類PDF生成・保存</td>
@@ -425,7 +421,7 @@
           <tr><td>Firebase Auth</td><td>Google OAuth は無料</td><td>$0</td><td>電話認証は別途課金（今回未使用）</td></tr>
           <tr><td>Cloud SQL</td><td>db-g1-small（1.7GB RAM）</td><td>〜$25–30</td><td>最小実用構成。トラフィック増加時は db-custom-1-3840 へ</td></tr>
           <tr><td>Firebase Storage</td><td>5GB 以下（Spark 無料枠）</td><td>$0</td><td>PDF・QR画像が増えたら Blaze プランへ移行（$0.026/GB）</td></tr>
-          <tr><td>Google Calendar API</td><td>無料枠内（1M リクエスト/日）</td><td>$0</td><td>通常の利用では超過しない</td></tr>
+          <tr><td>ガルーン REST API</td><td>ガルーン契約内（追加費用なし）</td><td>$0</td><td>既存のガルーン契約で API 利用可能</td></tr>
           <tr style="background:#f0f0ff;"><td><strong>合計</strong></td><td>—</td><td><strong>〜$30–35/月</strong></td><td>スタッフ10〜30名規模の想定</td></tr>
         </tbody>
       </table>

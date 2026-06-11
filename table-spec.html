@@ -362,13 +362,13 @@
             <td><strong style="color:#e91e63;">C. 選考フロー</strong></td>
             <td>SelectionFlow / SelectionStage / Selection / SelectionHistory / Interview（5）</td>
             <td>選考フロー設定・ステージ管理・面接記録</td>
-            <td>Interview.interviewer_id・google_calendar_event_idは今回追加</td>
+            <td>Interview.interviewer_id・garoon_event_idは今回追加</td>
           </tr>
           <tr>
             <td><strong style="color:#00838f;">D. カレンダー</strong></td>
             <td>CalendarSlot（1）</td>
             <td>面接・説明会の枠管理。Google Calendarと双方向同期</td>
-            <td>google_synced_atは今回追加</td>
+            <td>ガルーン連携のため garoon_event_id / garoon_synced_at を追加</td>
           </tr>
           <tr>
             <td><strong style="color:#00897b;">E. LINE</strong></td>
@@ -442,7 +442,7 @@
           <tr><td><code>name</code></td><td>VARCHAR(100)</td><td>NO</td><td>—</td><td>氏名（フルネーム）</td></tr>
           <tr><td><code>email</code></td><td>VARCHAR(255)</td><td>NO</td><td>—</td><td><span class="badge badge-uk">UQ</span> Google Workspaceのメールアドレス</td></tr>
           <tr><td><code>google_id</code></td><td>VARCHAR(255)</td><td>NO</td><td>—</td><td><span class="badge badge-uk">UQ</span> <span class="badge badge-new">NEW</span> Google OAuthのsub値</td></tr>
-          <tr><td><code>google_calendar_id</code></td><td>VARCHAR(255)</td><td>YES</td><td>NULL</td><td><span class="badge badge-new">NEW</span> Google Calendar のリソースID（連携後に設定）</td></tr>
+          <tr><td><code>garoon_user_id</code></td><td>VARCHAR(100)</td><td>YES</td><td>NULL</td><td>ガルーンのユーザーID（スケジュール同期時に使用。連携後に設定）</td></tr>
           <tr><td><code>role</code></td><td>staff_role</td><td>NO</td><td>'recruiter'</td><td><span class="badge badge-enum">ENUM</span> admin / recruiter / interviewer / viewer</td></tr>
           <tr><td><code>is_active</code></td><td>BOOLEAN</td><td>NO</td><td>true</td><td>退職・アカウント停止時にfalse</td></tr>
           <tr><td><code>position_type_access</code></td><td>staff_position_access</td><td>NO</td><td>'both'</td><td><span class="badge badge-enum">ENUM</span> <span class="badge badge-new">NEW</span> sogo / gino / both。担当職種区分。both は全職種を閲覧・操作可</td></tr>
@@ -847,7 +847,7 @@
             <tr><td><code>scheduled_at</code></td><td>TIMESTAMP</td><td>NO</td><td>面接予定日時</td></tr>
             <tr><td><code>score</code></td><td>SMALLINT</td><td>YES</td><td>1〜5点。未評価はNULL</td></tr>
             <tr><td><code>notes</code></td><td>TEXT</td><td>YES</td><td>面接メモ</td></tr>
-            <tr><td><code>google_calendar_event_id</code></td><td>VARCHAR(100)</td><td>YES</td><td><span class="badge badge-new">NEW</span> Google Calendar イベントID</td></tr>
+            <tr><td><code>garoon_event_id</code></td><td>VARCHAR(100)</td><td>YES</td><td>ガルーンのスケジュールID（ATS→ガルーン同期後に設定）</td></tr>
           </tbody>
         </table>
       </div>
@@ -878,8 +878,8 @@
           <tr><td><code>ends_at</code></td><td>TIMESTAMP</td><td>NO</td><td>—</td><td>枠終了日時</td></tr>
           <tr><td><code>type</code></td><td>slot_type</td><td>NO</td><td>'interview'</td><td><span class="badge badge-enum">ENUM</span> interview / briefing / other</td></tr>
           <tr><td><code>is_booked</code></td><td>BOOLEAN</td><td>NO</td><td>false</td><td>予約済みフラグ。Interview.calendar_slot_id で参照</td></tr>
-          <tr><td><code>google_calendar_event_id</code></td><td>VARCHAR(100)</td><td>YES</td><td>NULL</td><td><span class="badge badge-new">NEW</span> Google Calendar イベントID（同期後に設定）</td></tr>
-          <tr><td><code>google_synced_at</code></td><td>TIMESTAMP</td><td>YES</td><td>NULL</td><td><span class="badge badge-new">NEW</span> Google Calendar最終同期日時</td></tr>
+          <tr><td><code>garoon_event_id</code></td><td>VARCHAR(100)</td><td>YES</td><td>NULL</td><td>ガルーンのスケジュールID（ATS→ガルーン同期後に設定）</td></tr>
+          <tr><td><code>garoon_synced_at</code></td><td>TIMESTAMP</td><td>YES</td><td>NULL</td><td>ガルーンへの最終同期日時（ATS→ガルーンの一方向）</td></tr>
         </tbody>
       </table>
       <table class="idx-table" style="margin-top:12px;">
@@ -887,10 +887,10 @@
         <tbody>
           <tr><td><code>slot_time_idx</code></td><td>starts_at, ends_at</td><td>BTREE</td><td>週間カレンダー表示の範囲クエリ</td></tr>
           <tr><td><code>slot_owner_idx</code></td><td>owner_id, starts_at</td><td>BTREE</td><td>担当者別スケジュール表示</td></tr>
-          <tr><td><code>slot_gcal_idx</code></td><td>google_calendar_event_id</td><td>BTREE</td><td>Google Calendarウェブフック受信時の逆引き</td></tr>
+          <tr><td><code>slot_garoon_idx</code></td><td>garoon_event_id</td><td>BTREE</td><td>ガルーンのスケジュールIDによる高速ルックアップ</td></tr>
         </tbody>
       </table>
-      <div class="info-box" style="margin-top:12px;">Google Calendar との双方向同期ルール：ATS側変更 → Calendar API PATCH。Google側変更 → Push Notificationsウェブフック → ATS更新。競合時はupdated_atが新しい方を優先。</div>
+      <div class="info-box" style="margin-top:12px;">ガルーンとの同期は<strong>ATS→ガルーンの一方向</strong>。ATS側の変更をガルーン REST API に書き込む。ガルーン側の変更は ATS に自動反映されないため、ATSを正として管理する。</div>
     </div>
 
   </div>
