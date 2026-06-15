@@ -131,8 +131,8 @@
 <div class="page">
   <h1>新卒採用管理システム（ATS）テーブル定義書</h1>
   <div class="meta">
-    <span>v0.1</span>
-    <span>2026-06-05</span>
+    <span>v0.2</span>
+    <span>2026-06-15</span>
     <span>ステータス：設計中</span>
     <span style="background:#7c83fd;color:#fff;border-radius:10px;padding:2px 10px;font-weight:700;">DB: PostgreSQL 16</span>
   </div>
@@ -140,11 +140,11 @@
   <!-- Overview -->
   <div class="overview-grid">
     <div class="overview-card">
-      <div class="overview-card-val">29</div>
+      <div class="overview-card-val">36</div>
       <div class="overview-card-label">総テーブル数</div>
     </div>
     <div class="overview-card">
-      <div class="overview-card-val">6</div>
+      <div class="overview-card-val">7</div>
       <div class="overview-card-label">グループ</div>
     </div>
     <div class="overview-card">
@@ -178,6 +178,7 @@
     <div class="tab" onclick="switchTab(this,'tab-d')">📅 D. カレンダー</div>
     <div class="tab" onclick="switchTab(this,'tab-e')">💬 E. LINE</div>
     <div class="tab" onclick="switchTab(this,'tab-f')">📦 F. 媒体・マスター</div>
+    <div class="tab" onclick="switchTab(this,'tab-g')">🔔 G. 通知・テンプレート</div>
   </div>
 
   <!-- ===== 全体 ===== -->
@@ -190,6 +191,11 @@
           <div class="toc-item-name">Staff</div>
           <div class="toc-item-jp">担当者</div>
           <div class="toc-item-cols">10 columns</div>
+        </div>
+        <div class="toc-item toc-a" onclick="goTab('tab-a')">
+          <div class="toc-item-name">StaffColumnPreference <span class="badge badge-new">NEW</span></div>
+          <div class="toc-item-jp">一覧列設定</div>
+          <div class="toc-item-cols">6 columns</div>
         </div>
         <div class="toc-item toc-a" onclick="goTab('tab-a')">
           <div class="toc-item-name">StaffSession <span class="badge badge-new">NEW</span></div>
@@ -261,7 +267,22 @@
         <div class="toc-item toc-c" onclick="goTab('tab-c')">
           <div class="toc-item-name">Interview</div>
           <div class="toc-item-jp">面接記録</div>
-          <div class="toc-item-cols">9 columns</div>
+          <div class="toc-item-cols">10 columns</div>
+        </div>
+        <div class="toc-item toc-c" onclick="goTab('tab-c')">
+          <div class="toc-item-name">EvaluationTemplate <span class="badge badge-new">NEW</span></div>
+          <div class="toc-item-jp">評価シートテンプレート</div>
+          <div class="toc-item-cols">6 columns</div>
+        </div>
+        <div class="toc-item toc-c" onclick="goTab('tab-c')">
+          <div class="toc-item-name">EvaluationItem <span class="badge badge-new">NEW</span></div>
+          <div class="toc-item-jp">評価項目</div>
+          <div class="toc-item-cols">6 columns</div>
+        </div>
+        <div class="toc-item toc-c" onclick="goTab('tab-c')">
+          <div class="toc-item-name">EvaluationResponse <span class="badge badge-new">NEW</span></div>
+          <div class="toc-item-jp">評価回答</div>
+          <div class="toc-item-cols">6 columns</div>
         </div>
         <!-- Group D -->
         <div class="toc-item toc-d" onclick="goTab('tab-d')">
@@ -303,6 +324,22 @@
         <div class="toc-item toc-e" onclick="goTab('tab-e')">
           <div class="toc-item-name">LineMessage <span class="badge badge-new">NEW</span></div>
           <div class="toc-item-jp">LINEチャット履歴</div>
+          <div class="toc-item-cols">7 columns</div>
+        </div>
+        <!-- Group G -->
+        <div class="toc-item" style="border-left-color:#e91e63;" onclick="goTab('tab-g')">
+          <div class="toc-item-name">MessageTemplate <span class="badge badge-new">NEW</span></div>
+          <div class="toc-item-jp">メッセージテンプレート</div>
+          <div class="toc-item-cols">9 columns</div>
+        </div>
+        <div class="toc-item" style="border-left-color:#e91e63;" onclick="goTab('tab-g')">
+          <div class="toc-item-name">NotificationRule <span class="badge badge-new">NEW</span></div>
+          <div class="toc-item-jp">自動通知ルール</div>
+          <div class="toc-item-cols">9 columns</div>
+        </div>
+        <div class="toc-item" style="border-left-color:#e91e63;" onclick="goTab('tab-g')">
+          <div class="toc-item-name">NotificationLog <span class="badge badge-new">NEW</span></div>
+          <div class="toc-item-jp">通知送信ログ</div>
           <div class="toc-item-cols">7 columns</div>
         </div>
         <!-- Group F -->
@@ -348,39 +385,45 @@
         <tbody>
           <tr>
             <td><strong style="color:#37474f;">A. 認証・ログ</strong></td>
-            <td>Staff / StaffSession / AuditLog（3）</td>
-            <td>Google OAuthによるスタッフ認証・セッション・操作監査</td>
-            <td>StaffSession・AuditLogは今回新規追加</td>
+            <td>Staff / StaffSession / AuditLog / StaffColumnPreference（4）</td>
+            <td>Google OAuthによるスタッフ認証・セッション・操作監査・一覧列設定</td>
+            <td>StaffColumnPreferenceを新規追加（応募者一覧の表示列カスタマイズ）</td>
           </tr>
           <tr>
             <td><strong style="color:#7c83fd;">B. 応募者</strong></td>
             <td>Applicant / ApplicantSource / ApplicantCustomField / ApplicantTag / Tag / School / LineRegistrationToken（7）</td>
             <td>応募者情報・流入元・カスタム項目・タグ付け・LINE連携トークン</td>
-            <td>sf_contact_idでSalesforce連携。カスタム項目はJSONBから正規化テーブルに変更</td>
+            <td>Applicantにdocument_deadline / offer_acceptance_deadlineを追加</td>
           </tr>
           <tr>
             <td><strong style="color:#e91e63;">C. 選考フロー</strong></td>
-            <td>SelectionFlow / SelectionStage / Selection / SelectionHistory / Interview（5）</td>
-            <td>選考フロー設定・ステージ管理・面接記録</td>
-            <td>Interview.interviewer_id・garoon_event_idは今回追加</td>
+            <td>SelectionFlow / SelectionStage / Selection / SelectionHistory / Interview / EvaluationTemplate / EvaluationItem / EvaluationResponse（8）</td>
+            <td>選考フロー設定・ステージ管理・面接記録・ステージ別評価シート</td>
+            <td>Evaluation系3テーブルを新規追加（ステップごとの評価項目設定）</td>
           </tr>
           <tr>
             <td><strong style="color:#00838f;">D. カレンダー</strong></td>
             <td>CalendarSlot（1）</td>
-            <td>面接・説明会の枠管理。Google Calendarと双方向同期</td>
-            <td>ガルーン連携のため garoon_event_id / garoon_synced_at を追加</td>
+            <td>面接・説明会の枠管理。ガルーン REST API と一方向同期（ATS→ガルーン）</td>
+            <td>garoon_event_id / garoon_synced_at でガルーン連携</td>
           </tr>
           <tr>
             <td><strong style="color:#00897b;">E. LINE</strong></td>
             <td>RichMenu / RichMenuRule / Survey / SurveyQuestion / SurveyResponse / SurveyResponseItem / LineMessage（7）</td>
             <td>LINEリッチメニュー管理・アンケート機能・個別チャット履歴</td>
-            <td>LIFFアプリと連携。Survey系はJSONBから正規化テーブルに変更</td>
+            <td>LineMessageにfile_url / file_nameを追加（PDFファイル送受信対応）</td>
           </tr>
           <tr>
             <td><strong style="color:#f57f17;">F. 媒体・マスター</strong></td>
             <td>Media / QRCode / Document / RecruitmentGoal / Agency / AgencyContact（6）</td>
             <td>求人媒体・QRコード・書類テンプレート・採用目標・紹介会社のマスター管理</td>
-            <td>Agency/AgencyContactは今回新規追加。Applicant.agency_contact_idで紐づけ</td>
+            <td>Mediaのinfo-boxを6媒体（キミスカ・ABABA・キャリアチケット追加）に更新</td>
+          </tr>
+          <tr>
+            <td><strong style="color:#e91e63;">G. 通知・テンプレート</strong></td>
+            <td>MessageTemplate / NotificationRule / NotificationLog（3）</td>
+            <td>LINE/メール送信テンプレート・自動通知ルール・送信ログ</td>
+            <td>今回新規追加。サンクス・リマインド自動送信インフラ</td>
           </tr>
         </tbody>
       </table>
@@ -413,6 +456,11 @@
               <tr><td style="font-weight:600;"><code>audit_action</code></td><td>login / logout / export / status_change / offer / acceptance / line_send / edit_applicant / document_export</td></tr>
               <tr><td style="font-weight:600;"><code>position_type</code></td><td>sogo（総合職） / gino（技能職）</td></tr>
               <tr><td style="font-weight:600;"><code>staff_position_access</code></td><td>sogo / gino / both（両職種担当）</td></tr>
+              <tr><td style="font-weight:600;"><code>evaluation_item_type</code> <span class="badge badge-new">NEW</span></td><td>score5（5段階） / score10（10段階） / text（自由記述） / checkbox（チェック）</td></tr>
+              <tr><td style="font-weight:600;"><code>notification_trigger</code> <span class="badge badge-new">NEW</span></td><td>stage_change / interview_confirmed / offer_issued / deadline_reminder</td></tr>
+              <tr><td style="font-weight:600;"><code>notification_channel</code> <span class="badge badge-new">NEW</span></td><td>line / email</td></tr>
+              <tr><td style="font-weight:600;"><code>notification_status</code> <span class="badge badge-new">NEW</span></td><td>sent / failed / skipped</td></tr>
+              <tr><td style="font-weight:600;"><code>template_channel</code> <span class="badge badge-new">NEW</span></td><td>line / email / both</td></tr>
             </tbody>
           </table>
         </div>
@@ -526,6 +574,38 @@
       </table>
     </div>
 
+    <!-- StaffColumnPreference -->
+    <div class="section group-a">
+      <div class="tbl-header">
+        <div class="tbl-icon">🗂️</div>
+        <div>
+          <div class="tbl-name">StaffColumnPreference <span class="badge badge-new">NEW</span></div>
+          <div class="tbl-jp">応募者一覧 列表示設定テーブル</div>
+        </div>
+        <div class="tbl-count">6 columns</div>
+      </div>
+      <table>
+        <thead>
+          <tr><th class="col-col">カラム名</th><th class="col-type">型</th><th class="col-null">NULL</th><th class="col-default">デフォルト</th><th>制約・説明</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><code>id</code></td><td>UUID</td><td>NO</td><td>gen_random_uuid()</td><td><span class="badge badge-pk">PK</span></td></tr>
+          <tr><td><code>staff_id</code></td><td>UUID</td><td>NO</td><td>—</td><td><span class="badge badge-fk">FK</span> → <span class="fk-ref">Staff.id</span> ON DELETE CASCADE</td></tr>
+          <tr><td><code>column_key</code></td><td>VARCHAR(100)</td><td>NO</td><td>—</td><td>列識別キー（例: "school", "graduation_year", "tag", "applicant_type", "position_type"）</td></tr>
+          <tr><td><code>is_visible</code></td><td>BOOLEAN</td><td>NO</td><td>true</td><td>表示/非表示フラグ</td></tr>
+          <tr><td><code>sort_order</code></td><td>SMALLINT</td><td>NO</td><td>0</td><td>列の表示順序（昇順）</td></tr>
+          <tr><td><code>created_at</code></td><td>TIMESTAMP</td><td>NO</td><td>CURRENT_TIMESTAMP</td><td></td></tr>
+        </tbody>
+      </table>
+      <table class="idx-table" style="margin-top:12px;">
+        <thead><tr><th style="width:240px;">インデックス</th><th>カラム</th><th>種類</th><th>用途</th></tr></thead>
+        <tbody>
+          <tr><td><code>col_pref_staff_col_idx</code></td><td>staff_id, column_key</td><td>UNIQUE</td><td>同一スタッフに同一キーが重複しないよう制約</td></tr>
+        </tbody>
+      </table>
+      <div class="info-box" style="margin-top:12px;">担当者ごとに応募者一覧の表示列と並び順を永続化。設定がない場合はシステムデフォルト列を表示。FR099対応。</div>
+    </div>
+
   </div>
 
   <!-- ===== B. 応募者 ===== -->
@@ -539,7 +619,7 @@
           <div class="tbl-name">Applicant</div>
           <div class="tbl-jp">応募者テーブル（コアエンティティ）</div>
         </div>
-        <div class="tbl-count">21 columns</div>
+        <div class="tbl-count">23 columns</div>
       </div>
       <table>
         <thead>
@@ -563,6 +643,8 @@
           <tr><td><code>agency_contact_id</code></td><td>UUID</td><td>YES</td><td>NULL</td><td><span class="badge badge-fk">FK</span> → <span class="fk-ref">AgencyContact.id</span> <span class="badge badge-new">NEW</span> 紹介元エージェント担当者。直接応募はNULL</td></tr>
           <tr><td><code>position_type</code></td><td>position_type</td><td>YES</td><td>NULL</td><td><span class="badge badge-enum">ENUM</span> <span class="badge badge-new">NEW</span> sogo（総合職）/ gino（技能職）。未分類はNULL</td></tr>
           <tr><td><code>memo</code></td><td>TEXT</td><td>YES</td><td>NULL</td><td><span class="badge badge-new">NEW</span> 担当者メモ（自由記述）</td></tr>
+          <tr><td><code>document_deadline</code></td><td>DATE</td><td>YES</td><td>NULL</td><td><span class="badge badge-new">NEW</span> 書類提出期限。期限超過時に一覧上で警告表示（FR107）</td></tr>
+          <tr><td><code>offer_acceptance_deadline</code></td><td>DATE</td><td>YES</td><td>NULL</td><td><span class="badge badge-new">NEW</span> 内定承諾期限。期限超過時に一覧上で警告表示（FR107）</td></tr>
           <tr><td><code>sf_contact_id</code></td><td>VARCHAR(20)</td><td>YES</td><td>NULL</td><td>Salesforce Contact ID（18桁）。SF連携後に設定</td></tr>
           <tr><td><code>sf_employment_cache</code></td><td>JSONB</td><td>YES</td><td>NULL</td><td>SF側の採用状況キャッシュ（30分TTL）</td></tr>
           <tr><td><code>created_at</code></td><td>TIMESTAMP</td><td>NO</td><td>CURRENT_TIMESTAMP</td><td></td></tr>
@@ -848,9 +930,90 @@
             <tr><td><code>score</code></td><td>SMALLINT</td><td>YES</td><td>1〜5点。未評価はNULL</td></tr>
             <tr><td><code>notes</code></td><td>TEXT</td><td>YES</td><td>面接メモ</td></tr>
             <tr><td><code>garoon_event_id</code></td><td>VARCHAR(100)</td><td>YES</td><td>ガルーンのスケジュールID（ATS→ガルーン同期後に設定）</td></tr>
+            <tr><td><code>is_evaluation_complete</code></td><td>BOOLEAN</td><td>NO</td><td><span class="badge badge-new">NEW</span> DEFAULT false。面接担当者が評価入力を完了したらtrue（FR106）</td></tr>
           </tbody>
         </table>
       </div>
+    </div>
+
+    <!-- EvaluationTemplate / EvaluationItem -->
+    <div class="two-col">
+      <div class="section group-c">
+        <div class="tbl-header">
+          <div class="tbl-icon">📝</div>
+          <div>
+            <div class="tbl-name">EvaluationTemplate <span class="badge badge-new">NEW</span></div>
+            <div class="tbl-jp">評価シートテンプレート</div>
+          </div>
+          <div class="tbl-count">6 columns</div>
+        </div>
+        <table>
+          <thead><tr><th class="col-col">カラム名</th><th class="col-type">型</th><th class="col-null">NULL</th><th>制約・説明</th></tr></thead>
+          <tbody>
+            <tr><td><code>id</code></td><td>UUID</td><td>NO</td><td><span class="badge badge-pk">PK</span></td></tr>
+            <tr><td><code>name</code></td><td>VARCHAR(100)</td><td>NO</td><td>評価シート名（例: "一次面接評価シート"）</td></tr>
+            <tr><td><code>stage_id</code></td><td>UUID</td><td>YES</td><td><span class="badge badge-fk">FK</span> → <span class="fk-ref">SelectionStage.id</span>。NULL=全ステージ共通</td></tr>
+            <tr><td><code>is_active</code></td><td>BOOLEAN</td><td>NO</td><td>DEFAULT true</td></tr>
+            <tr><td><code>created_by</code></td><td>UUID</td><td>NO</td><td><span class="badge badge-fk">FK</span> → <span class="fk-ref">Staff.id</span></td></tr>
+            <tr><td><code>created_at</code></td><td>TIMESTAMP</td><td>NO</td><td>DEFAULT CURRENT_TIMESTAMP</td></tr>
+          </tbody>
+        </table>
+        <div class="info-box" style="margin-top:10px;">SelectionStageに紐づけることでステージ別の評価シートを実現。stage_id=NULLは全ステージ共通シート。FR099（ステップ別評価項目設定）対応。</div>
+      </div>
+      <div class="section group-c">
+        <div class="tbl-header">
+          <div class="tbl-icon">✅</div>
+          <div>
+            <div class="tbl-name">EvaluationItem <span class="badge badge-new">NEW</span></div>
+            <div class="tbl-jp">評価項目テーブル</div>
+          </div>
+          <div class="tbl-count">6 columns</div>
+        </div>
+        <table>
+          <thead><tr><th class="col-col">カラム名</th><th class="col-type">型</th><th class="col-null">NULL</th><th>制約・説明</th></tr></thead>
+          <tbody>
+            <tr><td><code>id</code></td><td>UUID</td><td>NO</td><td><span class="badge badge-pk">PK</span></td></tr>
+            <tr><td><code>template_id</code></td><td>UUID</td><td>NO</td><td><span class="badge badge-fk">FK</span> → <span class="fk-ref">EvaluationTemplate.id</span> ON DELETE CASCADE</td></tr>
+            <tr><td><code>question</code></td><td>VARCHAR(200)</td><td>NO</td><td>評価項目名（例: "コミュニケーション能力"）</td></tr>
+            <tr><td><code>item_type</code></td><td>evaluation_item_type</td><td>NO</td><td><span class="badge badge-enum">ENUM</span> score5 / score10 / text / checkbox</td></tr>
+            <tr><td><code>sort_order</code></td><td>SMALLINT</td><td>NO</td><td>評価シート内の表示順（1始まり）</td></tr>
+            <tr><td><code>created_at</code></td><td>TIMESTAMP</td><td>NO</td><td>DEFAULT CURRENT_TIMESTAMP</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- EvaluationResponse -->
+    <div class="section group-c">
+      <div class="tbl-header">
+        <div class="tbl-icon">📊</div>
+        <div>
+          <div class="tbl-name">EvaluationResponse <span class="badge badge-new">NEW</span></div>
+          <div class="tbl-jp">評価回答テーブル（面接担当者の評価入力結果）</div>
+        </div>
+        <div class="tbl-count">6 columns</div>
+      </div>
+      <table>
+        <thead>
+          <tr><th class="col-col">カラム名</th><th class="col-type">型</th><th class="col-null">NULL</th><th class="col-default">デフォルト</th><th>制約・説明</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><code>id</code></td><td>UUID</td><td>NO</td><td>gen_random_uuid()</td><td><span class="badge badge-pk">PK</span></td></tr>
+          <tr><td><code>interview_id</code></td><td>UUID</td><td>NO</td><td>—</td><td><span class="badge badge-fk">FK</span> → <span class="fk-ref">Interview.id</span> ON DELETE CASCADE</td></tr>
+          <tr><td><code>item_id</code></td><td>UUID</td><td>NO</td><td>—</td><td><span class="badge badge-fk">FK</span> → <span class="fk-ref">EvaluationItem.id</span></td></tr>
+          <tr><td><code>score</code></td><td>SMALLINT</td><td>YES</td><td>NULL</td><td>評価スコア（item_type = score5 / score10 の場合に使用）</td></tr>
+          <tr><td><code>answer_text</code></td><td>TEXT</td><td>YES</td><td>NULL</td><td>自由記述回答（item_type = text の場合に使用）</td></tr>
+          <tr><td><code>submitted_by</code></td><td>UUID</td><td>NO</td><td>—</td><td><span class="badge badge-fk">FK</span> → <span class="fk-ref">Staff.id</span>。評価入力した面接担当者</td></tr>
+          <tr><td><code>submitted_at</code></td><td>TIMESTAMP</td><td>NO</td><td>CURRENT_TIMESTAMP</td><td>評価入力日時。全項目入力完了時に Interview.is_evaluation_complete を true に更新</td></tr>
+        </tbody>
+      </table>
+      <table class="idx-table" style="margin-top:12px;">
+        <thead><tr><th style="width:240px;">インデックス</th><th>カラム</th><th>種類</th><th>用途</th></tr></thead>
+        <tbody>
+          <tr><td><code>eval_resp_interview_idx</code></td><td>interview_id, item_id</td><td>UNIQUE</td><td>同一面接に同一項目が重複しないよう制約</td></tr>
+        </tbody>
+      </table>
+      <div class="info-box" style="margin-top:12px;">Interview.score / notes は簡易サマリー（総合評価）として残す。詳細評価は EvaluationResponse で管理するハイブリッド設計。全 EvaluationItem への回答が揃った時点で Interview.is_evaluation_complete = true にトリガー更新。</div>
     </div>
 
   </div>
@@ -1044,7 +1207,7 @@
           <div class="tbl-name">LineMessage <span class="badge badge-new">NEW</span></div>
           <div class="tbl-jp">LINEチャット履歴テーブル</div>
         </div>
-        <div class="tbl-count">7 columns</div>
+        <div class="tbl-count">9 columns</div>
       </div>
       <table>
         <thead>
@@ -1054,8 +1217,10 @@
           <tr><td><code>id</code></td><td>UUID</td><td>NO</td><td>gen_random_uuid()</td><td><span class="badge badge-pk">PK</span></td></tr>
           <tr><td><code>applicant_id</code></td><td>UUID</td><td>NO</td><td>—</td><td><span class="badge badge-fk">FK</span> → <span class="fk-ref">Applicant.id</span> ON DELETE CASCADE</td></tr>
           <tr><td><code>direction</code></td><td>ENUM</td><td>NO</td><td>—</td><td>inbound（応募者→ATS）/ outbound（ATS→応募者）</td></tr>
-          <tr><td><code>message_type</code></td><td>ENUM</td><td>NO</td><td>'text'</td><td>text / image / sticker / template / flex</td></tr>
+          <tr><td><code>message_type</code></td><td>ENUM</td><td>NO</td><td>'text'</td><td>text / image / <strong>file</strong> / sticker / template / flex（<span class="badge badge-new">NEW</span> fileを追加。PDF等のファイル送受信対応）</td></tr>
           <tr><td><code>content</code></td><td>TEXT</td><td>YES</td><td>NULL</td><td>メッセージ本文。画像・スタンプはメディアURL等を格納</td></tr>
+          <tr><td><code>file_url</code></td><td>VARCHAR(500)</td><td>YES</td><td>NULL</td><td><span class="badge badge-new">NEW</span> Firebase Storage URL（message_type=file の場合に使用）</td></tr>
+          <tr><td><code>file_name</code></td><td>VARCHAR(200)</td><td>YES</td><td>NULL</td><td><span class="badge badge-new">NEW</span> 元ファイル名（例: "resume_yamada.pdf"）</td></tr>
           <tr><td><code>is_read</code></td><td>BOOLEAN</td><td>NO</td><td>false</td><td>スタッフによる既読フラグ（inboundのみ有効）</td></tr>
           <tr><td><code>sent_at</code></td><td>TIMESTAMP</td><td>NO</td><td>CURRENT_TIMESTAMP</td><td>メッセージ送受信日時</td></tr>
         </tbody>
@@ -1095,7 +1260,7 @@
             <tr><td><code>cost</code></td><td>INTEGER</td><td>YES</td><td><span class="badge badge-new">NEW</span> NULL。月額掲載費用（円）。媒体別コスト分析で使用</td></tr>
           </tbody>
         </table>
-        <div class="info-box" style="margin-top:10px;">確定4媒体: マイナビ / リクナビ / OfferBox / Re就活。field_mappingにより各媒体のCSV/APIレスポンスをApplicantテーブルに正規化。</div>
+        <div class="info-box" style="margin-top:10px;"><strong>必須6媒体：マイナビ / Re就活キャンパス / OfferBox / キミスカ / キャリアチケット / ABABA</strong>。オプション（Phase 2）: ワンキャリア / ホワイト企業ナビ。<br>field_mapping（JSONB）により各媒体のCSV/APIレスポンスをApplicantテーブルに正規化。初期はCSV連携から実装。</div>
       </div>
 
       <!-- QRCode -->
@@ -1219,6 +1384,98 @@
 
   </div>
 
+  <!-- ===== G. 通知・テンプレート ===== -->
+  <div id="tab-g" class="tab-content">
+
+    <!-- MessageTemplate -->
+    <div class="section" style="border-top:3px solid #e91e63;">
+      <div class="tbl-header">
+        <div class="tbl-icon">📨</div>
+        <div>
+          <div class="tbl-name">MessageTemplate <span class="badge badge-new">NEW</span></div>
+          <div class="tbl-jp">メッセージテンプレートテーブル</div>
+        </div>
+        <div class="tbl-count">9 columns</div>
+      </div>
+      <table>
+        <thead>
+          <tr><th class="col-col">カラム名</th><th class="col-type">型</th><th class="col-null">NULL</th><th class="col-default">デフォルト</th><th>制約・説明</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><code>id</code></td><td>UUID</td><td>NO</td><td>gen_random_uuid()</td><td><span class="badge badge-pk">PK</span></td></tr>
+          <tr><td><code>name</code></td><td>VARCHAR(100)</td><td>NO</td><td>—</td><td>テンプレート名（管理用。例: "説明会サンクスメール"）</td></tr>
+          <tr><td><code>channel</code></td><td>template_channel</td><td>NO</td><td>—</td><td><span class="badge badge-enum">ENUM</span> line / email / both。送信チャネル区分</td></tr>
+          <tr><td><code>subject</code></td><td>VARCHAR(200)</td><td>YES</td><td>NULL</td><td>メール件名（channel=email / both の場合に使用）</td></tr>
+          <tr><td><code>body</code></td><td>TEXT</td><td>NO</td><td>—</td><td>本文。差し込み変数（{{氏名}}・{{面接日時}}等）に対応</td></tr>
+          <tr><td><code>sort_order</code></td><td>SMALLINT</td><td>NO</td><td>0</td><td>テンプレート一覧の表示順。ドラッグ&ドロップで変更（FR100）</td></tr>
+          <tr><td><code>is_active</code></td><td>BOOLEAN</td><td>NO</td><td>true</td><td>無効化フラグ</td></tr>
+          <tr><td><code>created_at</code></td><td>TIMESTAMP</td><td>NO</td><td>CURRENT_TIMESTAMP</td><td></td></tr>
+          <tr><td><code>updated_at</code></td><td>TIMESTAMP</td><td>NO</td><td>CURRENT_TIMESTAMP</td><td>更新トリガーで自動更新</td></tr>
+        </tbody>
+      </table>
+      <div class="info-box" style="margin-top:12px;">LINE一斉送信・個別送信・自動通知（NotificationRule）で共通使用。channel=bothの場合、送信時に応募者のLINE有無に応じてチャネルを自動選択。</div>
+    </div>
+
+    <!-- NotificationRule / NotificationLog -->
+    <div class="two-col">
+      <div class="section" style="border-top:3px solid #e91e63;">
+        <div class="tbl-header">
+          <div class="tbl-icon">⚙️</div>
+          <div>
+            <div class="tbl-name">NotificationRule <span class="badge badge-new">NEW</span></div>
+            <div class="tbl-jp">自動通知ルールテーブル</div>
+          </div>
+          <div class="tbl-count">9 columns</div>
+        </div>
+        <table>
+          <thead><tr><th class="col-col">カラム名</th><th class="col-type">型</th><th class="col-null">NULL</th><th>制約・説明</th></tr></thead>
+          <tbody>
+            <tr><td><code>id</code></td><td>UUID</td><td>NO</td><td><span class="badge badge-pk">PK</span></td></tr>
+            <tr><td><code>name</code></td><td>VARCHAR(100)</td><td>NO</td><td>ルール名（管理用。例: "説明会翌日サンクス"）</td></tr>
+            <tr><td><code>trigger_event</code></td><td>notification_trigger</td><td>NO</td><td><span class="badge badge-enum">ENUM</span> stage_change / interview_confirmed / offer_issued / deadline_reminder</td></tr>
+            <tr><td><code>trigger_stage_id</code></td><td>UUID</td><td>YES</td><td><span class="badge badge-fk">FK</span> → <span class="fk-ref">SelectionStage.id</span>。stage_change時のみ有効。NULL=全ステージ</td></tr>
+            <tr><td><code>delay_hours</code></td><td>INTEGER</td><td>NO</td><td>DEFAULT 0。トリガーからの送信遅延（時間）。0=即時</td></tr>
+            <tr><td><code>channel</code></td><td>notification_channel</td><td>NO</td><td><span class="badge badge-enum">ENUM</span> line / email</td></tr>
+            <tr><td><code>template_id</code></td><td>UUID</td><td>NO</td><td><span class="badge badge-fk">FK</span> → <span class="fk-ref">MessageTemplate.id</span></td></tr>
+            <tr><td><code>is_active</code></td><td>BOOLEAN</td><td>NO</td><td>DEFAULT true</td></tr>
+            <tr><td><code>created_at</code></td><td>TIMESTAMP</td><td>NO</td><td>DEFAULT CURRENT_TIMESTAMP</td></tr>
+          </tbody>
+        </table>
+        <div class="info-box" style="margin-top:10px;">Cloud Scheduler（GCP）でポーリングし、対象応募者にNotificationLogを生成して送信キューに投入。FR101（自動送信）対応。</div>
+      </div>
+      <div class="section" style="border-top:3px solid #e91e63;">
+        <div class="tbl-header">
+          <div class="tbl-icon">📋</div>
+          <div>
+            <div class="tbl-name">NotificationLog <span class="badge badge-new">NEW</span></div>
+            <div class="tbl-jp">通知送信ログテーブル</div>
+          </div>
+          <div class="tbl-count">7 columns</div>
+        </div>
+        <table>
+          <thead><tr><th class="col-col">カラム名</th><th class="col-type">型</th><th class="col-null">NULL</th><th>制約・説明</th></tr></thead>
+          <tbody>
+            <tr><td><code>id</code></td><td>UUID</td><td>NO</td><td><span class="badge badge-pk">PK</span></td></tr>
+            <tr><td><code>applicant_id</code></td><td>UUID</td><td>NO</td><td><span class="badge badge-fk">FK</span> → <span class="fk-ref">Applicant.id</span></td></tr>
+            <tr><td><code>rule_id</code></td><td>UUID</td><td>YES</td><td><span class="badge badge-fk">FK</span> → <span class="fk-ref">NotificationRule.id</span>。NULL=手動送信</td></tr>
+            <tr><td><code>channel</code></td><td>notification_channel</td><td>NO</td><td><span class="badge badge-enum">ENUM</span> line / email</td></tr>
+            <tr><td><code>status</code></td><td>notification_status</td><td>NO</td><td><span class="badge badge-enum">ENUM</span> sent / failed / skipped</td></tr>
+            <tr><td><code>error_message</code></td><td>TEXT</td><td>YES</td><td>送信失敗時のエラー内容</td></tr>
+            <tr><td><code>sent_at</code></td><td>TIMESTAMP</td><td>NO</td><td>DEFAULT CURRENT_TIMESTAMP</td></tr>
+          </tbody>
+        </table>
+        <table class="idx-table" style="margin-top:12px;">
+          <thead><tr><th style="width:240px;">インデックス</th><th>カラム</th><th>種類</th><th>用途</th></tr></thead>
+          <tbody>
+            <tr><td><code>notif_log_applicant_idx</code></td><td>applicant_id, sent_at DESC</td><td>BTREE</td><td>応募者別送信履歴</td></tr>
+            <tr><td><code>notif_log_status_idx</code></td><td>status, sent_at</td><td>BTREE</td><td>失敗ログの抽出・リトライ管理</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+
 </div>
 
 <script>
@@ -1231,7 +1488,7 @@ function switchTab(el, id) {
 function goTab(id) {
   const tabs = document.querySelectorAll('.tab');
   const contents = document.querySelectorAll('.tab-content');
-  const map = {'tab-overview':0,'tab-a':1,'tab-b':2,'tab-c':3,'tab-d':4,'tab-e':5,'tab-f':6};
+  const map = {'tab-overview':0,'tab-a':1,'tab-b':2,'tab-c':3,'tab-d':4,'tab-e':5,'tab-f':6,'tab-g':7};
   contents.forEach(c => c.classList.remove('active'));
   tabs.forEach(t => t.classList.remove('active'));
   document.getElementById(id).classList.add('active');
