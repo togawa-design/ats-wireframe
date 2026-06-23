@@ -134,10 +134,10 @@
 <div class="page">
   <h1>新卒採用管理システム（ATS）画面仕様書</h1>
   <div class="meta">
-    <span>v0.2</span>
-    <span>2026-06-05</span>
+    <span>v0.3</span>
+    <span>2026-06-23</span>
     <span>ステータス：設計中</span>
-    <span style="color:#7c83fd;font-weight:700;">12画面</span>
+    <span style="color:#7c83fd;font-weight:700;">14画面</span>
   </div>
 
   <!-- Legend -->
@@ -241,6 +241,11 @@
             <td><strong>最近のエントリー（5件）</strong></td>
             <td><span class="db-ref">Applicant</span></td>
             <td><code>ORDER BY created_at DESC LIMIT 5</code>。氏名・学校名・エントリー日時を表示</td>
+          </tr>
+          <tr>
+            <td><strong>KPIカード：期限超過件数 <span class="badge badge-new">FR107</span></strong></td>
+            <td><span class="db-ref">Applicant.document_deadline</span> / <span class="db-ref">Applicant.offer_acceptance_deadline</span></td>
+            <td>書類提出期限・内定承諾期限がいずれも <code>CURRENT_DATE</code> 以前かつ未完了の件数。クリックで学生一覧（期限超過フィルタ）へ遷移。0件のときはカード非強調</td>
           </tr>
         </tbody>
       </table>
@@ -448,8 +453,19 @@
             <td><span class="db-ref">ApplicantSource.media_id</span> JOIN <span class="db-ref">Media.name</span></td>
             <td>複数ある場合は主媒体（created_at最古）を表示</td>
           </tr>
+          <tr>
+            <td>職種区分 <span class="badge badge-new">v0.6</span></td>
+            <td><span class="db-ref">Applicant.position_type</span></td>
+            <td>総合職 / 技能職 バッジ表示</td>
+          </tr>
+          <tr>
+            <td>期限警告マーク <span class="badge badge-new">FR107</span></td>
+            <td><span class="db-ref">Applicant.document_deadline</span> / <span class="db-ref">offer_acceptance_deadline</span></td>
+            <td>期限を過ぎている場合は🔴アイコンをセル内に表示。7日以内は🟡アイコン。クリックで学生詳細の期限フィールドへ</td>
+          </tr>
         </tbody>
       </table>
+      <div class="info-box" style="margin-top:10px;"><strong>列カスタマイズ（FR099）:</strong> 表示列はスタッフごとに <span class="db-ref">StaffColumnPreference</span> に保存。デフォルト列セットをシステムが提供し、列の表示・非表示・並び順をユーザーが変更可。設定はログインユーザーにのみ適用。</div>
 
       <div class="cat-header" style="margin-top:16px;">フィルタ条件</div>
       <table>
@@ -487,6 +503,11 @@
             <td>チェックボックス（新卒 / 既卒 / 第二新卒）</td>
           </tr>
           <tr>
+            <td>職種区分 <span class="badge badge-new">v0.6</span></td>
+            <td><span class="db-ref">Applicant.position_type</span></td>
+            <td>チェックボックス（総合職 / 技能職）</td>
+          </tr>
+          <tr>
             <td>卒業年度</td>
             <td><span class="db-ref">Applicant.graduation_year</span></td>
             <td>プルダウン単一選択</td>
@@ -495,6 +516,11 @@
             <td>LINE連携状態</td>
             <td><span class="db-ref">Applicant.line_user_id</span></td>
             <td>ラジオ（全て / 連携済 / 未連携）</td>
+          </tr>
+          <tr>
+            <td>期限超過フィルタ <span class="badge badge-new">FR107</span></td>
+            <td><span class="db-ref">Applicant.document_deadline</span> / <span class="db-ref">offer_acceptance_deadline</span></td>
+            <td>チェックON → 書類期限・承諾期限のいずれかが過去日の学生に絞り込み</td>
           </tr>
         </tbody>
       </table>
@@ -580,6 +606,24 @@
             <td><span class="api-pill">GET /api/students（フィルタなし）</span></td>
             <td>—</td>
           </tr>
+          <tr>
+            <td><span class="btn-pill btn-secondary">一括ステータス変更 <span class="badge badge-new">FR097</span></span></td>
+            <td>チェック選択した学生の選考ステージをまとめて変更するモーダルを表示</td>
+            <td><span class="api-pill">PATCH /api/students/bulk-status</span></td>
+            <td>1件以上チェック必須。採用担当者・管理者のみ操作可。SelectionHistory を各人分生成</td>
+          </tr>
+          <tr>
+            <td><span class="btn-pill btn-ghost">列カスタマイズ <span class="badge badge-new">FR099</span></span></td>
+            <td>表示列の選択・並び替えモーダルを表示</td>
+            <td><span class="api-pill">PUT /api/me/column-prefs</span></td>
+            <td>設定はログインユーザーにのみ適用。StaffColumnPreference に保存</td>
+          </tr>
+          <tr>
+            <td><span class="btn-pill btn-secondary">CSV一括取込 <span class="badge badge-new">FR097</span></span></td>
+            <td>媒体CSVを直接アップロードして学生を一括登録するモーダルを表示</td>
+            <td><span class="api-pill">POST /api/students/bulk-import</span></td>
+            <td>媒体管理画面（SCR-09）のCSV取込と同じ処理。ショートカットとして学生一覧からも実行可</td>
+          </tr>
         </tbody>
       </table>
     </div>
@@ -618,6 +662,11 @@
             <td>LINE送信ボタン押下時に選択0件</td>
             <td>ボタン付近トースト</td>
             <td><span class="err-msg">学生を1人以上選択してください。</span></td>
+          </tr>
+          <tr>
+            <td>一括ステータス変更で選択0件</td>
+            <td>ボタン付近トースト</td>
+            <td><span class="err-msg">変更対象の学生を1人以上選択してください。</span></td>
           </tr>
         </tbody>
       </table>
@@ -688,6 +737,21 @@
             <tr><td>流入媒体</td><td><span class="db-ref">ApplicantSource</span> JOIN <span class="db-ref">Media.name</span></td><td>複数表示</td></tr>
             <tr><td>エントリー日時</td><td><span class="db-ref">Applicant.created_at</span></td><td>YYYY/MM/DD HH:mm</td></tr>
             <tr><td>備考・メモ</td><td><span class="db-ref">Applicant.memo</span></td><td>テキストエリア（編集モード）</td></tr>
+            <tr>
+              <td>書類提出期限 <span class="badge badge-new">FR107</span></td>
+              <td><span class="db-ref">Applicant.document_deadline</span></td>
+              <td>日付ピッカー（編集可）。当日以前の日付は赤表示</td>
+            </tr>
+            <tr>
+              <td>内定承諾期限 <span class="badge badge-new">FR107</span></td>
+              <td><span class="db-ref">Applicant.offer_acceptance_deadline</span></td>
+              <td>日付ピッカー（編集可）。当日以前の日付は赤表示</td>
+            </tr>
+            <tr>
+              <td>職種区分 <span class="badge badge-new">v0.6</span></td>
+              <td><span class="db-ref">Applicant.position_type</span></td>
+              <td>総合職 / 技能職 セレクト（編集可）</td>
+            </tr>
           </tbody>
         </table>
       </div>
@@ -857,7 +921,16 @@
             <tr><td>変更日時</td><td><span class="db-ref">SelectionHistory.changed_at</span></td><td>YYYY/MM/DD HH:mm</td></tr>
             <tr><td>変更者</td><td><span class="db-ref">SelectionHistory.changed_by</span> JOIN <span class="db-ref">Staff.name</span></td><td></td></tr>
             <tr><td>変更理由・メモ</td><td><span class="db-ref">SelectionHistory.note</span></td><td>任意入力。空欄の場合は「—」表示</td></tr>
-            <tr><td>面接記録</td><td><span class="db-ref">Interview</span></td><td>面接日時・面接官・評価スコア・コメント</td></tr>
+            <tr>
+              <td>面接記録 + 評価完了マーク <span class="badge badge-new">FR106</span></td>
+              <td><span class="db-ref">Interview</span> + <span class="db-ref">Interview.is_evaluation_complete</span></td>
+              <td>面接日時・面接官・評価スコア・コメント。<code>is_evaluation_complete=true</code> のとき✅マーク表示</td>
+            </tr>
+            <tr>
+              <td>面接評価シート <span class="badge badge-new">FR106</span></td>
+              <td><span class="db-ref">EvaluationTemplate</span> → <span class="db-ref">EvaluationItem</span> → <span class="db-ref">EvaluationResponse</span></td>
+              <td>面接ごとにアコーディオンで展開。評価テンプレートの各評価項目（item_label）とその回答（score / comment）を一覧表示。未回答項目は「—」表示</td>
+            </tr>
             <tr><td>現在のステージ</td><td><span class="db-ref">Selection.current_stage_id</span> JOIN <span class="db-ref">SelectionStage</span></td><td>画面上部に現在地として強調表示</td></tr>
           </tbody>
         </table>
@@ -883,6 +956,12 @@
               <td>面接登録モーダル</td>
               <td><span class="api-pill">POST /api/interviews</span></td>
               <td></td>
+            </tr>
+            <tr>
+              <td><span class="btn-pill btn-secondary">評価シート入力 <span class="badge badge-new">FR106</span></span></td>
+              <td>評価シートモーダルを開く。EvaluationTemplate の各 EvaluationItem に対してスコア・コメントを入力</td>
+              <td><span class="api-pill">POST /api/interviews/:id/evaluation</span></td>
+              <td>全項目入力完了時に <code>is_evaluation_complete=true</code> を自動セット。面接官・採用担当者のみ操作可</td>
             </tr>
           </tbody>
         </table>
@@ -932,7 +1011,16 @@
             <tr><td>メッセージ一覧</td><td><span class="db-ref">LineMessage</span></td><td>送受信時刻・送信者区分（採用担当/学生）・本文。吹き出し形式</td></tr>
             <tr><td>送受信日時</td><td><span class="db-ref">LineMessage.sent_at</span></td><td>YYYY/MM/DD HH:mm</td></tr>
             <tr><td>既読状態</td><td><span class="db-ref">LineMessage.is_read</span></td><td>LINE Webhook の delivery イベント連動</td></tr>
-            <tr><td>メッセージ種別</td><td><span class="db-ref">LineMessage.message_type</span></td><td>テキスト / 画像 / スタンプ / テンプレート</td></tr>
+            <tr>
+              <td>メッセージ種別</td>
+              <td><span class="db-ref">LineMessage.message_type</span></td>
+              <td>テキスト / 画像 / スタンプ / テンプレート / ファイル <span class="badge badge-new">FR105</span></td>
+            </tr>
+            <tr>
+              <td>ファイル添付 <span class="badge badge-new">FR105</span></td>
+              <td><span class="db-ref">LineMessage.file_url</span> / <span class="db-ref">file_name</span></td>
+              <td>受信・送信両方対応。ファイル名リンクでダウンロード。画像はサムネイル表示</td>
+            </tr>
           </tbody>
         </table>
       </div>
@@ -948,8 +1036,13 @@
           <tbody>
             <tr>
               <td>メッセージ本文</td>
-              <td><span class="badge badge-must">必須</span></td>
-              <td>最大 <strong>2000文字</strong>（LINE API制限）。空欄では送信不可</td>
+              <td><span class="badge badge-must">必須</span>（ファイル送信時は任意）</td>
+              <td>最大 <strong>2000文字</strong>（LINE API制限）。テキストまたはファイルのどちらか必須</td>
+            </tr>
+            <tr>
+              <td>添付ファイル <span class="badge badge-new">FR105</span></td>
+              <td><span class="badge badge-opt">任意</span></td>
+              <td>最大 <strong>10MB</strong>。対応形式: PDF / PNG / JPG / XLSX / DOCX。Firebase Storage 経由でアップロード後 file_url を保存</td>
             </tr>
           </tbody>
         </table>
@@ -969,6 +1062,12 @@
               <td>LINE API 経由で個別メッセージ送信</td>
               <td><span class="api-pill">POST /api/line/send</span></td>
               <td>送信成功後、チャット一覧に即追加（オプティミスティックUI）</td>
+            </tr>
+            <tr>
+              <td><span class="btn-pill btn-ghost">📎 ファイル添付 <span class="badge badge-new">FR105</span></span></td>
+              <td>ファイルピッカーを開く → 選択後プレビュー表示 → 送信ボタンで LINE API 経由送信</td>
+              <td><span class="api-pill">POST /api/storage/upload → POST /api/line/send</span></td>
+              <td>先に Firebase Storage へアップロードし URL 取得後、LINE ファイルメッセージとして送信</td>
             </tr>
           </tbody>
         </table>
@@ -1160,6 +1259,11 @@
             <td><span class="db-ref">ApplicantSource.media_id</span></td>
             <td>プルダウン複数選択</td>
           </tr>
+          <tr>
+            <td>職種区分 <span class="badge badge-new">v0.6</span></td>
+            <td><span class="db-ref">Applicant.position_type</span></td>
+            <td>チェックボックス（総合職 / 技能職）</td>
+          </tr>
         </tbody>
       </table>
     </div>
@@ -1226,6 +1330,12 @@
             <td>ステージ選択プルダウン → 確定で更新</td>
             <td><span class="api-pill">PATCH /api/selections/:id</span></td>
             <td>同上</td>
+          </tr>
+          <tr>
+            <td><span class="btn-pill btn-secondary">一括ステータス変更 <span class="badge badge-new">FR097</span></span></td>
+            <td>カードにチェックボックス表示 → 複数選択 → ステージ選択モーダル → 一括更新</td>
+            <td><span class="api-pill">PATCH /api/selections/bulk-status</span></td>
+            <td>各応募者に <span class="db-ref">SelectionHistory</span> を個別 INSERT。最大100件まで一括処理</td>
           </tr>
           <tr>
             <td><span class="btn-pill btn-ghost">絞り込み</span></td>
@@ -1415,10 +1525,10 @@
             <td>対象が1000人以下は multicast、超過の場合は narrowcast 自動切替</td>
           </tr>
           <tr>
-            <td><span class="btn-pill btn-ghost">テンプレート選択</span></td>
-            <td>既存テンプレート一覧モーダル → 選択で本文に挿入</td>
+            <td><span class="btn-pill btn-ghost">テンプレート選択 <span class="badge badge-new">FR100</span></span></td>
+            <td>既存テンプレート一覧モーダル（MessageTemplate）→ 選択で本文に挿入。テンプレートはドラッグ&ドロップで並び替え可</td>
             <td><span class="api-pill">GET /api/message-templates</span></td>
-            <td>—</td>
+            <td>テンプレート並び順は <span class="db-ref">MessageTemplate.sort_order</span> で管理。並び替え保存 API: <span class="api-pill">PUT /api/message-templates/reorder</span></td>
           </tr>
         </tbody>
       </table>
@@ -1536,9 +1646,9 @@
             <td>プルダウン複数選択</td>
           </tr>
           <tr>
-            <td>期間（日付範囲）</td>
+            <td>期間（日付範囲） <span class="badge badge-new">FR103</span></td>
             <td><span class="db-ref">SelectionHistory.changed_at</span> / <span class="db-ref">Applicant.created_at</span></td>
-            <td>日付ピッカー（開始〜終了）</td>
+            <td>日付ピッカー（開始〜終了）。クイック選択: 今月 / 先月 / 今四半期 / 今年度。全サブタブに連動</td>
           </tr>
         </tbody>
       </table>
@@ -1589,6 +1699,11 @@
               <td>ファネル視覚化</td>
               <td>—</td>
               <td>棒グラフ or ファネルチャート。ホバーで人数・率をツールチップ表示</td>
+            </tr>
+            <tr>
+              <td>ドリルダウン（ステージ別学生一覧） <span class="badge badge-new">FR102</span></td>
+              <td><span class="db-ref">Selection</span> + <span class="db-ref">Applicant</span></td>
+              <td>ファネルのステージをクリック → そのステージに在籍する学生一覧をスライドパネル or モーダルで表示。行クリックで学生詳細へ遷移</td>
             </tr>
           </tbody>
         </table>
@@ -2104,6 +2219,12 @@
           <thead><tr><th class="col-btn">ボタン</th><th class="col-nav">遷移先・モーダル</th><th>権限</th><th>説明</th></tr></thead>
           <tbody>
             <tr><td><span class="btn-pill btn-primary">＋ 枠を追加</span></td><td>枠追加モーダル</td><td>採用担当者・管理者</td><td>日時・タイプ・担当者を入力してCalendarSlotを作成</td></tr>
+            <tr>
+              <td><span class="btn-pill btn-secondary">枠を一括登録 <span class="badge badge-new">FR098</span></span></td>
+              <td>枠一括登録モーダルを開く。開始日・終了日・時間帯・タイプ・担当者を指定して日次繰り返しでCalendarSlotを一括作成</td>
+              <td>採用担当者・管理者</td>
+              <td>既存枠と重複する場合はスキップ（上書きなし）。作成件数を完了トーストで通知</td>
+            </tr>
             <tr><td>枠クリック</td><td>枠詳細モーダル</td><td>全ロール</td><td>開始〜終了・担当者・紐づく面接（Interview）・応募者名を表示</td></tr>
             <tr><td><span class="btn-pill btn-ghost">編集</span>（モーダル内）</td><td>枠編集モーダル</td><td>採用担当者・管理者</td><td>日時・タイプ変更。is_booked=trueの枠は日時変更不可</td></tr>
             <tr><td><span class="btn-pill btn-danger">削除</span>（モーダル内）</td><td>確認ダイアログ</td><td>採用担当者・管理者</td><td>is_booked=trueの場合は削除不可（エラー表示）</td></tr>
@@ -2315,7 +2436,7 @@
             <tr><td><span class="btn-pill btn-secondary">費用編集</span></td><td>Media.cost の更新モーダル。分析画面のコスト算出に使用</td></tr>
           </tbody>
         </table>
-        <div class="info-box">確定4媒体（マイナビ・リクナビ・OfferBox・Re就活）はシステム固定。媒体の追加・削除はシステム管理者がDB直接操作で対応（画面からは不可）。</div>
+        <div class="info-box">確定6媒体（マイナビ・Re就活キャンパス・OfferBox・キミスカ・キャリアチケット・ABABA）はシステム固定。媒体の追加・削除はシステム管理者がDB直接操作で対応（画面からは不可）。</div>
       </div>
     </div><!-- /sm-list -->
 
@@ -2542,7 +2663,7 @@
       </div>
       <div class="overview-card">
         <div class="overview-card-label">サブタブ</div>
-        <div class="overview-card-val">4つ</div>
+        <div class="overview-card-val">6つ</div>
       </div>
     </div>
 
@@ -2551,6 +2672,8 @@
       <div class="sub-tab"       onclick="swSub(this,'ss-tags','settings')">タグ管理</div>
       <div class="sub-tab"       onclick="swSub(this,'ss-qr','settings')">QRコード</div>
       <div class="sub-tab"       onclick="swSub(this,'ss-goal','settings')">採用目標</div>
+      <div class="sub-tab"       onclick="swSub(this,'ss-templates','settings')">📝 テンプレート管理</div>
+      <div class="sub-tab"       onclick="swSub(this,'ss-notifications','settings')">🔔 自動通知ルール</div>
     </div>
 
     <!-- 選考フロー -->
@@ -2655,6 +2778,90 @@
       </div>
     </div><!-- /ss-goal -->
 
+    <!-- テンプレート管理 FR100 -->
+    <div id="ss-templates" class="sub-content">
+      <div class="section">
+        <div class="spec-header"><div class="spec-icon spec-icon-blue">📋</div><div class="spec-title">① テンプレート一覧（FR100）</div></div>
+        <div class="info-box" style="margin-bottom:12px;">LINE送信・メール送信で使用するメッセージテンプレート（<span class="db-ref">MessageTemplate</span>）を管理します。テンプレートはドラッグ&ドロップで並び替え可能です（<span class="db-ref">sort_order</span> に保存）。</div>
+        <table>
+          <thead><tr><th class="col-field">カラム</th><th class="col-src">データソース</th><th>備考</th></tr></thead>
+          <tbody>
+            <tr><td>テンプレート名</td><td><span class="db-ref">MessageTemplate.name</span></td><td></td></tr>
+            <tr><td>チャネル</td><td><span class="db-ref">MessageTemplate.channel</span></td><td>line / email / both をバッジで表示</td></tr>
+            <tr><td>本文（抜粋）</td><td><span class="db-ref">MessageTemplate.body</span></td><td>先頭80文字をプレビュー表示</td></tr>
+            <tr><td>差し込み変数</td><td><span class="db-ref">MessageTemplate.variables</span></td><td>使用変数を <code>{氏名}</code> 形式でバッジ列挙</td></tr>
+            <tr><td>並び順</td><td><span class="db-ref">MessageTemplate.sort_order</span></td><td>ドラッグハンドル付き。数値昇順で送信画面の選択肢に反映</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="section">
+        <div class="spec-header"><div class="spec-icon spec-icon-green">🖱️</div><div class="spec-title">② 操作</div></div>
+        <table>
+          <thead><tr><th class="col-btn">ボタン</th><th>説明</th></tr></thead>
+          <tbody>
+            <tr><td><span class="btn-pill btn-primary">＋ テンプレート作成</span></td><td>テンプレート名・チャネル・本文を入力して MessageTemplate を作成。差し込み変数 <code>{氏名}</code> <code>{面接日時}</code> 等を本文内で使用可</td></tr>
+            <tr><td><span class="btn-pill btn-secondary">編集</span></td><td>name / channel / body を更新</td></tr>
+            <tr><td>ドラッグ&ドロップ</td><td><span class="db-ref">MessageTemplate.sort_order</span> を更新。LINE送信画面のテンプレート選択モーダルの表示順に即時反映</td></tr>
+            <tr><td><span class="btn-pill btn-danger">削除</span></td><td>確認ダイアログ後に削除。送信済みメッセージには影響なし</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="section">
+        <div class="spec-header"><div class="spec-icon spec-icon-green">✅</div><div class="spec-title">③ バリデーション</div></div>
+        <table>
+          <thead><tr><th class="col-field">項目</th><th class="col-type">区分</th><th>ルール</th></tr></thead>
+          <tbody>
+            <tr><td>テンプレート名</td><td><span class="badge badge-must">必須</span></td><td>最大 <strong>100文字</strong>。重複不可（同一チャネル内）</td></tr>
+            <tr><td>本文</td><td><span class="badge badge-must">必須</span></td><td>最大 <strong>2000文字</strong>。未定義変数が含まれる場合は警告表示（保存は可能）</td></tr>
+            <tr><td>チャネル</td><td><span class="badge badge-must">必須</span></td><td>line / email / both から選択</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div><!-- /ss-templates -->
+
+    <!-- 自動通知ルール FR101 -->
+    <div id="ss-notifications" class="sub-content">
+      <div class="section">
+        <div class="spec-header"><div class="spec-icon spec-icon-blue">🔔</div><div class="spec-title">① 自動通知ルール一覧（FR101）</div></div>
+        <div class="info-box" style="margin-bottom:12px;"><span class="db-ref">NotificationRule</span> テーブルで管理。Cloud Scheduler が定期実行し、ルールに一致する学生に自動でメッセージ送信します。送信ログは <span class="db-ref">NotificationLog</span> に記録。</div>
+        <table>
+          <thead><tr><th class="col-field">カラム</th><th class="col-src">データソース</th><th>備考</th></tr></thead>
+          <tbody>
+            <tr><td>ルール名</td><td><span class="db-ref">NotificationRule.name</span></td><td></td></tr>
+            <tr><td>トリガー</td><td><span class="db-ref">NotificationRule.trigger_type</span></td><td>stage_enter（ステージ到達時）/ date_approach（期限N日前）/ manual（手動）をバッジ表示</td></tr>
+            <tr><td>チャネル</td><td><span class="db-ref">NotificationRule.channel</span></td><td>line / email / both</td></tr>
+            <tr><td>テンプレート</td><td><span class="db-ref">MessageTemplate.name</span>（template_id 経由）</td><td>送信内容のプレビューリンク</td></tr>
+            <tr><td>遅延（分）</td><td><span class="db-ref">NotificationRule.delay_minutes</span></td><td>トリガー発火から送信するまでの待機時間</td></tr>
+            <tr><td>有効/無効</td><td><span class="db-ref">NotificationRule.is_active</span></td><td>トグルスイッチで即時切替</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="section">
+        <div class="spec-header"><div class="spec-icon spec-icon-green">🖱️</div><div class="spec-title">② 操作</div></div>
+        <table>
+          <thead><tr><th class="col-btn">ボタン</th><th>説明</th></tr></thead>
+          <tbody>
+            <tr><td><span class="btn-pill btn-primary">＋ ルール作成</span></td><td>ルール名・トリガー種別・対象ステージ（trigger_type=stage_enter時）/ 期限カラム（date_approach時）・遅延分・チャネル・テンプレートを入力して NotificationRule を作成</td></tr>
+            <tr><td><span class="btn-pill btn-secondary">編集</span></td><td>ルール設定を変更。変更後は次回のCloud Scheduler実行から適用</td></tr>
+            <tr><td>有効/無効トグル</td><td><span class="db-ref">NotificationRule.is_active</span> を即時更新。無効化しても既存の NotificationLog は残る</td></tr>
+            <tr><td><span class="btn-pill btn-danger">削除</span></td><td>確認ダイアログ後に削除。送信済みの NotificationLog は残る</td></tr>
+            <tr><td><span class="btn-pill btn-ghost">送信ログ確認</span></td><td>対象ルールの NotificationLog（宛先・送信日時・ステータス）を一覧モーダルで表示</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="section">
+        <div class="spec-header"><div class="spec-icon spec-icon-green">✅</div><div class="spec-title">③ バリデーション</div></div>
+        <table>
+          <thead><tr><th class="col-field">項目</th><th class="col-type">区分</th><th>ルール</th></tr></thead>
+          <tbody>
+            <tr><td>ルール名</td><td><span class="badge badge-must">必須</span></td><td>最大 <strong>100文字</strong></td></tr>
+            <tr><td>テンプレート</td><td><span class="badge badge-must">必須</span></td><td>有効な MessageTemplate を選択必須</td></tr>
+            <tr><td>遅延（分）</td><td><span class="badge badge-must">必須</span></td><td>0以上の整数。0=即時送信</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div><!-- /ss-notifications -->
+
   </div><!-- /s-settings -->
 
 
@@ -2716,7 +2923,7 @@
             <tr><td>1</td><td>対象学生を選択</td><td>agency_contact_id が設定されている学生を一覧から選択（複数選択可）</td></tr>
             <tr><td>2</td><td>合否を選択</td><td>合格 / 不合格 / 内定 から選択。内定の場合は内定通知書テンプレートを選択</td></tr>
             <tr><td>3</td><td>メール本文確認</td><td>送信先（AgencyContact.email）・送信元（担当者個人アドレス）・本文プレビューを表示</td></tr>
-            <tr><td>4</td><td>送信実行</td><td>Microsoft Graph API 経由で送信。内定の場合は内定通知書 PDF を生成して添付</td></tr>
+            <tr><td>4</td><td>送信実行</td><td>サイバーメール SMTP（Nodemailer）経由で送信。内定の場合は内定通知書 PDF を生成して添付</td></tr>
             <tr><td>5</td><td>送信完了</td><td>AuditLog に document_export を記録。SelectionHistory.note に「合否連絡送信済」を記録</td></tr>
           </tbody>
         </table>
@@ -2727,7 +2934,7 @@
           <thead><tr><th class="col-field">条件</th><th>メッセージ</th></tr></thead>
           <tbody>
             <tr><td>対象学生に agency_contact_id が未設定</td><td><span class="err-msg">紹介会社が未設定の学生が含まれています。除外して続けますか？</span></td></tr>
-            <tr><td>Microsoft Graph API 送信失敗</td><td><span class="err-msg">メール送信に失敗しました。時間をおいて再試行してください。</span></td></tr>
+            <tr><td>サイバーメール SMTP 送信失敗</td><td><span class="err-msg">メール送信に失敗しました。時間をおいて再試行してください。</span></td></tr>
             <tr><td>内定通知書テンプレート未選択（内定時）</td><td><span class="err-msg">内定通知書テンプレートを選択してください。</span></td></tr>
           </tbody>
         </table>

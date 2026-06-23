@@ -198,7 +198,7 @@
           </div>
           <div class="arch-box layer-db">
             <span class="arch-box-text">🗄️ Cloud SQL</span>
-            <span class="arch-box-sub">PostgreSQL 16 / 29テーブル</span>
+            <span class="arch-box-sub">PostgreSQL 16 / 36テーブル</span>
           </div>
           <div class="arch-box layer-storage">
             <span class="arch-box-text">🗂️ Firebase Storage</span>
@@ -256,7 +256,7 @@
           <tr>
             <td><strong>Cloud SQL for PostgreSQL</strong></td>
             <td><span class="badge badge-google">Google Cloud</span></td>
-            <td>メインデータベース。27テーブル・リレーショナル設計・分析クエリを担当</td>
+            <td>メインデータベース。36テーブル・リレーショナル設計・分析クエリを担当</td>
             <td>Google（GCP）</td>
           </tr>
           <tr>
@@ -330,6 +330,10 @@
             <td>書類PDF生成・保存</td>
             <td>ブラウザ → Next.js API Routes → PDF生成 → Firebase Storage → ダウンロードURL返却</td>
           </tr>
+          <tr>
+            <td>自動通知送信 <span class="badge badge-new">v0.6</span></td>
+            <td>Cloud Scheduler（定期実行） → Next.js API Routes（/api/notifications/trigger） → NotificationRule 評価 → LINE / Nodemailer SMTP → NotificationLog INSERT</td>
+          </tr>
         </tbody>
       </table>
     </div>
@@ -371,7 +375,7 @@
           <div class="stack-card-role">データベース</div>
           <div class="stack-card-name">Cloud SQL for PostgreSQL 16</div>
           <div class="stack-card-vendor">Google Cloud</div>
-          <div class="stack-card-note">27テーブル / リレーショナル設計 / JSONB / ENUM。本番: db-g1-small 以上</div>
+          <div class="stack-card-note">36テーブル / リレーショナル設計 / JSONB / ENUM。本番: db-g1-small 以上</div>
         </div>
 
         <div class="stack-card" style="border-top-color:#f59e0b;">

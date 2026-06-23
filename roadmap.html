@@ -161,7 +161,7 @@
           <div class="feat-item core"><div class="feat-name">LINE友達追加フロー</div><div class="feat-note">LIFF + トークン照合（2パターン）</div></div>
           <div class="feat-item core"><div class="feat-name">LINE メッセージ送信</div><div class="feat-note">個別・タグ絞り一斉送信</div></div>
           <div class="feat-item core"><div class="feat-name">選考管理（1フロー）</div><div class="feat-note">基本的なステータス遷移・パイプライン</div></div>
-          <div class="feat-item core"><div class="feat-name">媒体CSV取込</div><div class="feat-note">マイナビ・リクナビ（CSV）</div></div>
+          <div class="feat-item core"><div class="feat-name">媒体CSV取込</div><div class="feat-note">マイナビ・Re就活キャンパス（CSV）</div></div>
           <div class="feat-item important"><div class="feat-name">学生マイページ（LIFF）</div><div class="feat-note">プロフィール登録・書類アップロード</div></div>
           <div class="feat-item important"><div class="feat-name">基本ファネル分析</div><div class="feat-note">遷移率・内定者一覧</div></div>
           <div class="feat-item important"><div class="feat-name">QRコード生成</div><div class="feat-note">流入経路タグ自動付与</div></div>
@@ -186,7 +186,7 @@
         <div class="feat-grid">
           <div class="feat-item core"><div class="feat-name">🆕 エージェント機能</div><div class="feat-note">紹介会社登録・学生登録フォーム・ポータル・合否連絡</div></div>
           <div class="feat-item core"><div class="feat-name">🆕 総合職・技能職分離</div><div class="feat-note">職種区分管理・スタッフ担当制限・フィルタ</div></div>
-          <div class="feat-item core"><div class="feat-name">🆕 Microsoft 365メール送信</div><div class="feat-note">Graph API 経由の合否連絡・内定通知書添付</div></div>
+          <div class="feat-item core"><div class="feat-name">🆕 サイバーメール SMTP送信</div><div class="feat-note">Nodemailer 経由の合否連絡・内定通知書添付</div></div>
           <div class="feat-item core"><div class="feat-name">複数選考フロー</div><div class="feat-note">職種別・区分別のフロー自由設計</div></div>
           <div class="feat-item core"><div class="feat-name">Salesforce連携</div><div class="feat-note">承諾時自動登録・在籍情報同期</div></div>
           <div class="feat-item core"><div class="feat-name">複数リッチメニュー</div><div class="feat-note">タグ別自動割り当て</div></div>
@@ -195,7 +195,13 @@
           <div class="feat-item important"><div class="feat-name">面接カレンダー（手動）</div><div class="feat-note">ATS内での枠管理・予約（Google連携なし）</div></div>
           <div class="feat-item important"><div class="feat-name">監査ログ</div><div class="feat-note">エクスポート・ステータス変更の証跡</div></div>
           <div class="feat-item important"><div class="feat-name">媒体別ファネル分析</div><div class="feat-note">媒体比較・ドリルダウン</div></div>
-          <div class="feat-item nice"><div class="feat-name">OfferBox / Re就活 CSV</div><div class="feat-note">4媒体のCSV取込を完備</div></div>
+          <div class="feat-item core"><div class="feat-name">🆕 媒体拡充（6媒体）</div><div class="feat-note">OfferBox・キミスカ・キャリアチケット・ABABA CSV取込を完備（計6媒体）</div></div>
+          <div class="feat-item core"><div class="feat-name">🆕 自動通知・テンプレート管理</div><div class="feat-note">NotificationRule / MessageTemplate / NotificationLog。Cloud Scheduler 連携</div></div>
+          <div class="feat-item core"><div class="feat-name">🆕 面接評価シート</div><div class="feat-note">EvaluationTemplate / EvaluationItem / EvaluationResponse。評価完了フラグ</div></div>
+          <div class="feat-item important"><div class="feat-name">🆕 列カスタマイズ</div><div class="feat-note">StaffColumnPreference。ユーザー別表示列設定</div></div>
+          <div class="feat-item important"><div class="feat-name">🆕 期限管理</div><div class="feat-note">書類提出期限・内定承諾期限・ダッシュボード期限超過カード</div></div>
+          <div class="feat-item important"><div class="feat-name">🆕 LINEファイル添付</div><div class="feat-note">送受信ファイル対応（PDF/画像/Excel）Firebase Storage 経由</div></div>
+          <div class="feat-item important"><div class="feat-name">🆕 カレンダー枠一括登録</div><div class="feat-note">日次繰り返しで CalendarSlot を一括作成</div></div>
         </div>
       </div>
     </div>
@@ -214,14 +220,14 @@
       </div>
       <div class="phase-body">
         <div class="feat-grid">
-          <div class="feat-item core"><div class="feat-name">Googleカレンダー連携</div><div class="feat-note">複数担当者の空き時間を自動検出・面接確定→カレンダー自動登録</div></div>
+          <div class="feat-item core"><div class="feat-name">ガルーン連携拡張</div><div class="feat-note">双方向同期・空き時間自動検出・面接確定→ガルーン自動登録（現在は一方向）</div></div>
           <div class="feat-item important"><div class="feat-name">辞退リスクスコア</div><div class="feat-note">入社意欲×LINE開封×アクセス頻度で算出</div></div>
           <div class="feat-item important"><div class="feat-name">採用目標達成予測</div><div class="feat-note">現ファネルから最終承諾数を予測</div></div>
           <div class="feat-item important"><div class="feat-name">前年比較分析</div><div class="feat-note">主要KPIの年度比較</div></div>
           <div class="feat-item nice"><div class="feat-name">媒体API連携</div><div class="feat-note">CSV→APIへ移行（要パートナー契約）</div></div>
           <div class="feat-item nice"><div class="feat-name">採用スピード分析</div><div class="feat-note">ステージ滞在日数・面接官通過率</div></div>
         </div>
-        <div class="warn-box">⚠️ Googleカレンダー連携はU-11（Workspace確認）が完了してから設計詳細化。</div>
+        <div class="info-box">✅ ガルーン連携（ATS→ガルーン一方向）は Phase 2 で確定済み。Phase 3 では双方向同期への拡張を検討。</div>
       </div>
     </div>
 
@@ -255,7 +261,7 @@
             <tbody>
               <tr><td style="font-size:12px;">複数選考フロー</td><td style="font-size:11px;color:#888;">1フローで動くのを確認してから</td><td style="font-size:11px;color:#7c83fd;">Phase2</td></tr>
               <tr><td style="font-size:12px;">Salesforce連携</td><td style="font-size:11px;color:#888;">SF側の設計調整が必要</td><td style="font-size:11px;color:#7c83fd;">Phase2</td></tr>
-              <tr><td style="font-size:12px;">Googleカレンダー</td><td style="font-size:11px;color:#888;">U-11確認待ち</td><td style="font-size:11px;color:#4caf50;">Phase3</td></tr>
+              <tr><td style="font-size:12px;">ガルーン双方向同期</td><td style="font-size:11px;color:#888;">一方向はPhase2で実装。双方向は仕様調整が必要</td><td style="font-size:11px;color:#4caf50;">Phase3</td></tr>
               <tr><td style="font-size:12px;">書類出力（PDF）</td><td style="font-size:11px;color:#888;">テンプレート設計が必要</td><td style="font-size:11px;color:#7c83fd;">Phase2</td></tr>
               <tr><td style="font-size:12px;">監査ログ</td><td style="font-size:11px;color:#888;">StaffSession基盤があれば後追い可</td><td style="font-size:11px;color:#7c83fd;">Phase2</td></tr>
               <tr><td style="font-size:12px;">辞退リスクスコア</td><td style="font-size:11px;color:#888;">データが溜まってから</td><td style="font-size:11px;color:#4caf50;">Phase3</td></tr>
@@ -339,10 +345,10 @@
         <thead><tr><th>機能</th><th>前提条件</th><th>工数感</th><th>優先度</th></tr></thead>
         <tbody>
           <tr>
-            <td><strong>Googleカレンダー連携</strong><br><span style="font-size:11px;color:#888;">複数担当者の空き検出・自動登録</span></td>
-            <td style="font-size:12px;color:#e65100;font-weight:600;">U-11（Workspace確認）必須</td>
+            <td><strong>ガルーン連携拡張</strong><br><span style="font-size:11px;color:#888;">双方向同期・空き時間自動検出・面接確定→ガルーン自動登録</span></td>
+            <td style="font-size:12px;">ガルーン REST API の書き込みスコープ確認が前提。Phase 2 の一方向同期が安定後</td>
             <td style="font-size:12px;">大</td>
-            <td><span class="badge badge-must">必須（条件付き）</span></td>
+            <td><span class="badge badge-should">推奨</span></td>
           </tr>
           <tr>
             <td><strong>辞退リスクスコア</strong><br><span style="font-size:11px;color:#888;">入社意欲×LINE開封×アクセス頻度</span></td>

@@ -174,7 +174,7 @@
           <div class="flow-arrow-h"></div>
 
           <div class="flow-col">
-            <div class="flow-node c-media">媒体<br><span style="font-size:10px;font-weight:400;">マイナビ / リクナビ</span></div>
+            <div class="flow-node c-media">媒体<br><span style="font-size:10px;font-weight:400;">マイナビ / Re就活 / OfferBox 他</span></div>
             <div class="flow-label">QRコード<br>または媒体経由</div>
           </div>
           <div class="flow-arrow-h"></div>
@@ -793,7 +793,7 @@
           <div class="entity-field"><span>name</span><span class="field-type">VARCHAR</span></div>
           <div class="entity-field" style="background:#f3e5f5;"><span>field_mapping</span><span class="field-type">JSONB</span></div>
           <div class="entity-field"><span>sync_type</span><span class="field-type">ENUM</span></div>
-          <div style="padding:6px 14px;font-size:10px;color:#666;background:#f5f5f5;">sync_type: api / csv<br>確定4媒体: マイナビ/リクナビ/OfferBox/Re就活</div>
+          <div style="padding:6px 14px;font-size:10px;color:#666;background:#f5f5f5;">sync_type: api / csv<br>確定6媒体: マイナビ/Re就活キャンパス/OfferBox/キミスカ/キャリアチケット/ABABA</div>
         </div>
         <div class="entity" style="min-width:200px;">
           <div class="entity-header gray">📲 QRCode</div>
@@ -815,6 +815,51 @@
     </div>
 
     <!-- ─────────────────────────────── -->
+    <!-- G. 通知・テンプレート (v0.6 新規) -->
+    <!-- ─────────────────────────────── -->
+    <div class="section">
+      <h2>G. 通知・テンプレート <span style="background:#f57f17;color:#fff;font-size:10px;font-weight:700;border-radius:10px;padding:2px 8px;margin-left:6px;">🆕 v0.6</span></h2>
+      <div class="erd">
+        <div class="entity" style="min-width:220px;">
+          <div class="entity-header" style="background:#f57f17;">📝 MessageTemplate</div>
+          <div class="entity-field"><span><span class="pk">PK</span> id</span><span class="field-type">UUID</span></div>
+          <div class="entity-field"><span>name</span><span class="field-type">VARCHAR</span></div>
+          <div class="entity-field"><span>channel</span><span class="field-type">ENUM</span></div>
+          <div class="entity-field"><span>body</span><span class="field-type">TEXT</span></div>
+          <div class="entity-field"><span>variables</span><span class="field-type">JSONB</span></div>
+          <div class="entity-field"><span>sort_order</span><span class="field-type">INT</span></div>
+          <div style="padding:6px 14px;font-size:10px;color:#666;background:#f5f5f5;">channel: line / email / both<br>LINE送信画面・メール送信で共用</div>
+        </div>
+        <div style="display:flex;align-items:center;font-size:18px;color:#aaa;">→</div>
+        <div class="entity" style="min-width:220px;">
+          <div class="entity-header" style="background:#ef6c00;">🔔 NotificationRule</div>
+          <div class="entity-field"><span><span class="pk">PK</span> id</span><span class="field-type">UUID</span></div>
+          <div class="entity-field"><span>name</span><span class="field-type">VARCHAR</span></div>
+          <div class="entity-field"><span>trigger_type</span><span class="field-type">ENUM</span></div>
+          <div class="entity-field"><span><span class="fk">FK</span> template_id</span><span class="field-type">UUID</span></div>
+          <div class="entity-field"><span>channel</span><span class="field-type">ENUM</span></div>
+          <div class="entity-field"><span>delay_minutes</span><span class="field-type">INT</span></div>
+          <div class="entity-field"><span>is_active</span><span class="field-type">BOOL</span></div>
+          <div style="padding:6px 14px;font-size:10px;color:#666;background:#f5f5f5;">trigger_type: stage_enter / date_approach / manual<br>Cloud Scheduler から定期実行</div>
+        </div>
+        <div style="display:flex;align-items:center;font-size:18px;color:#aaa;">→</div>
+        <div class="entity" style="min-width:220px;">
+          <div class="entity-header" style="background:#e65100;">📋 NotificationLog</div>
+          <div class="entity-field"><span><span class="pk">PK</span> id</span><span class="field-type">UUID</span></div>
+          <div class="entity-field"><span><span class="fk">FK</span> rule_id</span><span class="field-type">UUID</span></div>
+          <div class="entity-field"><span><span class="fk">FK</span> applicant_id</span><span class="field-type">UUID</span></div>
+          <div class="entity-field"><span>channel</span><span class="field-type">ENUM</span></div>
+          <div class="entity-field"><span>status</span><span class="field-type">ENUM</span></div>
+          <div class="entity-field"><span>sent_at</span><span class="field-type">TIMESTAMPTZ</span></div>
+          <div style="padding:6px 14px;font-size:10px;color:#666;background:#f5f5f5;">status: pending / sent / failed<br>重複送信防止に使用</div>
+        </div>
+      </div>
+      <div style="margin-top:14px;background:#fff8e1;border:1px solid #ffcc80;border-radius:8px;padding:10px 14px;font-size:12px;color:#e65100;">
+        <strong>自動通知フロー：</strong> Cloud Scheduler → <code>POST /api/notifications/trigger</code>（毎時）→ NotificationRule 評価 → 条件一致学生に LINE or メール送信 → NotificationLog INSERT（status=sent）。既に sent のレコードがある場合は重複送信しない。
+      </div>
+    </div>
+
+    <!-- ─────────────────────────────── -->
     <!-- エンティティ全体マップ           -->
     <!-- ─────────────────────────────── -->
     <div class="section">
@@ -826,10 +871,12 @@
         <div style="background:#00838f;color:#fff;border-radius:8px;padding:10px 14px;"><strong>カレンダー</strong><br><span style="font-size:11px;color:#e0f7fa;">CalendarSlot</span></div>
         <div style="background:#00897b;color:#fff;border-radius:8px;padding:10px 14px;"><strong>LINE</strong><br><span style="font-size:11px;color:#e0f2f1;">RichMenu / RichMenuRule / Survey / SurveyResponse / LineRegistrationToken</span></div>
         <div style="background:#f57f17;color:#fff;border-radius:8px;padding:10px 14px;"><strong>タグ・マスター</strong><br><span style="font-size:11px;color:#fff8e1;">Tag / School / Media / QRCode</span></div>
-        <div style="background:#546e7a;color:#fff;border-radius:8px;padding:10px 14px;"><strong>書類・その他</strong><br><span style="font-size:11px;color:#eceff1;">Document</span></div>
+        <div style="background:#546e7a;color:#fff;border-radius:8px;padding:10px 14px;"><strong>書類・その他</strong><br><span style="font-size:11px;color:#eceff1;">Document / RecruitmentGoal / Agency / AgencyContact</span></div>
         <div style="background:#1565c0;color:#fff;border-radius:8px;padding:10px 14px;"><strong>Salesforce連携</strong><br><span style="font-size:11px;color:#bbdefb;">sf_contact_id / sf_account_id（外部キー）</span></div>
+        <div style="background:#f57f17;color:#fff;border-radius:8px;padding:10px 14px;"><strong>通知・テンプレート 🆕 v0.6</strong><br><span style="font-size:11px;color:#fff8e1;">MessageTemplate / NotificationRule / NotificationLog</span></div>
+        <div style="background:#37474f;color:#fff;border-radius:8px;padding:10px 14px;"><strong>カスタマイズ・評価 🆕 v0.6</strong><br><span style="font-size:11px;color:#ccc;">StaffColumnPreference / EvaluationTemplate / EvaluationItem / EvaluationResponse</span></div>
       </div>
-      <div style="margin-top:10px;font-size:12px;color:#888;">合計 <strong style="color:#1a1a2e;">27テーブル</strong>（詳細は<a href="table-spec.html" style="color:#7c83fd;">テーブル定義書</a>を参照）</div>
+      <div style="margin-top:10px;font-size:12px;color:#888;">合計 <strong style="color:#1a1a2e;">36テーブル</strong>（詳細は<a href="table-spec.html" style="color:#7c83fd;">テーブル定義書</a>を参照）</div>
     </div>
 
   </div>
@@ -842,53 +889,68 @@
         <span style="background:#4caf50;color:#fff;font-size:10px;font-weight:700;border-radius:10px;padding:2px 8px;">✓ U-02 確定</span>
       </div>
 
-      <!-- Confirmed media list -->
-      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:20px;">
+      <!-- Confirmed media list (v0.6: 6媒体確定) -->
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:20px;">
 
         <div style="border:2px solid #e53935;border-radius:10px;overflow:hidden;">
           <div style="background:#e53935;color:#fff;padding:8px 12px;font-size:12px;font-weight:700;">① マイナビ</div>
           <div style="padding:10px 12px;font-size:12px;line-height:1.8;">
             <div>対象：<strong>新卒</strong></div>
-            <div>連携：API / CSV</div>
+            <div>連携：CSV（API要パートナー契約）</div>
             <div>優先度：<strong style="color:#e53935;">最高</strong></div>
           </div>
-          <div style="background:#ffebee;padding:6px 12px;font-size:11px;color:#c62828;">APIパートナー契約が必要な場合あり。要確認。</div>
         </div>
 
-        <div style="border:2px solid #1565c0;border-radius:10px;overflow:hidden;">
-          <div style="background:#1565c0;color:#fff;padding:8px 12px;font-size:12px;font-weight:700;">② リクナビ</div>
+        <div style="border:2px solid #6a1b9a;border-radius:10px;overflow:hidden;">
+          <div style="background:#6a1b9a;color:#fff;padding:8px 12px;font-size:12px;font-weight:700;">② Re就活キャンパス</div>
           <div style="padding:10px 12px;font-size:12px;line-height:1.8;">
-            <div>対象：<strong>新卒</strong></div>
-            <div>連携：API / CSV</div>
-            <div>優先度：<strong style="color:#1565c0;">最高</strong></div>
+            <div>対象：<strong>新卒（在学生）</strong></div>
+            <div>連携：CSV</div>
+            <div>優先度：<strong style="color:#6a1b9a;">最高</strong></div>
           </div>
-          <div style="background:#e3f2fd;padding:6px 12px;font-size:11px;color:#1565c0;">APIパートナー契約が必要な場合あり。要確認。</div>
+          <div style="background:#f3e5f5;padding:6px 12px;font-size:11px;color:#6a1b9a;">✅ U-02確定。「Re就活キャンパス」（在学生向け）が対象。</div>
         </div>
 
         <div style="border:2px solid #e65100;border-radius:10px;overflow:hidden;">
           <div style="background:#e65100;color:#fff;padding:8px 12px;font-size:12px;font-weight:700;">③ OfferBox</div>
           <div style="padding:10px 12px;font-size:12px;line-height:1.8;">
             <div>対象：<strong>新卒（スカウト型）</strong></div>
-            <div>連携：API / CSV</div>
+            <div>連携：CSV（API要確認）</div>
             <div>優先度：<strong style="color:#e65100;">高</strong></div>
           </div>
           <div style="background:#fff3e0;padding:6px 12px;font-size:11px;color:#e65100;">スカウト型。企業側から学生にアプローチする流れ。</div>
         </div>
 
-        <div style="border:2px solid #6a1b9a;border-radius:10px;overflow:hidden;">
-          <div style="background:#6a1b9a;color:#fff;padding:8px 12px;font-size:12px;font-weight:700;">④ Re就活</div>
+        <div style="border:2px solid #0288d1;border-radius:10px;overflow:hidden;">
+          <div style="background:#0288d1;color:#fff;padding:8px 12px;font-size:12px;font-weight:700;">④ キミスカ</div>
           <div style="padding:10px 12px;font-size:12px;line-height:1.8;">
-            <div>対象：<strong>既卒・第二新卒（20代）</strong></div>
-            <div>連携：CSV（API要確認）</div>
-            <div>優先度：<strong style="color:#6a1b9a;">高</strong></div>
+            <div>対象：<strong>新卒（逆求人型）</strong></div>
+            <div>連携：CSV</div>
+            <div>優先度：<strong style="color:#0288d1;">高</strong></div>
           </div>
-          <div style="background:#f3e5f5;padding:6px 12px;font-size:11px;color:#6a1b9a;">⚠️ 新卒ではなく<strong>既卒・第二新卒</strong>向けサービス。ATSのスコープを要確認。</div>
+          <div style="background:#e1f5fe;padding:6px 12px;font-size:11px;color:#0288d1;">✅ v0.6 新規追加。逆求人型スカウトサービス。</div>
         </div>
 
-      </div>
+        <div style="border:2px solid #388e3c;border-radius:10px;overflow:hidden;">
+          <div style="background:#388e3c;color:#fff;padding:8px 12px;font-size:12px;font-weight:700;">⑤ キャリアチケット</div>
+          <div style="padding:10px 12px;font-size:12px;line-height:1.8;">
+            <div>対象：<strong>新卒</strong></div>
+            <div>連携：CSV</div>
+            <div>優先度：<strong style="color:#388e3c;">高</strong></div>
+          </div>
+          <div style="background:#e8f5e9;padding:6px 12px;font-size:11px;color:#388e3c;">✅ v0.6 新規追加。就活エージェント経由の応募者が多い。</div>
+        </div>
 
-      <div style="background:#fff8e1;border:1px solid #ffcc80;border-radius:8px;padding:12px 16px;font-size:12px;color:#e65100;margin-bottom:20px;">
-        <strong>⚠️ Re就活について：</strong> Re就活（学情社運営）は主に<strong>20代の既卒・第二新卒</strong>向け媒体です。「Re就活Campus」という新卒（在学生）向けサービスも存在しますが、本ATSが<strong>純粋な新卒のみを対象とするのか、既卒・第二新卒も含めるのか</strong>を確認してください。スコープによってデータモデルの「卒業年度」フィールドの扱いが変わります。
+        <div style="border:2px solid #f57c00;border-radius:10px;overflow:hidden;">
+          <div style="background:#f57c00;color:#fff;padding:8px 12px;font-size:12px;font-weight:700;">⑥ ABABA</div>
+          <div style="padding:10px 12px;font-size:12px;line-height:1.8;">
+            <div>対象：<strong>新卒（選考実績型）</strong></div>
+            <div>連携：CSV</div>
+            <div>優先度：<strong style="color:#f57c00;">高</strong></div>
+          </div>
+          <div style="background:#fff3e0;padding:6px 12px;font-size:11px;color:#f57c00;">✅ v0.6 新規追加。他社最終選考経験者にアプローチ。</div>
+        </div>
+
       </div>
 
       <div class="three-col">
