@@ -83,8 +83,8 @@
 <div class="page">
   <h1>新卒採用管理システム（ATS）要件定義書</h1>
   <div class="meta">
-    <span>v0.6</span>
-    <span>2026-06-15</span>
+    <span>v0.7</span>
+    <span>2026-07-10</span>
     <span>ステータス：ヒアリング中</span>
     <span style="color:#4caf50;">確定済み：U-02, U-04</span>
   </div>
@@ -339,6 +339,52 @@
             書類提出期限（Applicant.document_deadline）や内定承諾期限（offer_acceptance_deadline）を過ぎた学生を、一覧上で警告マーク・色で強調表示。<br>
             ダッシュボードでも期限切れ件数をカード表示。
           </td><td><span class="badge badge-low">低</span></td></tr>
+        </tbody>
+      </table>
+
+      <div class="cat-header">🆕 追加要件（v0.7）― 受付業務・紹介業務強化</div>
+      <table>
+        <thead><tr><th style="width:90px;">ID</th><th style="width:220px;">機能</th><th>詳細</th><th style="width:60px;">優先度</th></tr></thead>
+        <tbody>
+          <tr><td class="fr-id">FR108 <span class="badge badge-new">NEW</span></td><td>選考会キャンセル履歴管理（種別変更含む）</td><td>
+            説明会・選考会への参加登録・キャンセルの履歴を追える。<br>
+            選考会には種別（2day/1day）があり、2day→1dayへの変更（キャンセル＋再登録）の履歴も一元管理。<br>
+            既存のキャンセル機能と統合。EventRegistration テーブルで管理。<br>
+            キャンセル理由は任意テキスト or 選択式で記録（FR114の集計に使用）。
+          </td><td><span class="badge badge-high">高</span></td></tr>
+          <tr><td class="fr-id">FR109 <span class="badge badge-new">NEW</span></td><td>架電履歴（手動入力）</td><td>
+            担当者が学生への電話日時・架電結果・内容を手動でシステムに記録。<br>
+            CallLog テーブルで管理。1学生に複数件登録可。<br>
+            架電結果：つながった / 不在 / 折り返し待ち / 留守録。<br>
+            学生詳細（SCR-03）の「架電履歴」タブで登録・閲覧。
+          </td><td><span class="badge badge-high">高</span></td></tr>
+          <tr><td class="fr-id">FR110 <span class="badge badge-new">NEW</span></td><td>要架電者フラグ・リスト</td><td>
+            「折り返し待ち」「連絡つかず」など要架電フラグを Applicant.call_status（ENUM: none / callback_needed / no_answer）で管理。<br>
+            担当者が手動更新（学生詳細から）。<br>
+            学生一覧（SCR-02）にフィルタ・識別バッジを追加し、要架電者を一覧で把握可能にする。
+          </td><td><span class="badge badge-high">高</span></td></tr>
+          <tr><td class="fr-id">FR111 <span class="badge badge-new">NEW</span></td><td>履歴書未提出の自動リマインド＋リスト</td><td>
+            Applicant.resume_url IS NULL の学生を抽出し自動リマインドを送信。<br>
+            NotificationRule に trigger_type: resume_missing を追加して実装。<br>
+            学生一覧（SCR-02）に「履歴書未提出」フィルタを追加。
+          </td><td><span class="badge badge-mid">中</span></td></tr>
+          <tr><td class="fr-id">FR112 <span class="badge badge-new">NEW</span></td><td>欠席ステータス→紹介会社メール自動通知（ON/OFF）</td><td>
+            学生のステータスが「欠席」に変更されたとき、紹介会社担当者（AgencyContact.email）へ自動でメールを送信。<br>
+            <strong>メールのみ（SMSは対象外）</strong>。サイバーメール SMTP 経由（Nodemailer）。<br>
+            NotificationRule.target_type = agency_contact として拡張。<br>
+            システム設定（SCR-12）でON/OFF 切り替え可能。
+          </td><td><span class="badge badge-mid">中</span></td></tr>
+          <tr><td class="fr-id">FR113 <span class="badge badge-new">NEW</span></td><td>エージェントポータルからのキャンセル操作</td><td>
+            エージェントポータル（SCR-14）に「キャンセル申請」タブを追加。<br>
+            紹介会社担当者が自らキャンセル操作を実行可能（portal_token 認証）。<br>
+            API: PATCH /api/portal/event-registrations/:id/cancel（portal_token 認証）。<br>
+            キャンセル時は EventRegistration.status を cancelled に更新し、採用担当者に通知（NotificationLog INSERT）。
+          </td><td><span class="badge badge-mid">中</span></td></tr>
+          <tr><td class="fr-id">FR114 <span class="badge badge-new">NEW</span></td><td>キャンセル・辞退・不合格理由の集計・確認</td><td>
+            キャンセル理由（EventRegistration.cancel_reason）・辞退理由（SelectionHistory.decline_reason）をフリーテキストまたは選択式で記録。<br>
+            分析画面（SCR-06）にて理由別の件数・割合を集計表示。<br>
+            期間・フロー・媒体でのフィルタに対応。
+          </td><td><span class="badge badge-mid">中</span></td></tr>
         </tbody>
       </table>
 
@@ -667,6 +713,12 @@
       <table>
         <thead><tr><th style="width:100px;">日付</th><th style="width:60px;">Ver</th><th>変更内容</th></tr></thead>
         <tbody>
+          <tr>
+            <td>2026-07-10</td><td>v0.7</td>
+            <td>
+              <span class="badge badge-new" style="margin-right:4px;">NEW</span> FR108〜FR114：選考会キャンセル履歴・架電履歴・要架電者フラグ・履歴書未提出リマインド・欠席→エージェントメール自動通知・ポータルキャンセル・理由集計を追加
+            </td>
+          </tr>
           <tr>
             <td>2026-06-15</td><td>v0.6</td>
             <td>

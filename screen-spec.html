@@ -463,6 +463,11 @@
             <td><span class="db-ref">Applicant.document_deadline</span> / <span class="db-ref">offer_acceptance_deadline</span></td>
             <td>期限を過ぎている場合は🔴アイコンをセル内に表示。7日以内は🟡アイコン。クリックで学生詳細の期限フィールドへ</td>
           </tr>
+          <tr>
+            <td>要架電フラグ <span class="badge badge-new">FR110</span></td>
+            <td><span class="db-ref">Applicant.call_status</span></td>
+            <td>none → 非表示。callback_needed → 🔵折り返し待ち バッジ。no_answer → 🟠連絡つかず バッジ</td>
+          </tr>
         </tbody>
       </table>
       <div class="info-box" style="margin-top:10px;"><strong>列カスタマイズ（FR099）:</strong> 表示列はスタッフごとに <span class="db-ref">StaffColumnPreference</span> に保存。デフォルト列セットをシステムが提供し、列の表示・非表示・並び順をユーザーが変更可。設定はログインユーザーにのみ適用。</div>
@@ -521,6 +526,16 @@
             <td>期限超過フィルタ <span class="badge badge-new">FR107</span></td>
             <td><span class="db-ref">Applicant.document_deadline</span> / <span class="db-ref">offer_acceptance_deadline</span></td>
             <td>チェックON → 書類期限・承諾期限のいずれかが過去日の学生に絞り込み</td>
+          </tr>
+          <tr>
+            <td>履歴書未提出 <span class="badge badge-new">FR111</span></td>
+            <td><span class="db-ref">Applicant.resume_url</span></td>
+            <td>チェックON → <code>resume_url IS NULL</code> の学生に絞り込み。履歴書未提出者リストとして使用</td>
+          </tr>
+          <tr>
+            <td>要架電者 <span class="badge badge-new">FR110</span></td>
+            <td><span class="db-ref">Applicant.call_status</span></td>
+            <td>チェックON → <code>call_status != 'none'</code> の学生に絞り込み（折り返し待ち / 連絡つかず）。学生一覧に🔵バッジで識別表示</td>
           </tr>
         </tbody>
       </table>
@@ -695,7 +710,7 @@
       </div>
       <div class="overview-card">
         <div class="overview-card-label">サブタブ</div>
-        <div class="overview-card-val">4つ（プロフィール / 選考 / LINE / アンケート）</div>
+        <div class="overview-card-val">5つ（プロフィール / 選考 / LINE / アンケート / 架電履歴）</div>
       </div>
     </div>
 
@@ -705,6 +720,7 @@
       <div class="sub-tab"       onclick="swSub(this,'sd-history','detail')">選考履歴</div>
       <div class="sub-tab"       onclick="swSub(this,'sd-line','detail')">LINEチャット</div>
       <div class="sub-tab"       onclick="swSub(this,'sd-survey','detail')">アンケート</div>
+      <div class="sub-tab"       onclick="swSub(this,'sd-calllog','detail')">📞 架電履歴 <span class="badge badge-new" style="font-size:9px;">v0.7</span></div>
     </div>
 
     <!-- プロフィール -->
@@ -1168,6 +1184,85 @@
         </table>
       </div>
     </div><!-- /sd-survey -->
+
+    <!-- 架電履歴 -->
+    <div id="sd-calllog" class="sub-content">
+      <div class="section">
+        <div class="spec-header">
+          <div class="spec-icon spec-icon-blue">📞</div>
+          <div class="spec-title">① 架電履歴一覧（CallLog）</div>
+        </div>
+        <table>
+          <thead>
+            <tr>
+              <th class="col-field">表示項目</th>
+              <th class="col-src">データソース</th>
+              <th>表示形式 / 補足</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td>架電日時</td><td><span class="db-ref">CallLog.called_at</span></td><td>YYYY/MM/DD HH:mm 形式。降順（最新が上）</td></tr>
+            <tr><td>架電結果</td><td><span class="db-ref">CallLog.outcome</span></td><td>つながった / 不在 / 折り返し待ち / 留守録 のバッジ表示</td></tr>
+            <tr><td>担当者</td><td><span class="db-ref">Staff.name</span>（<span class="db-ref">CallLog.staff_id</span> JOIN）</td><td></td></tr>
+            <tr><td>備考・内容</td><td><span class="db-ref">CallLog.notes</span></td><td>テキスト。折りたたみ表示（100文字超は省略）</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="section">
+        <div class="spec-header">
+          <div class="spec-icon spec-icon-orange">📝</div>
+          <div class="spec-title">② 架電記録入力フォーム</div>
+        </div>
+        <table>
+          <thead>
+            <tr>
+              <th class="col-field">項目</th>
+              <th class="col-type">必須</th>
+              <th>ルール</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td>架電日時</td><td><span class="badge badge-req">必須</span></td><td>日付ピッカー＋時刻入力。デフォルトは現在時刻</td></tr>
+            <tr><td>架電結果</td><td><span class="badge badge-req">必須</span></td><td>プルダウン: つながった / 不在 / 折り返し待ち / 留守録</td></tr>
+            <tr><td>備考</td><td><span class="badge badge-opt">任意</span></td><td>テキストエリア・最大1000文字</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="section">
+        <div class="spec-header">
+          <div class="spec-icon spec-icon-green">🖱️</div>
+          <div class="spec-title">③ ボタン動作</div>
+        </div>
+        <table>
+          <thead>
+            <tr>
+              <th class="col-btn">ボタン</th>
+              <th class="col-api">API / 処理</th>
+              <th>備考</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>架電記録を追加</td>
+              <td>POST /api/applicants/:id/call-logs</td>
+              <td>CallLog INSERT。outcome が callback_needed / no_answer の場合、<span class="db-ref">Applicant.call_status</span> も同時に更新</td>
+            </tr>
+            <tr>
+              <td>要架電フラグ変更</td>
+              <td>PATCH /api/applicants/:id（call_status 更新）</td>
+              <td>プロフィールタブにも同フラグ編集ボタンを配置。none / callback_needed / no_answer を切り替え</td>
+            </tr>
+            <tr>
+              <td>削除</td>
+              <td>DELETE /api/call-logs/:id</td>
+              <td>自分が登録したもののみ削除可。管理者は全件削除可</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div><!-- /sd-calllog -->
 
   </div><!-- /s-detail -->
 
@@ -1662,6 +1757,7 @@
       <div class="sub-tab"       onclick="swSub(this,'sa-time','analytics')">日程・処理速度</div>
       <div class="sub-tab"       onclick="swSub(this,'sa-offer','analytics')">内定承諾分析</div>
       <div class="sub-tab"       onclick="swSub(this,'sa-export','analytics')">CSVエクスポート</div>
+      <div class="sub-tab"       onclick="swSub(this,'sa-reasons','analytics')">📊 理由別集計 <span class="badge badge-new" style="font-size:9px;">v0.7</span></div>
     </div>
 
     <!-- ファネル分析 -->
@@ -2164,6 +2260,62 @@
         </table>
       </div>
     </div><!-- /sa-export -->
+
+    <!-- 理由別集計 -->
+    <div id="sa-reasons" class="sub-content">
+      <div class="section">
+        <div class="spec-header">
+          <div class="spec-icon spec-icon-blue">📊</div>
+          <div class="spec-title">① 表示項目（理由別集計）<span class="badge badge-new" style="margin-left:6px;">FR114</span></div>
+        </div>
+        <table>
+          <thead>
+            <tr>
+              <th class="col-field">集計項目</th>
+              <th class="col-src">データソース</th>
+              <th>表示形式</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>キャンセル理由別件数</td>
+              <td><span class="db-ref">EventRegistration.cancel_reason</span> WHERE status='cancelled'</td>
+              <td>理由テキスト or 選択肢ごとに件数・割合を棒グラフ＋テーブルで表示</td>
+            </tr>
+            <tr>
+              <td>辞退理由別件数</td>
+              <td><span class="db-ref">SelectionHistory.decline_reason</span> WHERE to_stage_id=辞退ステージ</td>
+              <td>理由ごとに件数・割合。上位5理由を色分けバーで表示</td>
+            </tr>
+            <tr>
+              <td>不合格理由別件数</td>
+              <td><span class="db-ref">SelectionHistory.decline_reason</span> WHERE Selection.result='failed'</td>
+              <td>理由ごとに件数・割合。ステージ別フィルタ対応</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="section">
+        <div class="spec-header">
+          <div class="spec-icon spec-icon-orange">🔍</div>
+          <div class="spec-title">② フィルタ条件</div>
+        </div>
+        <table>
+          <thead>
+            <tr><th class="col-field">フィルタ</th><th>内容</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>期間</td><td>開始日〜終了日（FR103 共通フィルタ適用）。デフォルト: 今年度</td></tr>
+            <tr><td>職種区分</td><td>総合職 / 技能職 / 全体</td></tr>
+            <tr><td>フロー</td><td>選考フロー別（SelectionFlow単位）</td></tr>
+            <tr><td>媒体</td><td>流入媒体別（Media単位）</td></tr>
+            <tr><td>対象区分</td><td>キャンセル / 辞退 / 不合格 の表示切り替え</td></tr>
+          </tbody>
+        </table>
+        <div class="info-box" style="margin-top:10px;">理由が空（NULL・未入力）の場合は「理由未記入」としてカウント。フリーテキスト理由はそのままグルーピング（完全一致）。選択式の場合は選択肢ラベルで集計。</div>
+      </div>
+    </div><!-- /sa-reasons -->
 
   </div><!-- /s-analytics -->
 
@@ -2823,18 +2975,25 @@
     <div id="ss-notifications" class="sub-content">
       <div class="section">
         <div class="spec-header"><div class="spec-icon spec-icon-blue">🔔</div><div class="spec-title">① 自動通知ルール一覧（FR101）</div></div>
-        <div class="info-box" style="margin-bottom:12px;"><span class="db-ref">NotificationRule</span> テーブルで管理。Cloud Scheduler が定期実行し、ルールに一致する学生に自動でメッセージ送信します。送信ログは <span class="db-ref">NotificationLog</span> に記録。</div>
+        <div class="info-box" style="margin-bottom:12px;"><span class="db-ref">NotificationRule</span> テーブルで管理。Cloud Scheduler が定期実行し、ルールに一致する学生 or 紹介会社に自動でメッセージ送信します。送信ログは <span class="db-ref">NotificationLog</span> に記録。</div>
         <table>
           <thead><tr><th class="col-field">カラム</th><th class="col-src">データソース</th><th>備考</th></tr></thead>
           <tbody>
             <tr><td>ルール名</td><td><span class="db-ref">NotificationRule.name</span></td><td></td></tr>
-            <tr><td>トリガー</td><td><span class="db-ref">NotificationRule.trigger_type</span></td><td>stage_enter（ステージ到達時）/ date_approach（期限N日前）/ manual（手動）をバッジ表示</td></tr>
-            <tr><td>チャネル</td><td><span class="db-ref">NotificationRule.channel</span></td><td>line / email / both</td></tr>
+            <tr><td>トリガー</td><td><span class="db-ref">NotificationRule.trigger_event</span></td><td>stage_change / interview_confirmed / offer_issued / deadline_reminder / resume_missing をバッジ表示</td></tr>
+            <tr><td>通知先 <span class="badge badge-new" style="font-size:9px;">v0.7</span></td><td><span class="db-ref">NotificationRule.target_type</span></td><td>applicant（応募者本人）/ agency_contact（紹介会社担当者）。agency_contactの場合メールのみ</td></tr>
+            <tr><td>チャネル</td><td><span class="db-ref">NotificationRule.channel</span></td><td>line / email。target_type=agency_contactの場合はemailのみ選択可</td></tr>
             <tr><td>テンプレート</td><td><span class="db-ref">MessageTemplate.name</span>（template_id 経由）</td><td>送信内容のプレビューリンク</td></tr>
-            <tr><td>遅延（分）</td><td><span class="db-ref">NotificationRule.delay_minutes</span></td><td>トリガー発火から送信するまでの待機時間</td></tr>
+            <tr><td>遅延（時間）</td><td><span class="db-ref">NotificationRule.delay_hours</span></td><td>トリガー発火から送信するまでの待機時間</td></tr>
             <tr><td>有効/無効</td><td><span class="db-ref">NotificationRule.is_active</span></td><td>トグルスイッチで即時切替</td></tr>
           </tbody>
         </table>
+
+        <div style="margin-top:14px;padding:12px 14px;background:#fff8e1;border-radius:8px;border-left:3px solid #ffcc80;font-size:12px;color:#e65100;">
+          <strong>⑦ 欠席→紹介会社メール自動通知（FR112）</strong><br>
+          ステータスが「欠席」に変更された際に紹介会社担当者へメールを自動送信するルール。下記ルールをプリセット設定として用意し、ON/OFF トグルで有効化/無効化できます。<br>
+          trigger_event: <code>stage_change</code>（欠席ステージ） / target_type: <code>agency_contact</code> / channel: <code>email</code>
+        </div>
       </div>
       <div class="section">
         <div class="spec-header"><div class="spec-icon spec-icon-green">🖱️</div><div class="spec-title">② 操作</div></div>

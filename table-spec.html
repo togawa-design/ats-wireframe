@@ -131,8 +131,8 @@
 <div class="page">
   <h1>新卒採用管理システム（ATS）テーブル定義書</h1>
   <div class="meta">
-    <span>v0.2</span>
-    <span>2026-06-15</span>
+    <span>v0.3</span>
+    <span>2026-07-10</span>
     <span>ステータス：設計中</span>
     <span style="background:#7c83fd;color:#fff;border-radius:10px;padding:2px 10px;font-weight:700;">DB: PostgreSQL 16</span>
   </div>
@@ -140,7 +140,7 @@
   <!-- Overview -->
   <div class="overview-grid">
     <div class="overview-card">
-      <div class="overview-card-val">36</div>
+      <div class="overview-card-val">38</div>
       <div class="overview-card-label">総テーブル数</div>
     </div>
     <div class="overview-card">
@@ -243,6 +243,11 @@
           <div class="toc-item-jp">LINE連携トークン</div>
           <div class="toc-item-cols">5 columns</div>
         </div>
+        <div class="toc-item toc-b" onclick="goTab('tab-b')">
+          <div class="toc-item-name">CallLog <span class="badge badge-new">NEW</span></div>
+          <div class="toc-item-jp">架電履歴</div>
+          <div class="toc-item-cols">7 columns</div>
+        </div>
         <!-- Group C -->
         <div class="toc-item toc-c" onclick="goTab('tab-c')">
           <div class="toc-item-name">SelectionFlow</div>
@@ -283,6 +288,11 @@
           <div class="toc-item-name">EvaluationResponse <span class="badge badge-new">NEW</span></div>
           <div class="toc-item-jp">評価回答</div>
           <div class="toc-item-cols">6 columns</div>
+        </div>
+        <div class="toc-item toc-c" onclick="goTab('tab-c')">
+          <div class="toc-item-name">EventRegistration <span class="badge badge-new">NEW</span></div>
+          <div class="toc-item-jp">選考会予約・キャンセル履歴</div>
+          <div class="toc-item-cols">8 columns</div>
         </div>
         <!-- Group D -->
         <div class="toc-item toc-d" onclick="goTab('tab-d')">
@@ -391,15 +401,15 @@
           </tr>
           <tr>
             <td><strong style="color:#7c83fd;">B. 応募者</strong></td>
-            <td>Applicant / ApplicantSource / ApplicantCustomField / ApplicantTag / Tag / School / LineRegistrationToken（7）</td>
-            <td>応募者情報・流入元・カスタム項目・タグ付け・LINE連携トークン</td>
-            <td>Applicantにdocument_deadline / offer_acceptance_deadlineを追加</td>
+            <td>Applicant / ApplicantSource / ApplicantCustomField / ApplicantTag / Tag / School / LineRegistrationToken / CallLog（8）</td>
+            <td>応募者情報・流入元・カスタム項目・タグ付け・LINE連携トークン・架電履歴</td>
+            <td>Applicantにresume_url / call_statusを追加。CallLogを新規追加（FR109/110）</td>
           </tr>
           <tr>
             <td><strong style="color:#e91e63;">C. 選考フロー</strong></td>
-            <td>SelectionFlow / SelectionStage / Selection / SelectionHistory / Interview / EvaluationTemplate / EvaluationItem / EvaluationResponse（8）</td>
-            <td>選考フロー設定・ステージ管理・面接記録・ステージ別評価シート</td>
-            <td>Evaluation系3テーブルを新規追加（ステップごとの評価項目設定）</td>
+            <td>SelectionFlow / SelectionStage / Selection / SelectionHistory / Interview / EvaluationTemplate / EvaluationItem / EvaluationResponse / EventRegistration（9）</td>
+            <td>選考フロー設定・ステージ管理・面接記録・ステージ別評価シート・選考会予約履歴</td>
+            <td>EventRegistrationを新規追加（選考会キャンセル履歴・種別変更対応、FR108/113）</td>
           </tr>
           <tr>
             <td><strong style="color:#00838f;">D. カレンダー</strong></td>
@@ -461,6 +471,11 @@
               <tr><td style="font-weight:600;"><code>notification_channel</code> <span class="badge badge-new">NEW</span></td><td>line / email</td></tr>
               <tr><td style="font-weight:600;"><code>notification_status</code> <span class="badge badge-new">NEW</span></td><td>sent / failed / skipped</td></tr>
               <tr><td style="font-weight:600;"><code>template_channel</code> <span class="badge badge-new">NEW</span></td><td>line / email / both</td></tr>
+              <tr><td style="font-weight:600;"><code>call_outcome</code> <span class="badge badge-new">NEW</span></td><td>connected（つながった）/ no_answer（不在）/ callback_needed（折り返し待ち）/ voicemail（留守録）</td></tr>
+              <tr><td style="font-weight:600;"><code>call_status</code> <span class="badge badge-new">NEW</span></td><td>none（なし）/ callback_needed（折り返し待ち）/ no_answer（連絡つかず）</td></tr>
+              <tr><td style="font-weight:600;"><code>event_booking_status</code> <span class="badge badge-new">NEW</span></td><td>registered / cancelled / attended / absent</td></tr>
+              <tr><td style="font-weight:600;"><code>event_type</code> <span class="badge badge-new">NEW</span></td><td>two_day（2日間選考会）/ one_day（1日間選考会）/ other</td></tr>
+              <tr><td style="font-weight:600;"><code>notification_target</code> <span class="badge badge-new">NEW</span></td><td>applicant（応募者本人）/ agency_contact（紹介会社担当者）</td></tr>
             </tbody>
           </table>
         </div>
@@ -619,7 +634,7 @@
           <div class="tbl-name">Applicant</div>
           <div class="tbl-jp">応募者テーブル（コアエンティティ）</div>
         </div>
-        <div class="tbl-count">23 columns</div>
+        <div class="tbl-count">25 columns</div>
       </div>
       <table>
         <thead>
@@ -645,6 +660,8 @@
           <tr><td><code>memo</code></td><td>TEXT</td><td>YES</td><td>NULL</td><td><span class="badge badge-new">NEW</span> 担当者メモ（自由記述）</td></tr>
           <tr><td><code>document_deadline</code></td><td>DATE</td><td>YES</td><td>NULL</td><td><span class="badge badge-new">NEW</span> 書類提出期限。期限超過時に一覧上で警告表示（FR107）</td></tr>
           <tr><td><code>offer_acceptance_deadline</code></td><td>DATE</td><td>YES</td><td>NULL</td><td><span class="badge badge-new">NEW</span> 内定承諾期限。期限超過時に一覧上で警告表示（FR107）</td></tr>
+          <tr><td><code>resume_url</code></td><td>VARCHAR(500)</td><td>YES</td><td>NULL</td><td><span class="badge badge-new">NEW</span> 履歴書 Firebase Storage URL。NULL = 未提出（FR111 自動リマインド対象判定に使用）</td></tr>
+          <tr><td><code>call_status</code></td><td>call_status</td><td>NO</td><td>'none'</td><td><span class="badge badge-enum">ENUM</span> <span class="badge badge-new">NEW</span> none / callback_needed / no_answer。担当者が手動更新する要架電フラグ（FR110）</td></tr>
           <tr><td><code>sf_contact_id</code></td><td>VARCHAR(20)</td><td>YES</td><td>NULL</td><td>Salesforce Contact ID（18桁）。SF連携後に設定</td></tr>
           <tr><td><code>sf_employment_cache</code></td><td>JSONB</td><td>YES</td><td>NULL</td><td>SF側の採用状況キャッシュ（30分TTL）</td></tr>
           <tr><td><code>created_at</code></td><td>TIMESTAMP</td><td>NO</td><td>CURRENT_TIMESTAMP</td><td></td></tr>
@@ -801,6 +818,41 @@
             <tr><td><code>created_at</code></td><td>TIMESTAMP</td><td>NO</td><td><span class="badge badge-new">NEW</span> DEFAULT CURRENT_TIMESTAMP。トークン発行日時</td></tr>
           </tbody>
         </table>
+      </div>
+    </div>
+
+    <!-- CallLog -->
+    <div class="section group-b">
+      <div class="tbl-header">
+        <div class="tbl-icon">📞</div>
+        <div>
+          <div class="tbl-name">CallLog <span class="badge badge-new">NEW</span></div>
+          <div class="tbl-jp">架電履歴テーブル（手動入力）</div>
+        </div>
+        <div class="tbl-count">7 columns</div>
+      </div>
+      <table>
+        <thead>
+          <tr><th class="col-col">カラム名</th><th class="col-type">型</th><th class="col-null">NULL</th><th class="col-default">デフォルト</th><th>制約・説明</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><code>id</code></td><td>UUID</td><td>NO</td><td>gen_random_uuid()</td><td><span class="badge badge-pk">PK</span></td></tr>
+          <tr><td><code>applicant_id</code></td><td>UUID</td><td>NO</td><td>—</td><td><span class="badge badge-fk">FK</span> → <span class="fk-ref">Applicant.id</span> ON DELETE CASCADE</td></tr>
+          <tr><td><code>staff_id</code></td><td>UUID</td><td>NO</td><td>—</td><td><span class="badge badge-fk">FK</span> → <span class="fk-ref">Staff.id</span>。架電した担当者</td></tr>
+          <tr><td><code>called_at</code></td><td>TIMESTAMPTZ</td><td>NO</td><td>—</td><td>架電日時（担当者が手入力）</td></tr>
+          <tr><td><code>outcome</code></td><td>call_outcome</td><td>NO</td><td>—</td><td><span class="badge badge-enum">ENUM</span> connected（つながった）/ no_answer（不在）/ callback_needed（折り返し待ち）/ voicemail（留守録）</td></tr>
+          <tr><td><code>notes</code></td><td>TEXT</td><td>YES</td><td>NULL</td><td>架電内容・備考（自由記述）</td></tr>
+          <tr><td><code>created_at</code></td><td>TIMESTAMP</td><td>NO</td><td>CURRENT_TIMESTAMP</td><td></td></tr>
+        </tbody>
+      </table>
+      <table class="idx-table" style="margin-top:12px;">
+        <thead><tr><th style="width:220px;">インデックス</th><th>カラム</th><th>種類</th><th>用途</th></tr></thead>
+        <tbody>
+          <tr><td><code>calllog_applicant_idx</code></td><td>applicant_id, called_at DESC</td><td>BTREE</td><td>学生別の架電履歴時系列取得</td></tr>
+        </tbody>
+      </table>
+      <div class="info-box" style="margin-top:12px;">
+        担当者が手動で入力する（自動記録ではない）。架電後に outcome を選択し、callback_needed / no_answer の場合は Applicant.call_status も更新する運用を推奨。1学生に複数件登録可能。FR109/FR110 対応。
       </div>
     </div>
 
@@ -1014,6 +1066,44 @@
         </tbody>
       </table>
       <div class="info-box" style="margin-top:12px;">Interview.score / notes は簡易サマリー（総合評価）として残す。詳細評価は EvaluationResponse で管理するハイブリッド設計。全 EvaluationItem への回答が揃った時点で Interview.is_evaluation_complete = true にトリガー更新。</div>
+    </div>
+
+    <!-- EventRegistration -->
+    <div class="section group-c">
+      <div class="tbl-header">
+        <div class="tbl-icon">📋</div>
+        <div>
+          <div class="tbl-name">EventRegistration <span class="badge badge-new">NEW</span></div>
+          <div class="tbl-jp">選考会予約・キャンセル履歴テーブル</div>
+        </div>
+        <div class="tbl-count">8 columns</div>
+      </div>
+      <table>
+        <thead>
+          <tr><th class="col-col">カラム名</th><th class="col-type">型</th><th class="col-null">NULL</th><th class="col-default">デフォルト</th><th>制約・説明</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><code>id</code></td><td>UUID</td><td>NO</td><td>gen_random_uuid()</td><td><span class="badge badge-pk">PK</span></td></tr>
+          <tr><td><code>applicant_id</code></td><td>UUID</td><td>NO</td><td>—</td><td><span class="badge badge-fk">FK</span> → <span class="fk-ref">Applicant.id</span> ON DELETE CASCADE</td></tr>
+          <tr><td><code>slot_id</code></td><td>UUID</td><td>NO</td><td>—</td><td><span class="badge badge-fk">FK</span> → <span class="fk-ref">CalendarSlot.id</span>。予約した説明会・選考会の枠</td></tr>
+          <tr><td><code>event_type</code></td><td>event_type</td><td>YES</td><td>NULL</td><td><span class="badge badge-enum">ENUM</span> two_day / one_day / other。選考会の種別（FR108: 2day→1day変更追跡に使用）。通常の説明会はNULL</td></tr>
+          <tr><td><code>status</code></td><td>event_booking_status</td><td>NO</td><td>'registered'</td><td><span class="badge badge-enum">ENUM</span> registered / cancelled / attended / absent</td></tr>
+          <tr><td><code>cancel_reason</code></td><td>TEXT</td><td>YES</td><td>NULL</td><td>キャンセル理由（FR108/FR114 理由集計に使用）</td></tr>
+          <tr><td><code>cancelled_by_portal</code></td><td>BOOLEAN</td><td>NO</td><td>false</td><td>true = エージェントポータルからのキャンセル（FR113）</td></tr>
+          <tr><td><code>created_at</code></td><td>TIMESTAMP</td><td>NO</td><td>CURRENT_TIMESTAMP</td><td></td></tr>
+        </tbody>
+      </table>
+      <table class="idx-table" style="margin-top:12px;">
+        <thead><tr><th style="width:240px;">インデックス</th><th>カラム</th><th>種類</th><th>用途</th></tr></thead>
+        <tbody>
+          <tr><td><code>event_reg_applicant_idx</code></td><td>applicant_id, created_at DESC</td><td>BTREE</td><td>学生別のキャンセル履歴時系列取得</td></tr>
+          <tr><td><code>event_reg_slot_idx</code></td><td>slot_id, status</td><td>BTREE</td><td>選考会枠別の登録者・欠席者集計</td></tr>
+        </tbody>
+      </table>
+      <div class="info-box" style="margin-top:12px;">
+        1学生×1枠に対して複数レコードを持てる設計（例: registered → cancelled → registered for different slot）。これにより 2day→1day の種別変更履歴を完全に追跡可能。<br>
+        エージェントポータルからのキャンセル（FR113）は cancelled_by_portal=true で区別。
+      </div>
     </div>
 
   </div>
@@ -1425,15 +1515,16 @@
             <div class="tbl-name">NotificationRule <span class="badge badge-new">NEW</span></div>
             <div class="tbl-jp">自動通知ルールテーブル</div>
           </div>
-          <div class="tbl-count">9 columns</div>
+          <div class="tbl-count">10 columns</div>
         </div>
         <table>
           <thead><tr><th class="col-col">カラム名</th><th class="col-type">型</th><th class="col-null">NULL</th><th>制約・説明</th></tr></thead>
           <tbody>
             <tr><td><code>id</code></td><td>UUID</td><td>NO</td><td><span class="badge badge-pk">PK</span></td></tr>
             <tr><td><code>name</code></td><td>VARCHAR(100)</td><td>NO</td><td>ルール名（管理用。例: "説明会翌日サンクス"）</td></tr>
-            <tr><td><code>trigger_event</code></td><td>notification_trigger</td><td>NO</td><td><span class="badge badge-enum">ENUM</span> stage_change / interview_confirmed / offer_issued / deadline_reminder</td></tr>
+            <tr><td><code>trigger_event</code></td><td>notification_trigger</td><td>NO</td><td><span class="badge badge-enum">ENUM</span> stage_change / interview_confirmed / offer_issued / deadline_reminder / resume_missing</td></tr>
             <tr><td><code>trigger_stage_id</code></td><td>UUID</td><td>YES</td><td><span class="badge badge-fk">FK</span> → <span class="fk-ref">SelectionStage.id</span>。stage_change時のみ有効。NULL=全ステージ</td></tr>
+            <tr><td><code>target_type</code></td><td>notification_target</td><td>NO</td><td><span class="badge badge-enum">ENUM</span> <span class="badge badge-new">NEW</span> applicant / agency_contact。通知先種別。agency_contactの場合は学生のAgencyContact.emailに送信（FR112）</td></tr>
             <tr><td><code>delay_hours</code></td><td>INTEGER</td><td>NO</td><td>DEFAULT 0。トリガーからの送信遅延（時間）。0=即時</td></tr>
             <tr><td><code>channel</code></td><td>notification_channel</td><td>NO</td><td><span class="badge badge-enum">ENUM</span> line / email</td></tr>
             <tr><td><code>template_id</code></td><td>UUID</td><td>NO</td><td><span class="badge badge-fk">FK</span> → <span class="fk-ref">MessageTemplate.id</span></td></tr>

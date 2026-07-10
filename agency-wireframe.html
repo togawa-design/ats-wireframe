@@ -185,6 +185,7 @@
       <div class="portal-tabs">
         <div class="portal-tab active" id="pt-list" onclick="swPortal('pt-list','pb-list')">📋 紹介した学生一覧</div>
         <div class="portal-tab" id="pt-form" onclick="swPortal('pt-form','pb-form')">➕ 学生を登録する</div>
+        <div class="portal-tab" id="pt-cancel" onclick="swPortal('pt-cancel','pb-cancel')">🚫 キャンセル申請 <span style="background:#ff6b6b;color:#fff;border-radius:10px;padding:1px 6px;font-size:10px;font-weight:700;margin-left:4px;">NEW</span></div>
       </div>
 
       <!-- Body: 学生一覧 -->
@@ -250,6 +251,64 @@
 
         <div style="background:#f8f9fc;border-radius:8px;padding:10px 14px;font-size:11px;color:#888;margin-top:8px;">
           ⚠️ 評価スコア・面接コメント・面接官名は表示されません
+        </div>
+      </div>
+
+      <!-- Body: キャンセル申請 -->
+      <div class="portal-body" id="pb-cancel" style="display:none;">
+        <div style="font-size:13px;font-weight:600;color:#1a1a2e;margin-bottom:4px;">選考会・説明会のキャンセル申請</div>
+        <div style="font-size:12px;color:#888;margin-bottom:16px;">キャンセルしたい学生と対象イベントを選択し、理由を入力してください。</div>
+
+        <!-- Student / event selector -->
+        <div style="background:#fff;border:1px solid #e8eaf0;border-radius:10px;padding:16px 18px;margin-bottom:14px;">
+          <div style="font-size:11px;font-weight:600;color:#555;margin-bottom:10px;">① 学生と対象イベントを選択</div>
+
+          <div class="notify-row">
+            <input type="checkbox" class="notify-check" checked>
+            <div style="flex:1;">
+              <div class="notify-name">山田 花子</div>
+              <div class="notify-agency">総合職 ／ 〇〇大学 経済学部</div>
+            </div>
+            <select class="form-select" style="font-size:11px;padding:4px 8px;width:200px;">
+              <option>対象イベントを選択</option>
+              <option selected>第1回選考会（2day） 2026/07/20</option>
+              <option>説明会 2026/07/15</option>
+            </select>
+          </div>
+
+          <div class="notify-row">
+            <input type="checkbox" class="notify-check">
+            <div style="flex:1;">
+              <div class="notify-name">佐藤 太郎</div>
+              <div class="notify-agency">技能職 ／ △△大学 工学部</div>
+            </div>
+            <select class="form-select" style="font-size:11px;padding:4px 8px;width:200px;">
+              <option>対象イベントを選択</option>
+              <option>第1回選考会（2day） 2026/07/20</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Cancel reason -->
+        <div style="background:#fff;border:1px solid #e8eaf0;border-radius:10px;padding:16px 18px;margin-bottom:14px;">
+          <div style="font-size:11px;font-weight:600;color:#555;margin-bottom:10px;">② キャンセル理由（任意）</div>
+          <select class="form-select" style="width:100%;margin-bottom:8px;">
+            <option value="">理由を選択（任意）</option>
+            <option>体調不良</option>
+            <option>日程変更希望</option>
+            <option>就職活動の方針変更</option>
+            <option>その他</option>
+          </select>
+          <textarea class="form-input" rows="3" style="width:100%;resize:vertical;" placeholder="補足がある場合はこちらに入力してください"></textarea>
+        </div>
+
+        <div style="padding:10px 14px;background:#fff8e1;border-radius:8px;font-size:12px;color:#e65100;margin-bottom:16px;">
+          ⚠️ キャンセル申請後、採用担当者に通知が届きます。再度のご登録を希望される場合は採用担当者にご連絡ください。
+        </div>
+
+        <div style="display:flex;justify-content:flex-end;gap:10px;">
+          <button class="btn btn-secondary" onclick="swPortal('pt-list','pb-list')">戻る</button>
+          <button class="btn btn-danger">キャンセルを申請する（1件）</button>
         </div>
       </div>
 
@@ -584,12 +643,12 @@
           <div style="font-size:14px;font-weight:700;color:#1a1a2e;margin-bottom:4px;">採用担当者が合否連絡を送信</div>
           <div style="font-size:12px;color:#666;line-height:1.8;">
             SCR-13「合否連絡送信」タブで対象学生・合否・内定通知書テンプレートを選択して送信。<br>
-            Microsoft Graph API 経由で採用担当者個人アドレスから AgencyContact.email 宛にメールが届く。<br>
+            <strong>サイバーメール（NTTCom）SMTP / Nodemailer</strong> 経由で採用担当者個人アドレスから AgencyContact.email 宛にメールが届く。<br>
             内定の場合は内定通知書 PDF が添付される。
           </div>
         </div>
         <div style="text-align:right;min-width:160px;background:#fff8e1;border-radius:8px;padding:10px 14px;font-size:11px;color:#e65100;">
-          📧 Microsoft 365<br>採用担当者アドレス → エージェントのメール
+          📧 サイバーメール SMTP<br>採用担当者アドレス → エージェントのメール
         </div>
       </div>
 
@@ -611,11 +670,11 @@ function swPage(el, id) {
   document.getElementById(id).classList.add('active');
 }
 function swPortal(tabId, bodyId) {
-  ['pt-list','pt-form'].forEach(id => {
+  ['pt-list','pt-form','pt-cancel'].forEach(id => {
     const el = document.getElementById(id);
     if (el) { el.style.color='#888'; el.style.borderBottom='2px solid transparent'; el.style.fontWeight='400'; }
   });
-  ['pb-list','pb-form'].forEach(id => {
+  ['pb-list','pb-form','pb-cancel'].forEach(id => {
     const el = document.getElementById(id);
     if (el) el.style.display='none';
   });
