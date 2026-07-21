@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>新卒採用ATS - 画面構成案</title>
+<title>採用管理システム ATS - 画面構成案</title>
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body { font-family: -apple-system, BlinkMacSystemFont, 'Hiragino Sans', sans-serif; background: #f0f2f5; color: #1a1a2e; display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
@@ -288,7 +288,7 @@
 <!-- Sidebar -->
 <nav class="sidebar">
   <div class="sidebar-logo">
-    新卒採用管理システム
+    採用管理システム（ATS）
   </div>
 
   <div class="nav-section">
@@ -297,7 +297,7 @@
       <span class="nav-icon">📊</span> ダッシュボード
     </div>
     <div class="nav-item" onclick="showPage('students')">
-      <span class="nav-icon">👥</span> 学生一覧
+      <span class="nav-icon">👥</span> 応募者一覧
       <span class="nav-badge">148</span>
     </div>
     <div class="nav-item" onclick="showPage('pipeline')">
@@ -309,7 +309,7 @@
   </div>
 
   <div class="nav-section">
-    <div class="nav-section-label">LINE</div>
+    <div class="nav-section-label">LINE <span style="font-size:9px;background:#ad1457;color:#fff;border-radius:8px;padding:1px 5px;vertical-align:middle;">新卒のみ</span></div>
     <div class="nav-item" onclick="showPage('line-send')">
       <span class="nav-icon">💬</span> メッセージ送信
     </div>
@@ -349,7 +349,7 @@
   <div class="topbar">
     <div class="topbar-title" id="page-title">ダッシュボード</div>
     <div class="topbar-actions">
-      <button class="btn btn-secondary btn-sm" onclick="showPage('students')">＋ 学生追加</button>
+      <button class="btn btn-secondary btn-sm" onclick="showPage('students')">＋ 応募者追加</button>
       <button class="btn btn-line btn-sm" onclick="showPage('line-send')">LINE送信</button>
       <div style="width:32px;height:32px;border-radius:50%;background:#7c83fd;color:#fff;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;">小</div>
     </div>
@@ -360,6 +360,17 @@
 
     <!-- ① Dashboard -->
     <div id="page-dashboard" class="page active">
+
+      <!-- 採用区分タブ -->
+      <div style="display:flex;gap:8px;margin-bottom:16px;align-items:center;">
+        <div style="display:flex;background:#fff;border-radius:8px;border:1px solid #e0e0e0;overflow:hidden;">
+          <button onclick="switchHireType(this,'all')" style="padding:6px 16px;font-size:12px;font-weight:700;border:none;background:#7c83fd;color:#fff;cursor:pointer;">全体</button>
+          <button onclick="switchHireType(this,'new_grad')" style="padding:6px 16px;font-size:12px;font-weight:600;border:none;background:transparent;color:#888;cursor:pointer;border-left:1px solid #e0e0e0;">新卒</button>
+          <button onclick="switchHireType(this,'mid_career')" style="padding:6px 16px;font-size:12px;font-weight:600;border:none;background:transparent;color:#888;cursor:pointer;border-left:1px solid #e0e0e0;">中途</button>
+        </div>
+        <span id="hire-type-label" style="font-size:11px;color:#888;">※ 全採用区分を表示中</span>
+      </div>
+
       <div class="kpi-grid">
         <div class="kpi-card">
           <div class="kpi-label">総エントリー数</div>
@@ -464,12 +475,13 @@
         <table>
           <thead>
             <tr>
-              <th>氏名</th><th>学校</th><th>流入経路</th><th>ステータス</th><th>登録日</th><th>操作</th>
+              <th>氏名</th><th>区分</th><th>学校 / 前職</th><th>流入経路</th><th>ステータス</th><th>登録日</th><th>操作</th>
             </tr>
           </thead>
           <tbody>
             <tr>
               <td><span class="avatar">山</span><span class="student-name">山口 沙織</span></td>
+              <td><span style="font-size:10px;background:#ad1457;color:#fff;border-radius:8px;padding:1px 6px;">新卒</span></td>
               <td style="font-size:12px;">東京工業大学</td>
               <td><span class="tag tag-blue">マイナビ</span></td>
               <td><span class="status status-entry">エントリー</span></td>
@@ -478,14 +490,16 @@
             </tr>
             <tr>
               <td><span class="avatar">中</span><span class="student-name">中村 翔太</span></td>
-              <td style="font-size:12px;">大阪大学</td>
-              <td><span class="tag tag-green">リクナビ</span></td>
-              <td><span class="status status-booked">説明会予約</span></td>
+              <td><span style="font-size:10px;background:#00796b;color:#fff;border-radius:8px;padding:1px 6px;">中途</span></td>
+              <td style="font-size:12px;">前職：製造業（5年）</td>
+              <td><span class="tag" style="background:#e0f2f1;color:#00796b;">ビズリーチ</span></td>
+              <td><span class="status status-booked">書類選考</span></td>
               <td style="font-size:12px;color:#999;">2025/10/27</td>
               <td><button class="btn btn-secondary btn-sm" onclick="showPage('student-detail')">詳細</button></td>
             </tr>
             <tr>
               <td><span class="avatar">林</span><span class="student-name">林 奈々</span></td>
+              <td><span style="font-size:10px;background:#ad1457;color:#fff;border-radius:8px;padding:1px 6px;">新卒</span></td>
               <td style="font-size:12px;">名古屋大学</td>
               <td><span class="tag tag-orange">学校訪問QR</span></td>
               <td><span class="status status-offer">内定</span></td>
@@ -499,11 +513,17 @@
 
     <!-- ② Students List -->
     <div id="page-students" class="page">
-      <div style="display:flex;gap:10px;margin-bottom:16px;align-items:center;">
-        <input type="text" placeholder="氏名・学校名で検索..." style="max-width:240px;">
+      <div style="display:flex;gap:10px;margin-bottom:16px;align-items:center;flex-wrap:wrap;">
+        <input type="text" placeholder="氏名・学校名・前職で検索..." style="max-width:240px;">
+        <select style="width:130px;">
+          <option>採用区分：全て</option>
+          <option>新卒</option>
+          <option>中途採用</option>
+        </select>
         <select style="width:140px;">
           <option>ステータス：全て</option>
           <option>エントリー</option>
+          <option>書類選考</option>
           <option>説明会予約</option>
           <option>1次面接</option>
           <option>最終面接</option>
@@ -523,11 +543,13 @@
           <option>マイナビ</option>
           <option>リクナビ</option>
           <option>OfferBox</option>
+          <option>ビズリーチ</option>
+          <option>doda</option>
           <option>学校訪問</option>
         </select>
         <div style="margin-left:auto;display:flex;gap:8px;">
           <button class="btn btn-secondary btn-sm">CSVエクスポート</button>
-          <button class="btn btn-line btn-sm" onclick="showPage('line-send')">選択してLINE送信</button>
+          <button class="btn btn-line btn-sm" onclick="showPage('line-send')">選択してLINE送信 <span style="font-size:9px;background:rgba(255,255,255,.3);border-radius:4px;padding:0 4px;">新卒のみ</span></button>
         </div>
       </div>
       <div class="card" style="padding:0;overflow:hidden;">
@@ -536,11 +558,11 @@
             <tr>
               <th><input type="checkbox"></th>
               <th>氏名</th>
-              <th>学校・学部</th>
+              <th>採用区分</th>
+              <th>学校・前職</th>
               <th>媒体</th>
-              <th>タグ</th>
               <th>ステータス</th>
-              <th>LINE</th>
+              <th>連絡手段</th>
               <th>最終アクション</th>
               <th>操作</th>
             </tr>
@@ -549,56 +571,56 @@
             <tr>
               <td><input type="checkbox"></td>
               <td onclick="showPage('student-detail')" style="cursor:pointer;"><span class="avatar">田</span><span class="student-name">田中 一郎</span></td>
+              <td><span style="font-size:10px;background:#ad1457;color:#fff;border-radius:8px;padding:1px 6px;">新卒</span></td>
               <td><div style="font-size:13px;">早稲田大学</div><div style="font-size:11px;color:#999;">政治経済学部</div></td>
               <td><span class="tag tag-blue">マイナビ</span></td>
-              <td><span class="tag tag-purple">理系</span><span class="tag tag-orange">関東</span></td>
               <td><span class="status status-offer">内定</span></td>
-              <td><span style="color:#06c755;font-size:12px;">✓ 連携済</span></td>
+              <td><span style="color:#06c755;font-size:12px;">LINE ✓</span></td>
               <td style="font-size:11px;color:#999;">最終面接 10/25</td>
               <td><button class="btn btn-secondary btn-sm" onclick="showPage('student-detail')">詳細</button></td>
             </tr>
             <tr>
               <td><input type="checkbox"></td>
               <td onclick="showPage('student-detail')" style="cursor:pointer;"><span class="avatar">佐</span><span class="student-name">佐藤 花子</span></td>
+              <td><span style="font-size:10px;background:#ad1457;color:#fff;border-radius:8px;padding:1px 6px;">新卒</span></td>
               <td><div style="font-size:13px;">東京大学</div><div style="font-size:11px;color:#999;">工学部</div></td>
               <td><span class="tag tag-green">リクナビ</span></td>
-              <td><span class="tag tag-blue">理系</span><span class="tag tag-orange">関東</span></td>
               <td><span class="status status-done">1次面接済</span></td>
-              <td><span style="color:#06c755;font-size:12px;">✓ 連携済</span></td>
+              <td><span style="color:#06c755;font-size:12px;">LINE ✓</span></td>
               <td style="font-size:11px;color:#999;">1次面接 10/28</td>
               <td><button class="btn btn-secondary btn-sm" onclick="showPage('student-detail')">詳細</button></td>
             </tr>
             <tr>
               <td><input type="checkbox"></td>
-              <td><span class="avatar">鈴</span><span class="student-name">鈴木 健太</span></td>
-              <td><div style="font-size:13px;">慶應義塾大学</div><div style="font-size:11px;color:#999;">経済学部</div></td>
-              <td><span class="tag tag-orange">OfferBox</span></td>
-              <td><span class="tag tag-green">文系</span></td>
-              <td><span class="status status-entry">エントリー</span></td>
-              <td><span style="color:#ccc;font-size:12px;">未連携</span></td>
-              <td style="font-size:11px;color:#999;">登録 10/29</td>
+              <td><span class="avatar">木</span><span class="student-name">木村 達也</span></td>
+              <td><span style="font-size:10px;background:#00796b;color:#fff;border-radius:8px;padding:1px 6px;">中途</span></td>
+              <td><div style="font-size:13px;">前職：機械メーカー</div><div style="font-size:11px;color:#999;">エンジニア（8年）</div></td>
+              <td><span class="tag" style="background:#e0f2f1;color:#00796b;">ビズリーチ</span></td>
+              <td><span class="status status-booked">書類選考</span></td>
+              <td><span style="color:#888;font-size:12px;">メール</span></td>
+              <td style="font-size:11px;color:#999;">書類受領 10/29</td>
               <td><button class="btn btn-secondary btn-sm">詳細</button></td>
             </tr>
             <tr>
               <td><input type="checkbox"></td>
               <td><span class="avatar">伊</span><span class="student-name">伊藤 美咲</span></td>
+              <td><span style="font-size:10px;background:#ad1457;color:#fff;border-radius:8px;padding:1px 6px;">新卒</span></td>
               <td><div style="font-size:13px;">大阪大学</div><div style="font-size:11px;color:#999;">医学部</div></td>
               <td><span class="tag tag-purple">学校訪問QR</span></td>
-              <td><span class="tag tag-blue">関西</span><span class="tag tag-purple">理系</span></td>
               <td><span class="status status-accept">承諾</span></td>
-              <td><span style="color:#06c755;font-size:12px;">✓ 連携済</span></td>
+              <td><span style="color:#06c755;font-size:12px;">LINE ✓</span></td>
               <td style="font-size:11px;color:#999;">承諾書受領 10/20</td>
               <td><button class="btn btn-secondary btn-sm">詳細</button></td>
             </tr>
             <tr>
               <td><input type="checkbox"></td>
-              <td><span class="avatar">渡</span><span class="student-name">渡辺 拓也</span></td>
-              <td><div style="font-size:13px;">北海道大学</div><div style="font-size:11px;color:#999;">農学部</div></td>
-              <td><span class="tag tag-green">リクナビ</span></td>
-              <td><span class="tag tag-gray">北海道</span></td>
-              <td><span class="status status-ng">辞退</span></td>
-              <td><span style="color:#06c755;font-size:12px;">✓ 連携済</span></td>
-              <td style="font-size:11px;color:#999;">辞退 10/22</td>
+              <td><span class="avatar">橋</span><span class="student-name">橋本 由美</span></td>
+              <td><span style="font-size:10px;background:#00796b;color:#fff;border-radius:8px;padding:1px 6px;">中途</span></td>
+              <td><div style="font-size:13px;">前職：化学メーカー</div><div style="font-size:11px;color:#999;">研究職（3年）</div></td>
+              <td><span class="tag" style="background:#e0f2f1;color:#00796b;">doda</span></td>
+              <td><span class="status status-done">1次面接済</span></td>
+              <td><span style="color:#888;font-size:12px;">メール</span></td>
+              <td style="font-size:11px;color:#999;">1次面接 10/28</td>
               <td><button class="btn btn-secondary btn-sm">詳細</button></td>
             </tr>
           </tbody>
@@ -1053,9 +1075,10 @@
       <!-- Global filters -->
       <div style="display:flex;gap:8px;margin-bottom:16px;align-items:center;flex-wrap:wrap;">
         <select style="width:150px;"><option>2025年度</option><option>2024年度</option></select>
-        <select style="width:130px;"><option>区分：全て</option><option>新卒</option><option>第二新卒</option><option>既卒</option></select>
-        <select style="width:130px;"><option>媒体：全て</option><option>マイナビ</option><option>リクナビ</option><option>OfferBox</option><option>Re就活</option></select>
-        <select style="width:150px;"><option>フロー：全て</option><option>新卒総合職</option><option>第二新卒</option></select>
+        <select style="width:130px;"><option>採用区分：全て</option><option>新卒</option><option>中途採用</option></select>
+        <select style="width:130px;"><option>応募者区分：全て</option><option>新卒</option><option>第二新卒</option><option>既卒</option><option>中途採用</option></select>
+        <select style="width:130px;"><option>媒体：全て</option><option>マイナビ</option><option>リクナビ</option><option>OfferBox</option><option>Re就活</option><option>ビズリーチ</option><option>doda</option></select>
+        <select style="width:150px;"><option>フロー：全て</option><option>新卒総合職</option><option>第二新卒</option><option>中途採用</option></select>
         <div style="margin-left:auto;display:flex;gap:8px;">
           <button class="btn btn-secondary btn-sm">前年比較</button>
           <button class="btn btn-secondary btn-sm">CSVエクスポート</button>
@@ -1106,6 +1129,7 @@
           <div class="tab" onclick="switchAnalyticsTab(this,'atab-risk')" style="font-size:12px;padding:10px 14px;">⚠️ 辞退リスク</div>
           <div class="tab" onclick="switchAnalyticsTab(this,'atab-forecast')" style="font-size:12px;padding:10px 14px;">🔮 予測・目標</div>
           <div class="tab" onclick="switchAnalyticsTab(this,'atab-media')" style="font-size:12px;padding:10px 14px;">📱 媒体別分析</div>
+          <div class="tab" onclick="switchAnalyticsTab(this,'atab-cross')" style="font-size:12px;padding:10px 14px;">🔀 クロス集計 <span style="font-size:9px;background:#1565c0;color:#fff;border-radius:8px;padding:1px 5px;vertical-align:middle;">NEW</span></div>
         </div>
 
         <div style="padding:20px;">
@@ -1501,6 +1525,97 @@
 
           </div>
 
+          <!-- ⑧ クロス集計 -->
+          <div id="atab-cross" class="tab-content">
+            <div style="display:flex;gap:12px;margin-bottom:16px;align-items:flex-end;flex-wrap:wrap;">
+              <div>
+                <div style="font-size:11px;color:#888;margin-bottom:4px;">行（縦軸）</div>
+                <select style="width:160px;">
+                  <option>採用区分</option>
+                  <option>流入媒体</option>
+                  <option>応募者区分</option>
+                  <option>学校・前職</option>
+                  <option>地域</option>
+                  <option>タグ</option>
+                </select>
+              </div>
+              <div>
+                <div style="font-size:11px;color:#888;margin-bottom:4px;">列（横軸）</div>
+                <select style="width:160px;">
+                  <option>選考ステータス</option>
+                  <option>採用区分</option>
+                  <option>流入媒体</option>
+                  <option>月別</option>
+                  <option>担当者</option>
+                </select>
+              </div>
+              <div>
+                <div style="font-size:11px;color:#888;margin-bottom:4px;">集計値</div>
+                <select style="width:130px;">
+                  <option>人数</option>
+                  <option>通過率</option>
+                  <option>承諾率</option>
+                </select>
+              </div>
+              <button class="btn btn-primary btn-sm">集計実行</button>
+              <div style="margin-left:auto;display:flex;gap:8px;">
+                <button class="btn btn-secondary btn-sm">CSVエクスポート</button>
+                <button class="btn btn-secondary btn-sm">Excelエクスポート</button>
+              </div>
+            </div>
+
+            <!-- クロス集計テーブル（採用区分 × 選考ステータス のサンプル） -->
+            <div class="card" style="padding:0;overflow:auto;">
+              <table style="font-size:12px;min-width:600px;">
+                <thead>
+                  <tr style="background:#f5f5f5;">
+                    <th style="padding:10px 12px;text-align:left;border-bottom:2px solid #e0e0e0;min-width:120px;">採用区分</th>
+                    <th style="padding:10px 12px;text-align:right;border-bottom:2px solid #e0e0e0;">エントリー</th>
+                    <th style="padding:10px 12px;text-align:right;border-bottom:2px solid #e0e0e0;">書類選考</th>
+                    <th style="padding:10px 12px;text-align:right;border-bottom:2px solid #e0e0e0;">1次面接</th>
+                    <th style="padding:10px 12px;text-align:right;border-bottom:2px solid #e0e0e0;">最終面接</th>
+                    <th style="padding:10px 12px;text-align:right;border-bottom:2px solid #e0e0e0;">内定</th>
+                    <th style="padding:10px 12px;text-align:right;border-bottom:2px solid #e0e0e0;">承諾</th>
+                    <th style="padding:10px 12px;text-align:right;border-bottom:2px solid #7c83fd;color:#7c83fd;font-weight:700;">承諾率</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr style="cursor:pointer;" onmouseover="this.style.background='#f9f9ff'" onmouseout="this.style.background=''">
+                    <td style="padding:10px 12px;font-weight:600;border-bottom:1px solid #f0f0f0;"><span style="font-size:10px;background:#ad1457;color:#fff;border-radius:8px;padding:1px 6px;margin-right:6px;">新卒</span>新卒採用</td>
+                    <td style="padding:10px 12px;text-align:right;border-bottom:1px solid #f0f0f0;">302</td>
+                    <td style="padding:10px 12px;text-align:right;border-bottom:1px solid #f0f0f0;">—</td>
+                    <td style="padding:10px 12px;text-align:right;border-bottom:1px solid #f0f0f0;">182</td>
+                    <td style="padding:10px 12px;text-align:right;border-bottom:1px solid #f0f0f0;">98</td>
+                    <td style="padding:10px 12px;text-align:right;border-bottom:1px solid #f0f0f0;">38</td>
+                    <td style="padding:10px 12px;text-align:right;border-bottom:1px solid #f0f0f0;">31</td>
+                    <td style="padding:10px 12px;text-align:right;border-bottom:1px solid #f0f0f0;color:#4caf50;font-weight:700;">82%</td>
+                  </tr>
+                  <tr style="cursor:pointer;" onmouseover="this.style.background='#f9f9ff'" onmouseout="this.style.background=''">
+                    <td style="padding:10px 12px;font-weight:600;border-bottom:1px solid #f0f0f0;"><span style="font-size:10px;background:#00796b;color:#fff;border-radius:8px;padding:1px 6px;margin-right:6px;">中途</span>中途採用</td>
+                    <td style="padding:10px 12px;text-align:right;border-bottom:1px solid #f0f0f0;">46</td>
+                    <td style="padding:10px 12px;text-align:right;border-bottom:1px solid #f0f0f0;">38</td>
+                    <td style="padding:10px 12px;text-align:right;border-bottom:1px solid #f0f0f0;">22</td>
+                    <td style="padding:10px 12px;text-align:right;border-bottom:1px solid #f0f0f0;">14</td>
+                    <td style="padding:10px 12px;text-align:right;border-bottom:1px solid #f0f0f0;">4</td>
+                    <td style="padding:10px 12px;text-align:right;border-bottom:1px solid #f0f0f0;">3</td>
+                    <td style="padding:10px 12px;text-align:right;border-bottom:1px solid #f0f0f0;color:#ff9800;font-weight:700;">75%</td>
+                  </tr>
+                  <tr style="background:#fafafa;font-weight:700;">
+                    <td style="padding:10px 12px;border-top:2px solid #e0e0e0;">合計</td>
+                    <td style="padding:10px 12px;text-align:right;border-top:2px solid #e0e0e0;">348</td>
+                    <td style="padding:10px 12px;text-align:right;border-top:2px solid #e0e0e0;">38</td>
+                    <td style="padding:10px 12px;text-align:right;border-top:2px solid #e0e0e0;">204</td>
+                    <td style="padding:10px 12px;text-align:right;border-top:2px solid #e0e0e0;">112</td>
+                    <td style="padding:10px 12px;text-align:right;border-top:2px solid #e0e0e0;">42</td>
+                    <td style="padding:10px 12px;text-align:right;border-top:2px solid #e0e0e0;">34</td>
+                    <td style="padding:10px 12px;text-align:right;border-top:2px solid #e0e0e0;color:#7c83fd;">81%</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div style="margin-top:8px;font-size:11px;color:#888;">※ 行をクリックするとドリルダウン表示。フィルタ条件は上部グローバルフィルタと連動。</div>
+          </div>
+
         </div>
       </div>
     </div>
@@ -1885,6 +2000,17 @@ function switchStudentTab(el, tabId) {
   el.closest('.card').querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
   el.classList.add('active');
   document.getElementById(tabId).classList.add('active');
+}
+
+function switchHireType(el, type) {
+  el.closest('div').querySelectorAll('button').forEach(b => {
+    b.style.background = 'transparent';
+    b.style.color = '#888';
+  });
+  el.style.background = '#7c83fd';
+  el.style.color = '#fff';
+  const labels = { all: '※ 全採用区分を表示中', new_grad: '※ 新卒採用のみ表示中', mid_career: '※ 中途採用のみ表示中' };
+  document.getElementById('hire-type-label').textContent = labels[type] || '';
 }
 </script>
 </body>
