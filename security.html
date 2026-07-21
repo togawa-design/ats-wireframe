@@ -1,0 +1,818 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ATS セキュリティ設計書</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Hiragino Sans', sans-serif; background: #f0f2f5; color: #1a1a2e; }
+  .page { max-width: 1100px; margin: 0 auto; padding: 32px 24px; }
+  h1 { font-size: 22px; font-weight: 700; margin-bottom: 4px; }
+  h2 { font-size: 15px; font-weight: 700; color: #1a1a2e; margin-bottom: 14px; padding-left: 12px; border-left: 4px solid #e53935; }
+  h3 { font-size: 13px; font-weight: 700; color: #555; margin-bottom: 10px; }
+  .meta { font-size: 12px; color: #999; margin-bottom: 28px; display:flex; gap:16px; }
+  .section { background: #fff; border-radius: 12px; padding: 22px 24px; margin-bottom: 20px; box-shadow: 0 1px 4px rgba(0,0,0,.06); }
+
+  /* Tabs */
+  .tabs { display:flex; gap:0; border-bottom:2px solid #e8eaf0; margin-bottom:22px; flex-wrap:wrap; }
+  .tab { padding:10px 18px; font-size:13px; cursor:pointer; color:#888; border-bottom:2px solid transparent; margin-bottom:-2px; transition:all .15s; white-space:nowrap; }
+  .tab.active { color:#e53935; border-bottom-color:#e53935; font-weight:600; }
+  .tab-content { display:none; }
+  .tab-content.active { display:block; }
+
+  /* Table */
+  table { width:100%; border-collapse:collapse; font-size:13px; }
+  th { background:#f8f9fc; padding:9px 12px; text-align:left; font-weight:600; color:#555; font-size:12px; border-bottom:1px solid #e8eaf0; }
+  td { padding:10px 12px; border-bottom:1px solid #f0f2f5; vertical-align:top; line-height:1.6; }
+  tr:last-child td { border-bottom:none; }
+  tr:hover td { background:#fff8f8; }
+
+  /* Badges */
+  .badge { display:inline-block; padding:2px 8px; border-radius:10px; font-size:10px; font-weight:700; white-space:nowrap; }
+  .badge-critical { background:#b71c1c; color:#fff; }
+  .badge-high     { background:#e53935; color:#fff; }
+  .badge-mid      { background:#ff9800; color:#fff; }
+  .badge-low      { background:#9e9e9e; color:#fff; }
+  .badge-done     { background:#4caf50; color:#fff; }
+  .badge-fw       { background:#7c83fd; color:#fff; }
+  .badge-be       { background:#00897b; color:#fff; }
+  .badge-infra    { background:#5c6bc0; color:#fff; }
+  .badge-ops      { background:#795548; color:#fff; }
+
+  /* Info / warn / ok boxes */
+  .info-box { background:#fff3f3; border:1px solid #ffcdd2; border-radius:8px; padding:10px 14px; font-size:12px; color:#c62828; margin-top:10px; }
+  .warn-box { background:#fff8e1; border:1px solid #ffcc80; border-radius:8px; padding:10px 14px; font-size:12px; color:#e65100; margin-top:10px; }
+  .ok-box   { background:#e8f5e9; border:1px solid #a5d6a7; border-radius:8px; padding:10px 14px; font-size:12px; color:#2e7d32; margin-top:10px; }
+  .blue-box { background:#e8eaf6; border:1px solid #9fa8da; border-radius:8px; padding:10px 14px; font-size:12px; color:#283593; margin-top:10px; }
+
+  /* Category header */
+  .cat-header { background:#fff5f5; border-radius:8px; padding:8px 14px; font-size:12px; font-weight:700; color:#c62828; margin:14px 0 8px; border-left:3px solid #e53935; }
+
+  /* Code */
+  code { background:#f5f5f5; border-radius:4px; padding:1px 6px; font-size:11px; font-family:monospace; }
+  pre { background:#1a1a2e; color:#e0e0e0; border-radius:8px; padding:14px; font-size:12px; font-family:monospace; line-height:1.6; overflow-x:auto; margin-top:10px; }
+
+  /* Two col */
+  .two-col { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+
+  /* Summary cards */
+  .summary-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:12px; margin-bottom:20px; }
+  .summary-card { background:#fff; border-radius:10px; padding:14px 16px; box-shadow:0 1px 4px rgba(0,0,0,.06); text-align:center; }
+  .summary-num  { font-size:28px; font-weight:700; color:#e53935; }
+  .summary-label{ font-size:11px; color:#888; margin-top:4px; }
+
+  /* Threat level indicator */
+  .threat-row-critical td { background:#fff3f3; }
+  .threat-row-high td { background:#fff8f5; }
+
+  /* DB ref */
+  .db-ref { background:#e8f5e9; border:1px solid #c8e6c9; border-radius:4px; padding:1px 6px; font-size:11px; font-family:monospace; color:#2e7d32; }
+</style>
+</head>
+<body>
+
+<!-- Global Nav -->
+<div style="background:#1a1a2e;height:40px;display:flex;align-items:center;padding:0 20px;gap:24px;font-size:12px;overflow-x:auto;">
+  <span style="color:#e53935;font-weight:700;letter-spacing:0.5px;">ATS設計ドキュメント</span>
+  <a href="index.html"          style="color:#aaa;text-decoration:none;opacity:.7;">🖥 ワイヤーフレーム</a>
+  <a href="requirements.html"   style="color:#aaa;text-decoration:none;opacity:.7;">📋 要件定義書</a>
+  <a href="screen-spec.html"    style="color:#aaa;text-decoration:none;opacity:.7;">📐 画面仕様書</a>
+  <a href="table-spec.html"     style="color:#aaa;text-decoration:none;opacity:.7;">🗃️ テーブル定義書</a>
+  <a href="dataflow.html"       style="color:#aaa;text-decoration:none;opacity:.7;">🔀 データフロー設計</a>
+  <a href="architecture.html"   style="color:#aaa;text-decoration:none;opacity:.7;">🏗️ アーキテクチャ</a>
+  <a href="security.html"       style="color:#fff;text-decoration:none;border-bottom:2px solid #e53935;padding-bottom:2px;">🔒 セキュリティ設計書</a>
+  <a href="agency-wireframe.html" style="color:#aaa;text-decoration:none;opacity:.7;">🤝 エージェントWF</a>
+</div>
+
+<div class="page">
+  <h1>新卒採用管理システム（ATS）セキュリティ設計書</h1>
+  <div class="meta">
+    <span>v0.1</span>
+    <span>2026-07-21</span>
+    <span>ステータス：設計中</span>
+  </div>
+
+  <div class="tabs">
+    <div class="tab active" onclick="sw(this,'t-overview')">① 概要・脅威モデル</div>
+    <div class="tab" onclick="sw(this,'t-auth')">② 認証・認可</div>
+    <div class="tab" onclick="sw(this,'t-api')">③ 通信・API保護</div>
+    <div class="tab" onclick="sw(this,'t-data')">④ データ保護</div>
+    <div class="tab" onclick="sw(this,'t-audit')">⑤ 監査ログ</div>
+    <div class="tab" onclick="sw(this,'t-infra')">⑥ インフラ設定</div>
+    <div class="tab" onclick="sw(this,'t-incident')">⑦ インシデント対応</div>
+    <div class="tab" onclick="sw(this,'t-log')">⑧ 変更履歴</div>
+  </div>
+
+  <!-- ① 概要・脅威モデル -->
+  <div id="t-overview" class="tab-content active">
+
+    <div class="summary-grid">
+      <div class="summary-card">
+        <div class="summary-num">6,700+</div>
+        <div class="summary-label">保護対象の個人情報件数（年間）</div>
+      </div>
+      <div class="summary-card">
+        <div class="summary-num">4</div>
+        <div class="summary-label">RBACロール数</div>
+      </div>
+      <div class="summary-card">
+        <div class="summary-num">3年</div>
+        <div class="summary-label">監査ログ・データ保持期間</div>
+      </div>
+      <div class="summary-card">
+        <div class="summary-num" style="font-size:20px;">OWASP</div>
+        <div class="summary-label">準拠目標セキュリティ標準</div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2>保護対象データの分類</h2>
+      <table>
+        <thead><tr><th style="width:100px;">分類</th><th style="width:120px;">レベル</th><th>対象データ（テーブル）</th><th>主なリスク</th></tr></thead>
+        <tbody>
+          <tr class="threat-row-critical">
+            <td>個人情報（PII）</td>
+            <td><span class="badge badge-critical">最重要</span></td>
+            <td><span class="db-ref">Applicant</span>：氏名・メールアドレス・電話番号・学校・卒業年度・LINE UserID</td>
+            <td>漏洩時に個人情報保護法の報告義務・損害賠償リスク</td>
+          </tr>
+          <tr class="threat-row-high">
+            <td>採用機密</td>
+            <td><span class="badge badge-high">高</span></td>
+            <td><span class="db-ref">Interview</span> / <span class="db-ref">EvaluationResponse</span>：面接評価スコア・コメント<br><span class="db-ref">Selection</span>：選考結果・内定情報</td>
+            <td>外部漏洩で採用活動の信頼失墜、採用者差別訴訟リスク</td>
+          </tr>
+          <tr>
+            <td>業務情報</td>
+            <td><span class="badge badge-mid">中</span></td>
+            <td><span class="db-ref">Agency</span> / <span class="db-ref">AgencyContact</span>：エージェント情報<br><span class="db-ref">SelectionFlow</span>：選考フロー設計</td>
+            <td>競合他社への流出リスク</td>
+          </tr>
+          <tr>
+            <td>システム情報</td>
+            <td><span class="badge badge-mid">中</span></td>
+            <td>APIキー・DBパスワード・portal_token・LINEチャネルシークレット</td>
+            <td>不正アクセスの踏み台</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="section">
+      <h2>脅威モデル（想定される攻撃・リスク）</h2>
+      <table>
+        <thead><tr><th style="width:60px;">ID</th><th style="width:80px;">深刻度</th><th style="width:180px;">脅威</th><th>攻撃シナリオ</th><th>主な対策</th></tr></thead>
+        <tbody>
+          <tr class="threat-row-critical">
+            <td>T-01</td>
+            <td><span class="badge badge-critical">最重要</span></td>
+            <td>個人情報の大量漏洩</td>
+            <td>SQLインジェクション / 不正なDBアクセスで Applicant テーブルを一括取得</td>
+            <td>ORM（Prisma）使用・DB直接アクセス禁止・Cloud SQL Private IP</td>
+          </tr>
+          <tr class="threat-row-critical">
+            <td>T-02</td>
+            <td><span class="badge badge-critical">最重要</span></td>
+            <td>なりすまし不正アクセス</td>
+            <td>盗んだGoogleアカウントでログイン / portal_token の推測・リプレイ攻撃</td>
+            <td>Google OAuthドメイン制限・portal_token 有効期限・UUID v4</td>
+          </tr>
+          <tr class="threat-row-high">
+            <td>T-03</td>
+            <td><span class="badge badge-high">高</span></td>
+            <td>XSS（クロスサイトスクリプティング）</td>
+            <td>学生名・メモ欄等のフィールドにスクリプトを入力し管理者セッションを乗っ取り</td>
+            <td>React JSXのデフォルトエスケープ・CSPヘッダー・dangerouslySetInnerHTML 禁止</td>
+          </tr>
+          <tr class="threat-row-high">
+            <td>T-04</td>
+            <td><span class="badge badge-high">高</span></td>
+            <td>権限昇格・横断アクセス</td>
+            <td>面接官権限のアカウントで他担当者の評価データや管理機能にアクセス</td>
+            <td>RBAC（Middleware）・API側での権限チェック・フロントエンドだけで判断しない</td>
+          </tr>
+          <tr>
+            <td>T-05</td>
+            <td><span class="badge badge-mid">中</span></td>
+            <td>悪意あるファイルアップロード</td>
+            <td>履歴書欄にマルウェアを含む実行ファイルをアップロード</td>
+            <td>MIME type 検証・拡張子許可リスト（pdf/jpg/png のみ）・Firebase Storage Rules</td>
+          </tr>
+          <tr>
+            <td>T-06</td>
+            <td><span class="badge badge-mid">中</span></td>
+            <td>API乱用・DoS</td>
+            <td>LINE一斉送信APIやエクスポートAPIを繰り返し叩いてサービス障害</td>
+            <td>レートリミット・LINE APIのレート制限考慮・ログ監視</td>
+          </tr>
+          <tr>
+            <td>T-07</td>
+            <td><span class="badge badge-mid">中</span></td>
+            <td>内部不正</td>
+            <td>退職した担当者のアカウントが残存しデータを持ち出し</td>
+            <td>退職時の即時アカウント無効化フロー・AuditLog による操作記録</td>
+          </tr>
+          <tr>
+            <td>T-08</td>
+            <td><span class="badge badge-low">低</span></td>
+            <td>依存ライブラリの脆弱性</td>
+            <td>npm パッケージの既知脆弱性を突いた攻撃</td>
+            <td>npm audit 定期実行・Dependabot による自動PR</td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="warn-box">⚠️ 個人情報保護法（2022年改正）により、個人データ漏洩時は<strong>72時間以内に個人情報保護委員会への報告</strong>が義務。インシデント対応フロー（タブ⑦）を参照。</div>
+    </div>
+
+  </div><!-- /t-overview -->
+
+  <!-- ② 認証・認可 -->
+  <div id="t-auth" class="tab-content">
+
+    <div class="section">
+      <h2>認証方式</h2>
+      <table>
+        <thead><tr><th style="width:140px;">対象</th><th style="width:160px;">認証方式</th><th>詳細</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><strong>管理画面スタッフ</strong></td>
+            <td>Google OAuth 2.0<br>（Firebase Auth）</td>
+            <td>
+              許可ドメインを先方の Google Workspace ドメインに限定（例: <code>@aaa-corp.co.jp</code>）。<br>
+              Firebase Auth の <code>allowedDomains</code> 設定で実装。他ドメインのGoogleアカウントはログイン不可。<br>
+              セッション: Firebase ID Token（有効期限1時間）+ Refresh Token（最大14日）。<br>
+              非アクティブ30分でタイムアウト。
+            </td>
+          </tr>
+          <tr>
+            <td><strong>エージェントポータル</strong></td>
+            <td>portal_token<br>（マジックリンク）</td>
+            <td>
+              <code>UUID v4</code> を使用（推測不可能な128bit乱数）。<br>
+              有効期限: 発行から <strong>60日間</strong>。期限切れトークンはアクセス拒否。<br>
+              発行単位: AgencyContact ごとに1トークン。更新時は旧トークンを無効化。<br>
+              操作範囲: 紹介学生の選考状況閲覧・キャンセル申請のみ（管理画面機能へのアクセス不可）。
+            </td>
+          </tr>
+          <tr>
+            <td><strong>学生マイページ（LIFF）</strong></td>
+            <td>LINE Login<br>（LIFF SDK）</td>
+            <td>
+              LINE ログイン経由でユーザーを識別。<code>LINE User ID</code> を <code>Applicant.line_user_id</code> と照合。<br>
+              LIFF アクセストークンをバックエンドAPIに渡し、サーバー側で LINE API を使って検証。<br>
+              自分のデータのみ閲覧・操作可能（他学生のデータへのアクセスはサーバー側で拒否）。
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="warn-box">⚠️ portal_token はURL内（クエリパラメータ）に含まれるため、<strong>メールの転送やリファラーヘッダーでの漏洩リスク</strong>がある。メール本文以外（Slackなど）では共有しないよう運用ルールを定める。</div>
+    </div>
+
+    <div class="section">
+      <h2>認可（RBAC）設計</h2>
+      <table>
+        <thead><tr><th style="width:120px;">ロール</th><th>許可操作</th><th style="width:180px;">制限</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><strong>admin</strong><br>管理者</td>
+            <td>全操作（学生管理・選考管理・システム設定・ユーザー管理・全データエクスポート）</td>
+            <td>—</td>
+          </tr>
+          <tr>
+            <td><strong>recruiter</strong><br>採用担当者</td>
+            <td>学生登録・編集・ステータス変更・LINE送信・エージェント操作・分析閲覧・エクスポート</td>
+            <td>スタッフ管理・システム設定の変更不可</td>
+          </tr>
+          <tr>
+            <td><strong>interviewer</strong><br>面接官</td>
+            <td>自分が担当するInterview の閲覧・評価入力</td>
+            <td>他担当者の評価・個人情報詳細・一覧エクスポート不可</td>
+          </tr>
+          <tr>
+            <td><strong>viewer</strong><br>閲覧のみ</td>
+            <td>学生一覧・詳細の閲覧・分析レポート閲覧</td>
+            <td>データ変更・エクスポート・LINE送信すべて不可</td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="cat-header">実装方針</div>
+      <table>
+        <tbody>
+          <tr>
+            <td style="width:160px;font-weight:600;">Middlewareチェック</td>
+            <td>Next.js の <code>middleware.ts</code> でルートごとに必要ロールを定義。Firebase ID Tokenのカスタムクレームにロールを付与し、リクエストごとに検証。</td>
+          </tr>
+          <tr>
+            <td style="font-weight:600;">APIサーバー側チェック</td>
+            <td>フロントエンドの非表示だけでなく、<strong>APIエンドポイント側でも必ずロールを検証する</strong>。フロントエンドのみでの制御はバイパス可能なため不十分。</td>
+          </tr>
+          <tr>
+            <td style="font-weight:600;">職種区分アクセス</td>
+            <td><code>Staff.position_access</code>（sogo / gino / both）で、スタッフが閲覧できる職種区分を制限。interviewer は自分の担当学生のみ表示（Row-level filtering）。</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+  </div><!-- /t-auth -->
+
+  <!-- ③ 通信・API保護 -->
+  <div id="t-api" class="tab-content">
+
+    <div class="section">
+      <h2>通信セキュリティ</h2>
+      <table>
+        <thead><tr><th style="width:160px;">項目</th><th>設定内容</th><th style="width:120px;">担当</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><strong>HTTPS強制</strong></td>
+            <td>Firebase App Hosting はデフォルトで HTTPS を強制。HTTP へのアクセスは自動リダイレクト。独自ドメインでも TLS 証明書を自動発行・更新。</td>
+            <td><span class="badge badge-infra">インフラ</span> 自動</td>
+          </tr>
+          <tr>
+            <td><strong>HSTS</strong></td>
+            <td><code>Strict-Transport-Security: max-age=31536000; includeSubDomains</code> ヘッダーを設定。</td>
+            <td><span class="badge badge-be">BEアプリ</span></td>
+          </tr>
+          <tr>
+            <td><strong>CORS</strong></td>
+            <td>APIルートは自ドメインからのリクエストのみ許可。<code>Access-Control-Allow-Origin</code> にワイルドカード（<code>*</code>）は使用しない。</td>
+            <td><span class="badge badge-be">BEアプリ</span></td>
+          </tr>
+          <tr>
+            <td><strong>CSP</strong></td>
+            <td>Content-Security-Policy ヘッダーで <code>script-src 'self'</code> に限定。インラインスクリプトは nonce 方式を使用。</td>
+            <td><span class="badge badge-be">BEアプリ</span></td>
+          </tr>
+          <tr>
+            <td><strong>セキュリティヘッダー</strong></td>
+            <td><code>X-Frame-Options: DENY</code>（クリックジャッキング防止）、<code>X-Content-Type-Options: nosniff</code>、<code>Referrer-Policy: strict-origin</code></td>
+            <td><span class="badge badge-be">BEアプリ</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="section">
+      <h2>入力バリデーション・出力エスケープ</h2>
+      <table>
+        <thead><tr><th style="width:160px;">脅威</th><th>対策</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><strong>SQLインジェクション</strong></td>
+            <td>Prisma ORM を使用。すべてのDBクエリはパラメータ化クエリで実行（生SQL使用禁止）。<code>$queryRaw</code> が必要な場合は <code>Prisma.sql</code> テンプレートリテラルを使用し、文字列連結でのSQL構築を禁止。</td>
+          </tr>
+          <tr>
+            <td><strong>XSS</strong></td>
+            <td>React JSX はデフォルトでHTMLエスケープ。<code>dangerouslySetInnerHTML</code> の使用を禁止（ESLint ルールで強制）。ユーザー入力を含むメール・LINE本文は送信前にサニタイズ（DOMPurifyまたはサーバー側サニタイズ）。</td>
+          </tr>
+          <tr>
+            <td><strong>ファイルアップロード</strong></td>
+            <td>
+              許可拡張子: <code>.pdf / .jpg / .jpeg / .png</code> のみ。<br>
+              MIMEタイプ検証: Content-Type ヘッダーではなく、ファイルのマジックバイトで検証。<br>
+              最大サイズ: 10MB（PDF）/ 5MB（画像）。<br>
+              Firebase Storage Rules で認証済みユーザーのみアップロード可。<br>
+              保存パス: <code>/resumes/{applicant_id}/{timestamp}_{filename}</code>（予測困難なパスに保存）。
+            </td>
+          </tr>
+          <tr>
+            <td><strong>CSRF</strong></td>
+            <td>Next.js の API Routes は Same-Origin の Cookie を使用しないため CSRF リスクは低い。Authorization ヘッダー（Bearer Token）方式で認証しており、CSRF トークン不要。</td>
+          </tr>
+          <tr>
+            <td><strong>オープンリダイレクト</strong></td>
+            <td>ログイン後のリダイレクト先は自ドメインに限定。外部URLへのリダイレクトを禁止する allowlist を設定。</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="section">
+      <h2>APIレートリミット</h2>
+      <table>
+        <thead><tr><th style="width:200px;">エンドポイント</th><th style="width:180px;">制限値</th><th>理由</th></tr></thead>
+        <tbody>
+          <tr>
+            <td>ログイン試行</td>
+            <td>5回/分/IPアドレス</td>
+            <td>ブルートフォース・クレデンシャルスタッフィング対策</td>
+          </tr>
+          <tr>
+            <td>LINE一斉送信 <code>POST /api/line/broadcast</code></td>
+            <td>1回/分（管理者: 3回/分）</td>
+            <td>誤操作による大量送信・LINE API コスト超過防止</td>
+          </tr>
+          <tr>
+            <td>データエクスポート <code>GET /api/export</code></td>
+            <td>10回/時/スタッフ</td>
+            <td>大量データ持ち出しの検知・制限</td>
+          </tr>
+          <tr>
+            <td>portal_token API全体</td>
+            <td>30回/分/token</td>
+            <td>スクレイピング・自動アクセス対策</td>
+          </tr>
+          <tr>
+            <td>その他APIエンドポイント</td>
+            <td>200回/分/スタッフ</td>
+            <td>一般的な操作の上限（通常使用で超えない値）</td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="blue-box">実装: <code>upstash/ratelimit</code> + Redis（Upstash）または Next.js Middleware でのインメモリ実装。超過時は HTTP 429 を返す。</div>
+    </div>
+
+  </div><!-- /t-api -->
+
+  <!-- ④ データ保護 -->
+  <div id="t-data" class="tab-content">
+
+    <div class="section">
+      <h2>暗号化</h2>
+      <table>
+        <thead><tr><th style="width:160px;">対象</th><th>方式</th><th style="width:120px;">管理者</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><strong>DB データ（保存時）</strong></td>
+            <td>Cloud SQL は GCP が管理する AES-256 で自動的に暗号化（透過的暗号化）。アプリケーションレベルでの追加暗号化は不要。</td>
+            <td><span class="badge badge-infra">GCP自動</span></td>
+          </tr>
+          <tr>
+            <td><strong>Firebase Storage（ファイル）</strong></td>
+            <td>Google Cloud Storage の暗号化が自動適用。履歴書PDFも含む。</td>
+            <td><span class="badge badge-infra">GCP自動</span></td>
+          </tr>
+          <tr>
+            <td><strong>通信</strong></td>
+            <td>TLS 1.2以上。Firebase App Hosting が自動管理。</td>
+            <td><span class="badge badge-infra">GCP自動</span></td>
+          </tr>
+          <tr>
+            <td><strong>APIキー・シークレット</strong></td>
+            <td>Google Secret Manager で管理。コードおよびgitリポジトリへのハードコード禁止。環境変数経由でアクセス。</td>
+            <td><span class="badge badge-ops">運用</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="section">
+      <h2>個人情報・データ保持ポリシー</h2>
+      <table>
+        <thead><tr><th style="width:160px;">データ種別</th><th style="width:140px;">保持期間</th><th>削除・処理方法</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><strong>内定承諾者</strong></td>
+            <td>入社後5年</td>
+            <td>入社管理システム（Salesforce）に引き継ぎ後、ATS側は匿名化（氏名→イニシャル、連絡先削除）</td>
+          </tr>
+          <tr>
+            <td><strong>不採用者</strong></td>
+            <td>採用活動終了から1年</td>
+            <td>1年経過後に個人特定情報（氏名・連絡先・学校名）を削除、統計データ（媒体・ステージ記録）は保持</td>
+          </tr>
+          <tr>
+            <td><strong>辞退者</strong></td>
+            <td>採用活動終了から1年</td>
+            <td>不採用者と同様</td>
+          </tr>
+          <tr>
+            <td><strong>面接評価データ</strong></td>
+            <td>採用活動終了から3年</td>
+            <td>3年後に完全削除（個人情報保護法の安全管理措置）</td>
+          </tr>
+          <tr>
+            <td><strong>アップロードファイル（履歴書等）</strong></td>
+            <td>採用活動終了から1年</td>
+            <td>Firebase Storage から完全削除。Applicant.resume_url を NULL に更新。</td>
+          </tr>
+          <tr>
+            <td><strong>AuditLog</strong></td>
+            <td>3年（法的根拠のため）</td>
+            <td>3年後に自動アーカイブ or 削除（Cloud Scheduler でバッチ実行）</td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="warn-box">⚠️ データ保持期間は先方（クライアント）の社内規程・就業規則に合わせた最終確認が必要。上記はデフォルト案。</div>
+    </div>
+
+    <div class="section">
+      <h2>秘密情報管理（シークレット一覧）</h2>
+      <table>
+        <thead><tr><th style="width:220px;">シークレット名</th><th>内容</th><th style="width:100px;">保存場所</th></tr></thead>
+        <tbody>
+          <tr><td><code>DATABASE_URL</code></td><td>Cloud SQL 接続文字列（DBパスワード含む）</td><td><span class="badge badge-infra">Secret Manager</span></td></tr>
+          <tr><td><code>LINE_CHANNEL_SECRET</code></td><td>LINE Messaging API チャネルシークレット</td><td><span class="badge badge-infra">Secret Manager</span></td></tr>
+          <tr><td><code>LINE_CHANNEL_ACCESS_TOKEN</code></td><td>LINE Messaging API アクセストークン</td><td><span class="badge badge-infra">Secret Manager</span></td></tr>
+          <tr><td><code>FIREBASE_SERVICE_ACCOUNT</code></td><td>Firebase Admin SDK サービスアカウントキー</td><td><span class="badge badge-infra">Secret Manager</span></td></tr>
+          <tr><td><code>GAROON_API_TOKEN</code></td><td>ガルーン REST API トークン</td><td><span class="badge badge-infra">Secret Manager</span></td></tr>
+          <tr><td><code>CYBERMAIL_SMTP_PASSWORD</code></td><td>サイバーメール SMTP 認証パスワード</td><td><span class="badge badge-infra">Secret Manager</span></td></tr>
+          <tr><td><code>SALESFORCE_CLIENT_SECRET</code></td><td>Salesforce Connected App クライアントシークレット</td><td><span class="badge badge-infra">Secret Manager</span></td></tr>
+        </tbody>
+      </table>
+      <div class="info-box">🔒 上記のいずれも <code>.env</code> ファイルや git リポジトリにコミットしてはならない。<code>.gitignore</code> に <code>.env*</code> を追加し、<code>git-secrets</code> または GitHub の Secret Scanning を有効にする。</div>
+    </div>
+
+  </div><!-- /t-data -->
+
+  <!-- ⑤ 監査ログ -->
+  <div id="t-audit" class="tab-content">
+
+    <div class="section">
+      <h2>AuditLog テーブル設計</h2>
+      <p style="font-size:13px;margin-bottom:12px;">重要操作はすべて <span class="db-ref">AuditLog</span> テーブルに記録する。ログは <strong>INSERT ONLY</strong>（更新・削除禁止）。</p>
+      <table>
+        <thead><tr><th style="width:160px;">カラム</th><th style="width:120px;">型</th><th>内容</th></tr></thead>
+        <tbody>
+          <tr><td><code>id</code></td><td>UUID PK</td><td>自動生成</td></tr>
+          <tr><td><code>staff_id</code></td><td>UUID FK → Staff</td><td>操作者（NULLの場合はシステム自動処理）</td></tr>
+          <tr><td><code>action</code></td><td>audit_action ENUM</td><td>操作種別（下記参照）</td></tr>
+          <tr><td><code>target_type</code></td><td>VARCHAR(50)</td><td>対象リソース種別（Applicant / Interview / Selection 等）</td></tr>
+          <tr><td><code>target_id</code></td><td>UUID</td><td>対象リソースのID</td></tr>
+          <tr><td><code>before_value</code></td><td>JSONB</td><td>変更前のスナップショット（UPDATE 操作時）</td></tr>
+          <tr><td><code>after_value</code></td><td>JSONB</td><td>変更後のスナップショット</td></tr>
+          <tr><td><code>ip_address</code></td><td>INET</td><td>操作元IPアドレス</td></tr>
+          <tr><td><code>user_agent</code></td><td>TEXT</td><td>ブラウザ・クライアント情報</td></tr>
+          <tr><td><code>created_at</code></td><td>TIMESTAMPTZ</td><td>操作日時（UTC）</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="section">
+      <h2>ログ記録対象アクション</h2>
+      <table>
+        <thead><tr><th style="width:200px;">action ENUM 値</th><th>記録タイミング</th><th style="width:80px;">重要度</th></tr></thead>
+        <tbody>
+          <tr><td><code>login</code></td><td>管理画面ログイン成功</td><td><span class="badge badge-mid">中</span></td></tr>
+          <tr><td><code>logout</code></td><td>ログアウト操作 / セッションタイムアウト</td><td><span class="badge badge-low">低</span></td></tr>
+          <tr><td><code>login_failed</code></td><td>ログイン失敗（連続失敗は T-02 の検知に使用）</td><td><span class="badge badge-high">高</span></td></tr>
+          <tr><td><code>export</code></td><td>学生データ・分析データのCSV/Excelエクスポート</td><td><span class="badge badge-critical">最重要</span></td></tr>
+          <tr><td><code>status_change</code></td><td>選考ステータス変更（ステージ移動・結果入力）</td><td><span class="badge badge-high">高</span></td></tr>
+          <tr><td><code>offer</code></td><td>内定通知書の発行・送付</td><td><span class="badge badge-critical">最重要</span></td></tr>
+          <tr><td><code>acceptance</code></td><td>内定承諾ステータスへの変更</td><td><span class="badge badge-critical">最重要</span></td></tr>
+          <tr><td><code>line_send</code></td><td>LINE一斉送信の実行</td><td><span class="badge badge-high">高</span></td></tr>
+          <tr><td><code>edit_applicant</code></td><td>学生情報（PII）の編集</td><td><span class="badge badge-high">高</span></td></tr>
+          <tr><td><code>delete_applicant</code></td><td>学生データの削除・匿名化</td><td><span class="badge badge-critical">最重要</span></td></tr>
+          <tr><td><code>document_export</code></td><td>内定通知書・書類PDFの生成・ダウンロード</td><td><span class="badge badge-high">高</span></td></tr>
+          <tr><td><code>portal_token_issued</code></td><td>portal_token の新規発行・再発行</td><td><span class="badge badge-mid">中</span></td></tr>
+          <tr><td><code>staff_created</code></td><td>スタッフアカウントの新規作成</td><td><span class="badge badge-high">高</span></td></tr>
+          <tr><td><code>staff_role_changed</code></td><td>スタッフロール変更（権限変更）</td><td><span class="badge badge-critical">最重要</span></td></tr>
+          <tr><td><code>staff_disabled</code></td><td>スタッフアカウントの無効化</td><td><span class="badge badge-high">高</span></td></tr>
+        </tbody>
+      </table>
+      <div class="ok-box">✅ AuditLog は画面上（SCR-12 システム設定）で admin ロールのみ閲覧可能。操作者・日時・変更内容をフィルタリング・検索できる UI を提供する。</div>
+    </div>
+
+    <div class="section">
+      <h2>異常検知・アラート</h2>
+      <table>
+        <thead><tr><th style="width:220px;">検知条件</th><th>対応アクション</th></tr></thead>
+        <tbody>
+          <tr>
+            <td>同一IPから5分以内に10回以上 <code>login_failed</code></td>
+            <td>そのIPからのアクセスを30分ブロック。adminへメール通知。</td>
+          </tr>
+          <tr>
+            <td>1スタッフが1時間以内に <code>export</code> を5回以上</td>
+            <td>6回目以降のエクスポートをブロック。adminへメール通知。</td>
+          </tr>
+          <tr>
+            <td>業務時間外（22時〜7時）の <code>export</code> or <code>delete_applicant</code></td>
+            <td>実行は許可するがadminに即時メール通知（翌営業日確認）。</td>
+          </tr>
+          <tr>
+            <td>退職処理済みスタッフのログイン試行</td>
+            <td>即時ブロック（Firebase Auth でアカウント無効化済みのため通常発生しない）。監視ダッシュボードで記録。</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+  </div><!-- /t-audit -->
+
+  <!-- ⑥ インフラ設定 -->
+  <div id="t-infra" class="tab-content">
+
+    <div class="section">
+      <h2>Firebase Security Rules（Storage）</h2>
+      <pre>rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+    // 履歴書・添付ファイル: 認証済みスタッフのみ読み書き可
+    match /resumes/{applicantId}/{fileName} {
+      allow read:  if request.auth != null;
+      allow write: if request.auth != null
+                   && request.resource.size < 10 * 1024 * 1024   // 10MB上限
+                   && request.resource.contentType.matches('application/pdf|image/.*');
+      allow delete: if request.auth.token.role == 'admin'
+                    || request.auth.token.role == 'recruiter';
+    }
+    // それ以外は全拒否
+    match /{allPaths=**} {
+      allow read, write: if false;
+    }
+  }
+}</pre>
+    </div>
+
+    <div class="section">
+      <h2>Cloud SQL セキュリティ設定</h2>
+      <table>
+        <thead><tr><th style="width:200px;">設定項目</th><th>設定内容</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><strong>ネットワーク</strong></td>
+            <td>Public IP を無効化。Firebase App Hosting からは <strong>Cloud SQL Auth Proxy（Private IP）</strong> 経由でのみ接続。インターネットからの直接接続は不可。</td>
+          </tr>
+          <tr>
+            <td><strong>認証</strong></td>
+            <td>パスワード認証（最低16文字以上の強力なパスワード）+ IAM 認証を併用。DBユーザーは用途別に分離（アプリ用・マイグレーション用・読み取り専用）。</td>
+          </tr>
+          <tr>
+            <td><strong>自動バックアップ</strong></td>
+            <td>毎日2時に自動バックアップ。保持期間7日。ポイントインタイムリカバリ（PITR）有効。</td>
+          </tr>
+          <tr>
+            <td><strong>監査ログ</strong></td>
+            <td>Cloud SQL のデータアクセスログを有効化（Cloud Logging に転送）。</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="section">
+      <h2>依存関係の脆弱性管理</h2>
+      <table>
+        <thead><tr><th style="width:160px;">施策</th><th>実施タイミング・方法</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><strong>npm audit</strong></td>
+            <td>CI/CD パイプライン（GitHub Actions）で <code>npm audit --audit-level=high</code> を実行。high/critical レベルの脆弱性があればビルドを失敗させる。</td>
+          </tr>
+          <tr>
+            <td><strong>Dependabot</strong></td>
+            <td>GitHub Dependabot を有効化。週1回自動でセキュリティアップデートの PR を作成。</td>
+          </tr>
+          <tr>
+            <td><strong>手動レビュー</strong></td>
+            <td>月1回、依存関係の手動確認。メジャーアップデートは手動で検討・適用。</td>
+          </tr>
+          <tr>
+            <td><strong>Node.js バージョン</strong></td>
+            <td>LTS版を使用。EOL（サポート終了）になる前に次期LTSへ移行計画を立てる。</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="section">
+      <h2>アカウント管理運用ルール</h2>
+      <table>
+        <thead><tr><th style="width:200px;">シナリオ</th><th>手順</th></tr></thead>
+        <tbody>
+          <tr>
+            <td>スタッフ入社時</td>
+            <td>admin が Staff テーブルに登録 → Firebase Auth でアカウント作成 → 最小権限のロール（recruiter または interviewer）を付与。初回ログイン時に Google OAuth 経由で認証確立。</td>
+          </tr>
+          <tr>
+            <td><strong>スタッフ退職時</strong></td>
+            <td><strong>即日</strong>: Firebase Auth でアカウント無効化（<code>disabled: true</code>）→ Staff.is_active を false に更新。期限切れセッションの強制失効（Firebase Auth リボーク）。AuditLog は保持。</td>
+          </tr>
+          <tr>
+            <td>portal_token 漏洩疑い</td>
+            <td>admin が AgencyContact のトークンを即時再発行。旧トークンは <code>token_invalidated_at</code> を設定して無効化。エージェントに新しいURLを再送付。</td>
+          </tr>
+          <tr>
+            <td>パスワードリセット</td>
+            <td>Google OAuth 認証のため ATS 側にパスワードは存在しない。Googleアカウントのセキュリティ問題は先方の IT 管理者が対応。</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+  </div><!-- /t-infra -->
+
+  <!-- ⑦ インシデント対応 -->
+  <div id="t-incident" class="tab-content">
+
+    <div class="section">
+      <h2>インシデント対応フロー</h2>
+      <div class="warn-box">⚠️ 個人情報保護法（改正2022年施行）により、<strong>1,000件以上または要配慮個人情報の漏洩は個人情報保護委員会への報告（72時間以内）と本人への通知が義務</strong>。ATS は6,700件以上のPIIを保持するため、漏洩時は必ずこのフローを実行する。</div>
+      <table style="margin-top:12px;">
+        <thead><tr><th style="width:80px;">フェーズ</th><th style="width:120px;">時間軸</th><th>アクション</th><th style="width:100px;">担当</th></tr></thead>
+        <tbody>
+          <tr class="threat-row-critical">
+            <td>① 検知・初動</td>
+            <td>発生〜1時間</td>
+            <td>
+              漏洩・不正アクセスの疑いを検知した担当者は<strong>即座に開発担当（卓也さん）に連絡</strong>。<br>
+              該当するAPIエンドポイント・アカウントを暫定的に無効化またはレートリミット強化。<br>
+              AuditLog からアクセス履歴を取得・保全（証拠保全）。
+            </td>
+            <td>検知者 + 開発</td>
+          </tr>
+          <tr class="threat-row-high">
+            <td>② 影響範囲特定</td>
+            <td>〜6時間</td>
+            <td>
+              漏洩したデータの件数・内容・期間を特定（AuditLog / Cloud SQL ログを調査）。<br>
+              影響を受けた応募者のIDリストを作成。<br>
+              攻撃経路を特定し、脆弱性を閉塞。
+            </td>
+            <td>開発担当</td>
+          </tr>
+          <tr>
+            <td>③ 報告（社内）</td>
+            <td>〜12時間</td>
+            <td>
+              先方（クライアント）の個人情報保護責任者（通常は情報システム部長または法務部）に報告。<br>
+              報告内容: 発生日時・影響件数・影響を受けたデータ種別・暫定対策・今後の対応方針。
+            </td>
+            <td>開発 + クライアント</td>
+          </tr>
+          <tr class="threat-row-critical">
+            <td>④ 法的報告</td>
+            <td>72時間以内</td>
+            <td>
+              <strong>個人情報保護委員会への報告</strong>（1,000件以上の漏洩または要配慮個人情報含む場合）。<br>
+              報告フォーム: <code>https://www.ppc.go.jp/</code><br>
+              本人（応募者）への通知: 漏洩した個人情報の内容・対応状況・問い合わせ窓口を通知。
+            </td>
+            <td>クライアント（法務）</td>
+          </tr>
+          <tr>
+            <td>⑤ 根本対策・再発防止</td>
+            <td>〜1週間</td>
+            <td>
+              脆弱性の根本修正・デプロイ。<br>
+              セキュリティレビュー実施。<br>
+              インシデントレポート作成（原因・影響・対策・再発防止策）。<br>
+              必要に応じて外部セキュリティ診断を実施。
+            </td>
+            <td>開発担当</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="section">
+      <h2>定期セキュリティ対応</h2>
+      <table>
+        <thead><tr><th style="width:120px;">頻度</th><th>実施内容</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><strong>毎日</strong></td>
+            <td>Cloud SQL 自動バックアップ確認（失敗アラートをメール通知）</td>
+          </tr>
+          <tr>
+            <td><strong>毎週</strong></td>
+            <td>Dependabot PRの確認・マージ。AuditLog の異常アクセス確認（export/delete 集中等）</td>
+          </tr>
+          <tr>
+            <td><strong>毎月</strong></td>
+            <td>npm audit の実行・依存関係手動レビュー。スタッフアカウント棚卸し（退職者の残存確認）。portal_token の期限切れ確認。</td>
+          </tr>
+          <tr>
+            <td><strong>半年ごと</strong></td>
+            <td>外部ペネトレーションテスト or 脆弱性診断（OWASP Top 10 ベース）。Firebase Security Rules の見直し。</td>
+          </tr>
+          <tr>
+            <td><strong>年1回</strong></td>
+            <td>全体セキュリティ設計の見直し。データ保持ポリシーの実施確認（匿名化バッチの動作確認）。</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+  </div><!-- /t-incident -->
+
+  <!-- ⑧ 変更履歴 -->
+  <div id="t-log" class="tab-content">
+    <div class="section">
+      <h2>変更履歴</h2>
+      <table>
+        <thead><tr><th style="width:100px;">日付</th><th style="width:60px;">Ver</th><th>変更内容</th></tr></thead>
+        <tbody>
+          <tr>
+            <td>2026-07-21</td><td>v0.1</td>
+            <td>初版作成。脅威モデル・認証認可・通信API保護・データ保護・監査ログ・インフラ設定・インシデント対応を網羅。</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div><!-- /t-log -->
+
+</div><!-- /page -->
+
+<script>
+function sw(el, id) {
+  document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById(id).classList.add('active');
+}
+</script>
+</body>
+</html>
