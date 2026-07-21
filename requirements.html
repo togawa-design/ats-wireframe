@@ -36,8 +36,10 @@
   .badge-high   { background:#ff6b6b; color:#fff; }
   .badge-mid    { background:#ff9800; color:#fff; }
   .badge-low    { background:#9e9e9e; color:#fff; }
-  .badge-new    { background:#7c83fd; color:#fff; }
-  .badge-update { background:#00897b; color:#fff; }
+  .badge-new       { background:#7c83fd; color:#fff; }
+  .badge-update    { background:#00897b; color:#fff; }
+  .badge-both      { background:#1565c0; color:#fff; }
+  .badge-shinsostu { background:#ad1457; color:#fff; }
 
   /* FR ID */
   .fr-id { font-family:monospace; font-size:11px; color:#7c83fd; font-weight:700; white-space:nowrap; }
@@ -84,10 +86,12 @@
 <div class="page">
   <h1>新卒採用管理システム（ATS）要件定義書</h1>
   <div class="meta">
-    <span>v0.8</span>
+    <span>v0.9</span>
     <span>2026-07-21</span>
     <span>ステータス：ヒアリング中</span>
     <span style="color:#4caf50;">確定済み：U-02, U-04</span>
+    <span><span style="display:inline-block;background:#1565c0;color:#fff;border-radius:10px;padding:1px 7px;font-size:10px;font-weight:700;">共通</span> 新卒・中途両対応</span>
+    <span><span style="display:inline-block;background:#ad1457;color:#fff;border-radius:10px;padding:1px 7px;font-size:10px;font-weight:700;">新卒</span> 新卒採用のみ</span>
   </div>
 
   <div class="tabs">
@@ -163,7 +167,7 @@
         <tbody>
           <tr><td class="fr-id">FR001</td><td>学生登録・プロフィール管理</td><td>氏名・学校・学部・連絡先・卒業見込み年度・<strong>応募者区分（新卒/既卒/第二新卒）</strong>を登録・編集</td><td><span class="badge badge-high">高</span></td></tr>
           <tr><td class="fr-id">FR002</td><td>マイページ（LIFF）</td><td>個人情報登録・書類アップロード・画像アップロード・選考状況確認</td><td><span class="badge badge-high">高</span></td></tr>
-          <tr><td class="fr-id">FR003 <span class="badge badge-update">UPD</span></td><td>タグ管理</td><td>タグマスターで一元管理（Tag / ApplicantTag テーブル）。媒体・QRスキャン時に自動付与。複数タグの組み合わせ検索対応</td><td><span class="badge badge-high">高</span></td></tr>
+          <tr><td class="fr-id">FR003 <span class="badge badge-both">共通</span> <span class="badge badge-update">UPD</span></td><td>タグ管理</td><td>タグマスターで一元管理（Tag / ApplicantTag テーブル）。媒体・QRスキャン時に自動付与。複数タグの組み合わせ検索対応</td><td><span class="badge badge-high">高</span></td></tr>
           <tr><td class="fr-id">FR004</td><td>学生一覧・検索</td><td>氏名・学校・タグ・ステータス・媒体・応募者区分による複合絞り込み</td><td><span class="badge badge-high">高</span></td></tr>
           <tr><td class="fr-id">FR005</td><td>書類管理</td><td>学生ごとの添付ファイル（PDF・画像等）の保存・閲覧・ダウンロード</td><td><span class="badge badge-mid">中</span></td></tr>
         </tbody>
@@ -173,11 +177,11 @@
       <table>
         <thead><tr><th style="width:90px;">ID</th><th style="width:220px;">機能</th><th>詳細</th><th style="width:60px;">優先度</th></tr></thead>
         <tbody>
-          <tr><td class="fr-id">FR010 <span class="badge badge-update">UPD</span></td><td>選考フロー管理</td><td><strong>複数フローを自由に設計可能</strong>（SelectionFlow / SelectionStage）。ステージ名・順序をカスタマイズ。各ステージに stage_type を設定してファネル集計に使用</td><td><span class="badge badge-high">高</span></td></tr>
+          <tr><td class="fr-id">FR010 <span class="badge badge-both">共通</span> <span class="badge badge-update">UPD</span></td><td>選考フロー管理</td><td><strong>複数フローを自由に設計可能</strong>（SelectionFlow / SelectionStage）。ステージ名・順序をカスタマイズ。各ステージに stage_type を設定してファネル集計に使用</td><td><span class="badge badge-high">高</span></td></tr>
           <tr><td class="fr-id">FR011</td><td>パイプラインビュー</td><td>カンバン形式とリスト形式で選考状況を可視化。ドラッグ&ドロップでステータス変更</td><td><span class="badge badge-high">高</span></td></tr>
           <tr><td class="fr-id">FR012</td><td>面接情報登録</td><td>面接日時・担当者・評価スコア・コメントをシステム内に記録</td><td><span class="badge badge-high">高</span></td></tr>
           <tr><td class="fr-id">FR013</td><td>面接書類データ化</td><td>評価シート・面接メモをシステム上で作成・保存（紙廃止）</td><td><span class="badge badge-mid">中</span></td></tr>
-          <tr><td class="fr-id">FR014 <span class="badge badge-new">NEW</span></td><td>選考履歴ログ</td><td>SelectionHistory テーブルで誰がいつどのステージに変更したかを全記録</td><td><span class="badge badge-mid">中</span></td></tr>
+          <tr><td class="fr-id">FR014 <span class="badge badge-both">共通</span> <span class="badge badge-new">NEW</span></td><td>選考履歴ログ</td><td>SelectionHistory テーブルで誰がいつどのステージに変更したかを全記録</td><td><span class="badge badge-mid">中</span></td></tr>
         </tbody>
       </table>
 
@@ -200,8 +204,8 @@
           <tr><td class="fr-id">FR031</td><td>メッセージ送信</td><td>タグ・ステータスで対象を絞って一斉送信。差し込み変数（氏名等）対応</td><td><span class="badge badge-high">高</span></td></tr>
           <tr><td class="fr-id">FR032</td><td>画像送受信</td><td>管理者→学生・学生→管理者の両方向での画像送受信</td><td><span class="badge badge-mid">中</span></td></tr>
           <tr><td class="fr-id">FR033</td><td>送信履歴・開封集計</td><td>送信日時・送信数・開封率（集計値）の記録・表示。※個人単位の既読取得は LINE API 制約により不可</td><td><span class="badge badge-mid">中</span></td></tr>
-          <tr><td class="fr-id">FR034 <span class="badge badge-update">UPD</span></td><td>リッチメニュー管理</td><td><strong>複数メニューを管理・タグで自動割り当て</strong>（職種別・選考ステータス別等）。優先順位設定あり。公開中/下書きのステータス管理</td><td><span class="badge badge-high">高</span></td></tr>
-          <tr><td class="fr-id">FR035 <span class="badge badge-new">NEW</span></td><td>リッチメニュー自動切替</td><td>応募者のタグが変更された際に、RichMenuRule に基づき LINE 側のメニューを自動切り替え</td><td><span class="badge badge-high">高</span></td></tr>
+          <tr><td class="fr-id">FR034 <span class="badge badge-shinsostu">新卒</span> <span class="badge badge-update">UPD</span></td><td>リッチメニュー管理</td><td><strong>複数メニューを管理・タグで自動割り当て</strong>（職種別・選考ステータス別等）。優先順位設定あり。公開中/下書きのステータス管理</td><td><span class="badge badge-high">高</span></td></tr>
+          <tr><td class="fr-id">FR035 <span class="badge badge-shinsostu">新卒</span> <span class="badge badge-new">NEW</span></td><td>リッチメニュー自動切替</td><td>応募者のタグが変更された際に、RichMenuRule に基づき LINE 側のメニューを自動切り替え</td><td><span class="badge badge-high">高</span></td></tr>
           <tr><td class="fr-id">FR036</td><td>LINEアンケート</td><td>LIFF経由のアンケートをLINEで送付・回答回収・集計</td><td><span class="badge badge-mid">中</span></td></tr>
         </tbody>
       </table>
@@ -210,7 +214,7 @@
       <table>
         <thead><tr><th style="width:90px;">ID</th><th style="width:220px;">機能</th><th>詳細</th><th style="width:60px;">優先度</th></tr></thead>
         <tbody>
-          <tr><td class="fr-id">FR040 <span class="badge badge-update">UPD</span></td><td>媒体連携</td><td>
+          <tr><td class="fr-id">FR040 <span class="badge badge-both">共通</span> <span class="badge badge-update">UPD</span></td><td>媒体連携</td><td>
             <strong>必須6媒体：マイナビ・Re就活キャンパス・OfferBox・キミスカ・キャリアチケット・ABABA</strong>からの応募データ自動取込（API/CSV）。<br>
             <strong>オプション：ワンキャリア・ホワイト企業ナビ</strong>（Phase 2以降で対応）。<br>
             媒体ごとにフィールドマッピング設定（Media.field_mapping JSONB）。重複排除ロジックあり。<br>
@@ -225,14 +229,14 @@
       <table>
         <thead><tr><th style="width:90px;">ID</th><th style="width:220px;">機能</th><th>詳細</th><th style="width:60px;">優先度</th></tr></thead>
         <tbody>
-          <tr><td class="fr-id">FR050 <span class="badge badge-update">UPD</span></td><td>統合ファネル遷移率</td><td>複数フローを統合した1本のファネルで集計。<strong>フローにないステージでも「それより先に進んでいれば通過扱い」のバイパスカウントロジック</strong>（stage_type ENUMで実装）</td><td><span class="badge badge-high">高</span></td></tr>
+          <tr><td class="fr-id">FR050 <span class="badge badge-both">共通</span> <span class="badge badge-update">UPD</span></td><td>統合ファネル遷移率</td><td>複数フローを統合した1本のファネルで集計。<strong>フローにないステージでも「それより先に進んでいれば通過扱い」のバイパスカウントロジック</strong>（stage_type ENUMで実装）</td><td><span class="badge badge-high">高</span></td></tr>
           <tr><td class="fr-id">FR051</td><td>媒体・流入経路別分析</td><td>媒体・学校・QR別のエントリー数・各ステージ通過率・承諾率・平均採用日数の比較</td><td><span class="badge badge-high">高</span></td></tr>
           <tr><td class="fr-id">FR052</td><td>内定者・承諾者一覧</td><td>フィルター付きリスト表示。印刷・CSV出力対応</td><td><span class="badge badge-high">高</span></td></tr>
           <tr><td class="fr-id">FR053</td><td>全データエクスポート</td><td>学生データ・選考データ・アンケートデータのCSV一括出力</td><td><span class="badge badge-mid">中</span></td></tr>
-          <tr><td class="fr-id">FR054 <span class="badge badge-new">NEW</span></td><td>採用スピード分析</td><td>ステージ別平均滞在日数・ボトルネック検出。面接官別通過率・評価スコア分布</td><td><span class="badge badge-mid">中</span></td></tr>
-          <tr><td class="fr-id">FR055 <span class="badge badge-new">NEW</span></td><td>辞退リスクスコア</td><td>アンケート入社意欲・LINEアクセス頻度・承諾期限残日数から辞退リスクを算出。一覧表示＋即時LINEフォロー</td><td><span class="badge badge-mid">中</span></td></tr>
-          <tr><td class="fr-id">FR056 <span class="badge badge-new">NEW</span></td><td>採用目標達成予測</td><td>現在のファネル状況から最終承諾数を予測。目標との差分を可視化</td><td><span class="badge badge-mid">中</span></td></tr>
-          <tr><td class="fr-id">FR057 <span class="badge badge-new">NEW</span></td><td>前年比較</td><td>同一期間の主要指標（エントリー数・承諾率・採用日数等）を前年と比較</td><td><span class="badge badge-low">低</span></td></tr>
+          <tr><td class="fr-id">FR054 <span class="badge badge-both">共通</span> <span class="badge badge-new">NEW</span></td><td>採用スピード分析</td><td>ステージ別平均滞在日数・ボトルネック検出。面接官別通過率・評価スコア分布</td><td><span class="badge badge-mid">中</span></td></tr>
+          <tr><td class="fr-id">FR055 <span class="badge badge-shinsostu">新卒</span> <span class="badge badge-new">NEW</span></td><td>辞退リスクスコア</td><td>アンケート入社意欲・LINEアクセス頻度・承諾期限残日数から辞退リスクを算出。一覧表示＋即時LINEフォロー</td><td><span class="badge badge-mid">中</span></td></tr>
+          <tr><td class="fr-id">FR056 <span class="badge badge-both">共通</span> <span class="badge badge-new">NEW</span></td><td>採用目標達成予測</td><td>現在のファネル状況から最終承諾数を予測。目標との差分を可視化</td><td><span class="badge badge-mid">中</span></td></tr>
+          <tr><td class="fr-id">FR057 <span class="badge badge-both">共通</span> <span class="badge badge-new">NEW</span></td><td>前年比較</td><td>同一期間の主要指標（エントリー数・承諾率・採用日数等）を前年と比較</td><td><span class="badge badge-low">低</span></td></tr>
         </tbody>
       </table>
 
@@ -250,8 +254,8 @@
         <thead><tr><th style="width:90px;">ID</th><th style="width:220px;">機能</th><th>詳細</th><th style="width:60px;">優先度</th></tr></thead>
         <tbody>
           <tr><td class="fr-id">FR070</td><td>承諾時の自動SF登録</td><td>内定承諾ステータス変更をトリガーにSalesforce REST APIでContactを自動生成。ATS_Applicant_ID__c カスタム項目で双方向リンク</td><td><span class="badge badge-high">高</span></td></tr>
-          <tr><td class="fr-id">FR071 <span class="badge badge-update">UPD</span></td><td>SF→ATS 在籍情報同期</td><td><strong>SF が主従（マスター）</strong>。退職・部署異動のレコード変更を日次バッチで取得。ATS側は読み取り専用キャッシュ。上書き不可</td><td><span class="badge badge-mid">中</span></td></tr>
-          <tr><td class="fr-id">FR072 <span class="badge badge-update">UPD</span></td><td>SF→ATS 大学情報同期</td><td><strong>SF が主従</strong>。SFのAccountオブジェクト（大学）から訪問履歴・担当者情報を取得。ATSの学校マスターに反映</td><td><span class="badge badge-mid">中</span></td></tr>
+          <tr><td class="fr-id">FR071 <span class="badge badge-both">共通</span> <span class="badge badge-update">UPD</span></td><td>SF→ATS 在籍情報同期</td><td><strong>SF が主従（マスター）</strong>。退職・部署異動のレコード変更を日次バッチで取得。ATS側は読み取り専用キャッシュ。上書き不可</td><td><span class="badge badge-mid">中</span></td></tr>
+          <tr><td class="fr-id">FR072 <span class="badge badge-shinsostu">新卒</span> <span class="badge badge-update">UPD</span></td><td>SF→ATS 大学情報同期</td><td><strong>SF が主従</strong>。SFのAccountオブジェクト（大学）から訪問履歴・担当者情報を取得。ATSの学校マスターに反映</td><td><span class="badge badge-mid">中</span></td></tr>
         </tbody>
       </table>
 
@@ -259,18 +263,18 @@
       <table>
         <thead><tr><th style="width:90px;">ID</th><th style="width:220px;">機能</th><th>詳細</th><th style="width:60px;">優先度</th></tr></thead>
         <tbody>
-          <tr><td class="fr-id">FR085 <span class="badge badge-new">NEW</span></td><td>Google OAuth認証</td><td>先方のGoogleアカウントでログイン。パスワード管理不要。許可済みドメインのみログイン可能にする（不正アクセス防止）</td><td><span class="badge badge-high">高</span></td></tr>
-          <tr><td class="fr-id">FR086 <span class="badge badge-new">NEW</span></td><td>ロールベースアクセス制御</td><td>
+          <tr><td class="fr-id">FR085 <span class="badge badge-both">共通</span> <span class="badge badge-new">NEW</span></td><td>Google OAuth認証</td><td>先方のGoogleアカウントでログイン。パスワード管理不要。許可済みドメインのみログイン可能にする（不正アクセス防止）</td><td><span class="badge badge-high">高</span></td></tr>
+          <tr><td class="fr-id">FR086 <span class="badge badge-both">共通</span> <span class="badge badge-new">NEW</span></td><td>ロールベースアクセス制御</td><td>
             4権限：<strong>管理者</strong>（全操作）/  <strong>採用担当</strong>（学生管理・LINE・分析）/ <strong>面接官</strong>（担当学生の閲覧・評価入力のみ）/ <strong>閲覧のみ</strong>（データ閲覧・分析）<br>
             面接官は自分が assigned_to に設定された学生のみ表示
           </td><td><span class="badge badge-high">高</span></td></tr>
-          <tr><td class="fr-id">FR087 <span class="badge badge-new">NEW</span></td><td>ユーザー管理画面</td><td>管理者のみ操作可。招待メール送付・ロール変更・アカウント停止。Googleアカウントとの紐付け管理</td><td><span class="badge badge-high">高</span></td></tr>
-          <tr><td class="fr-id">FR088 <span class="badge badge-new">NEW</span></td><td>操作ログ（監査ログ）</td><td>
+          <tr><td class="fr-id">FR087 <span class="badge badge-both">共通</span> <span class="badge badge-new">NEW</span></td><td>ユーザー管理画面</td><td>管理者のみ操作可。招待メール送付・ロール変更・アカウント停止。Googleアカウントとの紐付け管理</td><td><span class="badge badge-high">高</span></td></tr>
+          <tr><td class="fr-id">FR088 <span class="badge badge-both">共通</span> <span class="badge badge-new">NEW</span></td><td>操作ログ（監査ログ）</td><td>
             全ログイン/ログアウト（IP・日時）を記録。<br>
             重要操作を AuditLog に記録：データエクスポート・選考ステータス変更・内定/承諾操作・LINE一斉送信・学生情報編集<br>
             管理者のみ閲覧可能
           </td><td><span class="badge badge-high">高</span></td></tr>
-          <tr><td class="fr-id">FR089 <span class="badge badge-update">UPD</span></td><td>ガルーン連携（カレンダー）</td><td>
+          <tr><td class="fr-id">FR089 <span class="badge badge-both">共通</span> <span class="badge badge-update">UPD</span></td><td>ガルーン連携（カレンダー）</td><td>
             複数担当者のガルーンスケジュールをATS上で表示・空き枠を検出。<br>
             面接確定時にガルーン REST API で予定を自動登録。<br>
             ※ ATS→ガルーンの一方向同期。ガルーン側の変更は ATS に自動反映されない。<br>
@@ -283,8 +287,8 @@
       <table>
         <thead><tr><th style="width:90px;">ID</th><th style="width:220px;">機能</th><th>詳細</th><th style="width:60px;">優先度</th></tr></thead>
         <tbody>
-          <tr><td class="fr-id">FR080 <span class="badge badge-update">UPD</span></td><td>担当者・権限管理</td><td>Staff テーブルで管理。Google OAuth と紐付け。担当者もLINE通知受け取り可</td><td><span class="badge badge-high">高</span></td></tr>
-          <tr><td class="fr-id">FR081 <span class="badge badge-update">UPD</span></td><td>選考フロー設定</td><td>複数フローの作成・ステージ追加・並び替え・stage_type 設定</td><td><span class="badge badge-high">高</span></td></tr>
+          <tr><td class="fr-id">FR080 <span class="badge badge-both">共通</span> <span class="badge badge-update">UPD</span></td><td>担当者・権限管理</td><td>Staff テーブルで管理。Google OAuth と紐付け。担当者もLINE通知受け取り可</td><td><span class="badge badge-high">高</span></td></tr>
+          <tr><td class="fr-id">FR081 <span class="badge badge-both">共通</span> <span class="badge badge-update">UPD</span></td><td>選考フロー設定</td><td>複数フローの作成・ステージ追加・並び替え・stage_type 設定</td><td><span class="badge badge-high">高</span></td></tr>
           <tr><td class="fr-id">FR082</td><td>タグマスター管理</td><td>タグの作成・色設定・編集・削除。削除時は ApplicantTag の紐付けも解除</td><td><span class="badge badge-mid">中</span></td></tr>
         </tbody>
       </table>
@@ -293,50 +297,50 @@
       <table>
         <thead><tr><th style="width:90px;">ID</th><th style="width:220px;">機能</th><th>詳細</th><th style="width:60px;">優先度</th></tr></thead>
         <tbody>
-          <tr><td class="fr-id">FR097 <span class="badge badge-new">NEW</span></td><td>選考結果・出欠の一括登録</td><td>
+          <tr><td class="fr-id">FR097 <span class="badge badge-both">共通</span> <span class="badge badge-new">NEW</span></td><td>選考結果・出欠の一括登録</td><td>
             説明会参加・不参加・キャンセル等の結果を複数学生に対して一括登録。<br>
             Selection / SelectionHistory へ一括 INSERT。AuditLog に status_change を記録。
           </td><td><span class="badge badge-high">高</span></td></tr>
-          <tr><td class="fr-id">FR098 <span class="badge badge-new">NEW</span></td><td>説明会・面接枠の一括登録</td><td>
+          <tr><td class="fr-id">FR098 <span class="badge badge-both">共通</span> <span class="badge badge-new">NEW</span></td><td>説明会・面接枠の一括登録</td><td>
             同一日程・同一条件の CalendarSlot を複数まとめて作成できる一括登録画面。<br>
             例: 「10:00〜17:00 を1時間ごとに6枠作成」等の繰り返しパターン入力に対応。
           </td><td><span class="badge badge-high">高</span></td></tr>
-          <tr><td class="fr-id">FR099 <span class="badge badge-new">NEW</span></td><td>応募者一覧の表示列カスタマイズ</td><td>
+          <tr><td class="fr-id">FR099 <span class="badge badge-both">共通</span> <span class="badge badge-new">NEW</span></td><td>応募者一覧の表示列カスタマイズ</td><td>
             担当者ごとに応募者一覧の表示列・並び順を設定・保存。<br>
             設定は StaffColumnPreference テーブルに永続化。<br>
             例: 学校名・卒業年度・タグを表示 / 電話番号・職種を非表示。
           </td><td><span class="badge badge-mid">中</span></td></tr>
-          <tr><td class="fr-id">FR100 <span class="badge badge-new">NEW</span></td><td>メッセージテンプレート管理</td><td>
+          <tr><td class="fr-id">FR100 <span class="badge badge-both">共通</span> <span class="badge badge-new">NEW</span></td><td>メッセージテンプレート管理</td><td>
             LINE / メール / 両方のチャネル別テンプレートを登録・編集・並び替え。<br>
             表示順はドラッグ&ドロップで変更（sort_order カラムを更新）。<br>
             差し込み変数（{{氏名}} 等）対応。MessageTemplate テーブルで管理。
           </td><td><span class="badge badge-high">高</span></td></tr>
-          <tr><td class="fr-id">FR101 <span class="badge badge-new">NEW</span></td><td>サンクス・リマインドの自動送信</td><td>
+          <tr><td class="fr-id">FR101 <span class="badge badge-both">共通</span> <span class="badge badge-new">NEW</span></td><td>サンクス・リマインドの自動送信</td><td>
             説明会後のサンクスメール・面接前日リマインド等を自動送信。<br>
             NotificationRule にトリガー（ステージ変更・面接確定・期限前等）と遅延時間・テンプレートを設定。<br>
             送信チャネル: LINE / サイバーメール SMTP。送信結果は NotificationLog に記録。
           </td><td><span class="badge badge-high">高</span></td></tr>
-          <tr><td class="fr-id">FR102 <span class="badge badge-new">NEW</span></td><td>レポートからのドリルダウン</td><td>
+          <tr><td class="fr-id">FR102 <span class="badge badge-both">共通</span> <span class="badge badge-new">NEW</span></td><td>レポートからのドリルダウン</td><td>
             ファネル・レポートの各数値をクリックすると、該当する学生一覧画面に遷移。<br>
             例: 「一次面接通過: 42名」をクリック → 42名の学生一覧（フィルタ適用済み）。
           </td><td><span class="badge badge-high">高</span></td></tr>
-          <tr><td class="fr-id">FR103 <span class="badge badge-new">NEW</span></td><td>レポートの集計期間指定</td><td>
+          <tr><td class="fr-id">FR103 <span class="badge badge-both">共通</span> <span class="badge badge-new">NEW</span></td><td>レポートの集計期間指定</td><td>
             分析画面で集計対象期間（開始日〜終了日）を任意に指定。<br>
             媒体別・フロー別・全体のすべての集計に適用。
           </td><td><span class="badge badge-mid">中</span></td></tr>
-          <tr><td class="fr-id">FR104 <span class="badge badge-new">NEW</span></td><td>採用サイトからLIFFマイページへの導線</td><td>
+          <tr><td class="fr-id">FR104 <span class="badge badge-shinsostu">新卒</span> <span class="badge badge-new">NEW</span></td><td>採用サイトからLIFFマイページへの導線</td><td>
             外部採用サイトのエントリーフォームから、LIFF マイページ登録へシームレスに遷移。<br>
             エントリートークンをURLパラメータとして引き継ぎ、LINE友達追加と同時に応募者を自動生成。
           </td><td><span class="badge badge-mid">中</span></td></tr>
-          <tr><td class="fr-id">FR105 <span class="badge badge-new">NEW</span></td><td>LINEでのファイル（PDF等）送受信</td><td>
+          <tr><td class="fr-id">FR105 <span class="badge badge-shinsostu">新卒</span> <span class="badge badge-new">NEW</span></td><td>LINEでのファイル（PDF等）送受信</td><td>
             画像に加えてPDF等のファイルを管理者↔学生間で送受信可能にする。<br>
             受信ファイルは Firebase Storage に保存し、LineMessage.file_url で参照。
           </td><td><span class="badge badge-mid">中</span></td></tr>
-          <tr><td class="fr-id">FR106 <span class="badge badge-new">NEW</span></td><td>面接評価入力完了の可視化（願望）</td><td>
+          <tr><td class="fr-id">FR106 <span class="badge badge-both">共通</span> <span class="badge badge-new">NEW</span></td><td>面接評価入力完了の可視化（願望）</td><td>
             面接担当者が評価入力を完了したことを、学生一覧・面接一覧上でマーク・色で視覚的に表示。<br>
             Interview.is_evaluation_complete フラグで管理。
           </td><td><span class="badge badge-low">低</span></td></tr>
-          <tr><td class="fr-id">FR107 <span class="badge badge-new">NEW</span></td><td>期限超過学生の可視化（願望）</td><td>
+          <tr><td class="fr-id">FR107 <span class="badge badge-both">共通</span> <span class="badge badge-new">NEW</span></td><td>期限超過学生の可視化（願望）</td><td>
             書類提出期限（Applicant.document_deadline）や内定承諾期限（offer_acceptance_deadline）を過ぎた学生を、一覧上で警告マーク・色で強調表示。<br>
             ダッシュボードでも期限切れ件数をカード表示。
           </td><td><span class="badge badge-low">低</span></td></tr>
@@ -347,41 +351,41 @@
       <table>
         <thead><tr><th style="width:90px;">ID</th><th style="width:220px;">機能</th><th>詳細</th><th style="width:60px;">優先度</th></tr></thead>
         <tbody>
-          <tr><td class="fr-id">FR108 <span class="badge badge-new">NEW</span></td><td>選考会キャンセル履歴管理（種別変更含む）</td><td>
+          <tr><td class="fr-id">FR108 <span class="badge badge-shinsostu">新卒</span> <span class="badge badge-new">NEW</span></td><td>選考会キャンセル履歴管理（種別変更含む）</td><td>
             説明会・選考会への参加登録・キャンセルの履歴を追える。<br>
             選考会には種別（2day/1day）があり、2day→1dayへの変更（キャンセル＋再登録）の履歴も一元管理。<br>
             既存のキャンセル機能と統合。EventRegistration テーブルで管理。<br>
             キャンセル理由は任意テキスト or 選択式で記録（FR114の集計に使用）。
           </td><td><span class="badge badge-high">高</span></td></tr>
-          <tr><td class="fr-id">FR109 <span class="badge badge-new">NEW</span></td><td>架電履歴（手動入力）</td><td>
+          <tr><td class="fr-id">FR109 <span class="badge badge-both">共通</span> <span class="badge badge-new">NEW</span></td><td>架電履歴（手動入力）</td><td>
             担当者が学生への電話日時・架電結果・内容を手動でシステムに記録。<br>
             CallLog テーブルで管理。1学生に複数件登録可。<br>
             架電結果：つながった / 不在 / 折り返し待ち / 留守録。<br>
             学生詳細（SCR-03）の「架電履歴」タブで登録・閲覧。
           </td><td><span class="badge badge-high">高</span></td></tr>
-          <tr><td class="fr-id">FR110 <span class="badge badge-new">NEW</span></td><td>要架電者フラグ・リスト</td><td>
+          <tr><td class="fr-id">FR110 <span class="badge badge-both">共通</span> <span class="badge badge-new">NEW</span></td><td>要架電者フラグ・リスト</td><td>
             「折り返し待ち」「連絡つかず」など要架電フラグを Applicant.call_status（ENUM: none / callback_needed / no_answer）で管理。<br>
             担当者が手動更新（学生詳細から）。<br>
             学生一覧（SCR-02）にフィルタ・識別バッジを追加し、要架電者を一覧で把握可能にする。
           </td><td><span class="badge badge-high">高</span></td></tr>
-          <tr><td class="fr-id">FR111 <span class="badge badge-new">NEW</span></td><td>履歴書未提出の自動リマインド＋リスト</td><td>
+          <tr><td class="fr-id">FR111 <span class="badge badge-both">共通</span> <span class="badge badge-new">NEW</span></td><td>履歴書未提出の自動リマインド＋リスト</td><td>
             Applicant.resume_url IS NULL の学生を抽出し自動リマインドを送信。<br>
             NotificationRule に trigger_type: resume_missing を追加して実装。<br>
             学生一覧（SCR-02）に「履歴書未提出」フィルタを追加。
           </td><td><span class="badge badge-mid">中</span></td></tr>
-          <tr><td class="fr-id">FR112 <span class="badge badge-new">NEW</span></td><td>欠席ステータス→紹介会社メール自動通知（ON/OFF）</td><td>
+          <tr><td class="fr-id">FR112 <span class="badge badge-both">共通</span> <span class="badge badge-new">NEW</span></td><td>欠席ステータス→紹介会社メール自動通知（ON/OFF）</td><td>
             学生のステータスが「欠席」に変更されたとき、紹介会社担当者（AgencyContact.email）へ自動でメールを送信。<br>
             <strong>メールのみ（SMSは対象外）</strong>。サイバーメール SMTP 経由（Nodemailer）。<br>
             NotificationRule.target_type = agency_contact として拡張。<br>
             システム設定（SCR-12）でON/OFF 切り替え可能。
           </td><td><span class="badge badge-mid">中</span></td></tr>
-          <tr><td class="fr-id">FR113 <span class="badge badge-new">NEW</span></td><td>エージェントポータルからのキャンセル操作</td><td>
+          <tr><td class="fr-id">FR113 <span class="badge badge-both">共通</span> <span class="badge badge-new">NEW</span></td><td>エージェントポータルからのキャンセル操作</td><td>
             エージェントポータル（SCR-14）に「キャンセル申請」タブを追加。<br>
             紹介会社担当者が自らキャンセル操作を実行可能（portal_token 認証）。<br>
             API: PATCH /api/portal/event-registrations/:id/cancel（portal_token 認証）。<br>
             キャンセル時は EventRegistration.status を cancelled に更新し、採用担当者に通知（NotificationLog INSERT）。
           </td><td><span class="badge badge-mid">中</span></td></tr>
-          <tr><td class="fr-id">FR114 <span class="badge badge-new">NEW</span></td><td>キャンセル・辞退・不合格理由の集計・確認</td><td>
+          <tr><td class="fr-id">FR114 <span class="badge badge-both">共通</span> <span class="badge badge-new">NEW</span></td><td>キャンセル・辞退・不合格理由の集計・確認</td><td>
             キャンセル理由（EventRegistration.cancel_reason）・辞退理由（SelectionHistory.decline_reason）をフリーテキストまたは選択式で記録。<br>
             分析画面（SCR-06）にて理由別の件数・割合を集計表示。<br>
             期間・フロー・媒体でのフィルタに対応。
@@ -393,29 +397,29 @@
       <table>
         <thead><tr><th style="width:90px;">ID</th><th style="width:220px;">機能</th><th>詳細</th><th style="width:60px;">優先度</th></tr></thead>
         <tbody>
-          <tr><td class="fr-id">FR115 <span class="badge badge-new">NEW</span></td><td>中途採用の統合管理</td><td>
+          <tr><td class="fr-id">FR115 <span class="badge badge-both">共通</span> <span class="badge badge-new">NEW</span></td><td>中途採用の統合管理</td><td>
             Applicant.hire_type ENUM（new_grad / mid_career）を追加し、新卒・中途を同一管理画面で運用。<br>
             <strong>中途採用はLINE連携なし</strong>（hire_type = 'mid_career' の応募者にはLINE機能を非表示）。メール・システム内通知のみ対応。<br>
             Job テーブルにも hire_type を追加し、求人単位で区分管理。<br>
             エージェントポータル・媒体連携は新卒・中途ともに共通利用可。
           </td><td><span class="badge badge-mid">中</span></td></tr>
-          <tr><td class="fr-id">FR116 <span class="badge badge-new">NEW</span></td><td>新卒/中途ダッシュボード分離</td><td>
+          <tr><td class="fr-id">FR116 <span class="badge badge-both">共通</span> <span class="badge badge-new">NEW</span></td><td>新卒/中途ダッシュボード分離</td><td>
             ダッシュボード（SCR-01）に「新卒 / 中途 / 全体」切り替えタブを追加（FR115 と連動）。<br>
             KPIカード・ファネルチャート・最近のエントリー・スケジュールが hire_type でフィルタされる。<br>
             API: <code>GET /api/dashboard?hire_type=new_grad|mid_career|all</code>
           </td><td><span class="badge badge-mid">中</span></td></tr>
-          <tr><td class="fr-id">FR117 <span class="badge badge-new">NEW</span></td><td>レポートのクロス集計（会議向け）</td><td>
+          <tr><td class="fr-id">FR117 <span class="badge badge-both">共通</span> <span class="badge badge-new">NEW</span></td><td>レポートのクロス集計（会議向け）</td><td>
             分析画面（SCR-06）にクロス集計タブを追加。<br>
             行軸・列軸を任意に設定して集計（媒体×ステージ通過率、フロー×結果、学校×承諾率等）。<br>
             集計結果は CSV / Excel（.xlsx）でエクスポート可能。<br>
             期間・hire_type・職種区分でのフィルタに対応。
           </td><td><span class="badge badge-mid">中</span></td></tr>
-          <tr><td class="fr-id">FR118 <span class="badge badge-new">NEW</span></td><td>追加媒体対応</td><td>
+          <tr><td class="fr-id">FR118 <span class="badge badge-both">共通</span> <span class="badge badge-new">NEW</span></td><td>追加媒体対応</td><td>
             <strong>【必須】</strong>リクナビ：API連携で応募者データを自動取り込み。ApplicantSource マスタに追加。<br>
             <strong>【オプション】</strong>ワンキャリア・ホワイト企業ナビ：CSV取り込み（API非対応の場合）。<br>
             対応済み必須6媒体（マイナビ・Re就活キャンパス・OfferBox・キミスカ・キャリアチケット・ABABA）に追加。
           </td><td><span class="badge badge-high">高</span></td></tr>
-          <tr><td class="fr-id">FR119 <span class="badge badge-new">NEW</span></td><td>選考会種別4種類対応</td><td>
+          <tr><td class="fr-id">FR119 <span class="badge badge-shinsostu">新卒</span> <span class="badge badge-new">NEW</span></td><td>選考会種別4種類対応</td><td>
             EventRegistration.event_type ENUM を 4種類に拡張（one_day / two_day / three_day / four_day / other）。<br>
             製造エンジニア職の選考フロー（1day〜4day の4段階）に対応。<br>
             「1dayの人は一次選考でもカウント」のバイパスロジック（FR050）と組み合わせて遷移率を正確に算出。
@@ -427,40 +431,40 @@
       <table>
         <thead><tr><th style="width:90px;">ID</th><th style="width:220px;">機能</th><th>詳細</th><th style="width:60px;">優先度</th></tr></thead>
         <tbody>
-          <tr><td class="fr-id">FR090 <span class="badge badge-new">NEW</span></td><td>紹介会社（エージェント）マスター管理</td><td>
+          <tr><td class="fr-id">FR090 <span class="badge badge-both">共通</span> <span class="badge badge-new">NEW</span></td><td>紹介会社（エージェント）マスター管理</td><td>
             Agency（紹介会社）と AgencyContact（担当者）の登録・編集・無効化。<br>
             担当者はエリア別（関東担当・東海担当等）に複数登録可。<br>
             Applicant.agency_contact_id で学生と担当者を紐づけ。
           </td><td><span class="badge badge-high">高</span></td></tr>
-          <tr><td class="fr-id">FR091 <span class="badge badge-new">NEW</span></td><td>エージェントによる学生登録（外部フォーム）</td><td>
+          <tr><td class="fr-id">FR091 <span class="badge badge-both">共通</span> <span class="badge badge-new">NEW</span></td><td>エージェントによる学生登録（外部フォーム）</td><td>
             AgencyContact ごとに発行したマジックリンク URL（ログイン不要）から学生情報・履歴書を登録。<br>
             登録された学生は Applicant テーブルに agency_contact_id 付きで作成。<br>
             履歴書 PDF は Firebase Storage に格納し、Applicant に URL を保存。
           </td><td><span class="badge badge-high">高</span></td></tr>
-          <tr><td class="fr-id">FR092 <span class="badge badge-new">NEW</span></td><td>エージェントポータル（選考状況確認）</td><td>
+          <tr><td class="fr-id">FR092 <span class="badge badge-both">共通</span> <span class="badge badge-new">NEW</span></td><td>エージェントポータル（選考状況確認）</td><td>
             AgencyContact.portal_token を使ったマジックリンク URL でアクセス可能な外部向けポータル。<br>
             表示情報: 現在のステージ・面接日時・ステータス（選考中 / 合格 / 不合格 / 内定 / 辞退）・最終更新日。<br>
             非表示: 評価スコア・コメント・面接官名・内部メモ。
           </td><td><span class="badge badge-high">高</span></td></tr>
-          <tr><td class="fr-id">FR093 <span class="badge badge-new">NEW</span></td><td>合否連絡のシステム内送信（サイバーメール）</td><td>
+          <tr><td class="fr-id">FR093 <span class="badge badge-both">共通</span> <span class="badge badge-new">NEW</span></td><td>合否連絡のシステム内送信（サイバーメール）</td><td>
             ATS から直接、AgencyContact.email 宛に合否連絡メールを送信。<br>
             送信手段: <strong>サイバーメール（NTTCom）の SMTP 経由 / Nodemailer</strong>。<br>
             送信元: 採用担当者個人のアドレス（tanaka@〇〇.com）。<br>
             対象: 紹介会社経由の学生の合否確定時。<br>
             ※ SMTP 接続情報（host / port / auth）はクライアント確認中。
           </td><td><span class="badge badge-high">高</span></td></tr>
-          <tr><td class="fr-id">FR094 <span class="badge badge-new">NEW</span></td><td>合否連絡・内定通知書の一括送信</td><td>
+          <tr><td class="fr-id">FR094 <span class="badge badge-both">共通</span> <span class="badge badge-new">NEW</span></td><td>合否連絡・内定通知書の一括送信</td><td>
             内定（offer）確定時に合否連絡メール＋内定通知書 PDF を1通にまとめて送信。<br>
             PDF は Document テーブルのテンプレートから生成し Firebase Storage に保存後に添付。<br>
             AuditLog に document_export + line_send を記録。
           </td><td><span class="badge badge-high">高</span></td></tr>
-          <tr><td class="fr-id">FR095 <span class="badge badge-new">NEW</span></td><td>総合職・技能職の職種区分管理</td><td>
+          <tr><td class="fr-id">FR095 <span class="badge badge-both">共通</span> <span class="badge badge-new">NEW</span></td><td>総合職・技能職の職種区分管理</td><td>
             Applicant.position_type（sogo / gino）で応募者を職種区分で管理。<br>
             Staff.position_type_access（sogo / gino / both）でスタッフの閲覧・操作範囲を制限。<br>
             both 以外のスタッフは担当外職種の応募者を閲覧・操作不可。<br>
             学生一覧・選考管理・分析画面すべてに職種フィルタを追加。
           </td><td><span class="badge badge-high">高</span></td></tr>
-          <tr><td class="fr-id">FR096 <span class="badge badge-new">NEW</span></td><td>選考ステップの個別カスタマイズ</td><td>
+          <tr><td class="fr-id">FR096 <span class="badge badge-both">共通</span> <span class="badge badge-new">NEW</span></td><td>選考ステップの個別カスタマイズ</td><td>
             個人の状況に応じてステージのスキップ・追加が可能。<br>
             例: 一次面接をスキップして二次面接から開始 / 役員面接を追加。<br>
             SelectionFlow のテンプレートをベースに、Selection レコード単位でカスタマイズを記録。<br>
@@ -748,6 +752,12 @@
       <table>
         <thead><tr><th style="width:100px;">日付</th><th style="width:60px;">Ver</th><th>変更内容</th></tr></thead>
         <tbody>
+          <tr>
+            <td>2026-07-21</td><td>v0.9</td>
+            <td>
+              <span class="badge badge-update" style="margin-right:4px;">UPD</span> 全FR（50件）に適用区分バッジを追加：<span class="badge badge-both" style="margin:0 2px;">共通</span>（新卒・中途両対応）/ <span class="badge badge-shinsostu" style="margin:0 2px;">新卒</span>（新卒のみ）。LINE連携・LIFF・選考会系（FR002/022/030〜036/055/072/104/105/108/119）を新卒のみに分類。
+            </td>
+          </tr>
           <tr>
             <td>2026-07-21</td><td>v0.8</td>
             <td>
