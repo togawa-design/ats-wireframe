@@ -83,8 +83,8 @@
 <div class="page">
   <h1>新卒採用管理システム（ATS）要件定義書</h1>
   <div class="meta">
-    <span>v0.7</span>
-    <span>2026-07-10</span>
+    <span>v0.8</span>
+    <span>2026-07-21</span>
     <span>ステータス：ヒアリング中</span>
     <span style="color:#4caf50;">確定済み：U-02, U-04</span>
   </div>
@@ -385,6 +385,40 @@
             分析画面（SCR-06）にて理由別の件数・割合を集計表示。<br>
             期間・フロー・媒体でのフィルタに対応。
           </td><td><span class="badge badge-mid">中</span></td></tr>
+        </tbody>
+      </table>
+
+      <div class="cat-header">🆕 追加要件（v0.8）― 中途採用統合・クロス集計・媒体追加</div>
+      <table>
+        <thead><tr><th style="width:90px;">ID</th><th style="width:220px;">機能</th><th>詳細</th><th style="width:60px;">優先度</th></tr></thead>
+        <tbody>
+          <tr><td class="fr-id">FR115 <span class="badge badge-new">NEW</span></td><td>中途採用の統合管理</td><td>
+            Applicant.hire_type ENUM（new_grad / mid_career）を追加し、新卒・中途を同一管理画面で運用。<br>
+            <strong>中途採用はLINE連携なし</strong>（hire_type = 'mid_career' の応募者にはLINE機能を非表示）。メール・システム内通知のみ対応。<br>
+            Job テーブルにも hire_type を追加し、求人単位で区分管理。<br>
+            エージェントポータル・媒体連携は新卒・中途ともに共通利用可。
+          </td><td><span class="badge badge-mid">中</span></td></tr>
+          <tr><td class="fr-id">FR116 <span class="badge badge-new">NEW</span></td><td>新卒/中途ダッシュボード分離</td><td>
+            ダッシュボード（SCR-01）に「新卒 / 中途 / 全体」切り替えタブを追加（FR115 と連動）。<br>
+            KPIカード・ファネルチャート・最近のエントリー・スケジュールが hire_type でフィルタされる。<br>
+            API: <code>GET /api/dashboard?hire_type=new_grad|mid_career|all</code>
+          </td><td><span class="badge badge-mid">中</span></td></tr>
+          <tr><td class="fr-id">FR117 <span class="badge badge-new">NEW</span></td><td>レポートのクロス集計（会議向け）</td><td>
+            分析画面（SCR-06）にクロス集計タブを追加。<br>
+            行軸・列軸を任意に設定して集計（媒体×ステージ通過率、フロー×結果、学校×承諾率等）。<br>
+            集計結果は CSV / Excel（.xlsx）でエクスポート可能。<br>
+            期間・hire_type・職種区分でのフィルタに対応。
+          </td><td><span class="badge badge-mid">中</span></td></tr>
+          <tr><td class="fr-id">FR118 <span class="badge badge-new">NEW</span></td><td>追加媒体対応</td><td>
+            <strong>【必須】</strong>リクナビ：API連携で応募者データを自動取り込み。ApplicantSource マスタに追加。<br>
+            <strong>【オプション】</strong>ワンキャリア・ホワイト企業ナビ：CSV取り込み（API非対応の場合）。<br>
+            対応済み必須6媒体（マイナビ・Re就活キャンパス・OfferBox・キミスカ・キャリアチケット・ABABA）に追加。
+          </td><td><span class="badge badge-high">高</span></td></tr>
+          <tr><td class="fr-id">FR119 <span class="badge badge-new">NEW</span></td><td>選考会種別4種類対応</td><td>
+            EventRegistration.event_type ENUM を 4種類に拡張（one_day / two_day / three_day / four_day / other）。<br>
+            製造エンジニア職の選考フロー（1day〜4day の4段階）に対応。<br>
+            「1dayの人は一次選考でもカウント」のバイパスロジック（FR050）と組み合わせて遷移率を正確に算出。
+          </td><td><span class="badge badge-high">高</span></td></tr>
         </tbody>
       </table>
 
@@ -713,6 +747,12 @@
       <table>
         <thead><tr><th style="width:100px;">日付</th><th style="width:60px;">Ver</th><th>変更内容</th></tr></thead>
         <tbody>
+          <tr>
+            <td>2026-07-21</td><td>v0.8</td>
+            <td>
+              <span class="badge badge-new" style="margin-right:4px;">NEW</span> FR115〜FR119：中途採用統合管理（LINE連携なし）・新卒/中途ダッシュボード分離・クロス集計（会議向け）・追加媒体（リクナビ必須・ワンキャリア/ホワイト企業ナビ optional）・選考会種別4種類対応を追加
+            </td>
+          </tr>
           <tr>
             <td>2026-07-10</td><td>v0.7</td>
             <td>

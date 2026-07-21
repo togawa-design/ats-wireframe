@@ -134,8 +134,8 @@
 <div class="page">
   <h1>新卒採用管理システム（ATS）画面仕様書</h1>
   <div class="meta">
-    <span>v0.3</span>
-    <span>2026-06-23</span>
+    <span>v0.4</span>
+    <span>2026-07-21</span>
     <span>ステータス：設計中</span>
     <span style="color:#7c83fd;font-weight:700;">14画面</span>
   </div>
@@ -247,6 +247,11 @@
             <td><span class="db-ref">Applicant.document_deadline</span> / <span class="db-ref">Applicant.offer_acceptance_deadline</span></td>
             <td>書類提出期限・内定承諾期限がいずれも <code>CURRENT_DATE</code> 以前かつ未完了の件数。クリックで学生一覧（期限超過フィルタ）へ遷移。0件のときはカード非強調</td>
           </tr>
+          <tr>
+            <td><strong>採用区分タブ <span class="badge badge-new">v0.8 FR116</span></strong></td>
+            <td><span class="db-ref">Applicant.hire_type</span></td>
+            <td>ページ上部に「新卒 / 中途 / 全体」のタブを配置。選択中のタブで全KPIカード・ファネル・スケジュール・最近のエントリーをフィルタ。デフォルト：新卒。<code>?hire_type=new_grad|mid_career|all</code> にURLパラメータ反映</td>
+          </tr>
         </tbody>
       </table>
     </div>
@@ -257,7 +262,7 @@
         <div class="spec-icon spec-icon-green">✅</div>
         <div class="spec-title">② 入力バリデーション</div>
       </div>
-      <div class="ok-box" style="margin-top:0;">ダッシュボードには入力フォームがありません。フィルタ操作（年度切替）のみ行います。</div>
+      <div class="ok-box" style="margin-top:0;">ダッシュボードには入力フォームがありません。フィルタ操作（年度切替・採用区分タブ切替）のみ行います。</div>
       <table style="margin-top:12px;">
         <thead>
           <tr>
@@ -271,6 +276,11 @@
             <td>年度フィルタ</td>
             <td><span class="badge badge-opt">任意</span></td>
             <td>プルダウン選択のみ。テキスト入力なし。デフォルト：システム設定の現採用年度</td>
+          </tr>
+          <tr>
+            <td>採用区分タブ <span class="badge badge-new">v0.8</span></td>
+            <td><span class="badge badge-opt">任意</span></td>
+            <td>タブ選択のみ（新卒 / 中途 / 全体）。デフォルト：新卒。URLパラメータ <code>hire_type</code> に反映</td>
           </tr>
         </tbody>
       </table>
@@ -468,6 +478,11 @@
             <td><span class="db-ref">Applicant.call_status</span></td>
             <td>none → 非表示。callback_needed → 🔵折り返し待ち バッジ。no_answer → 🟠連絡つかず バッジ</td>
           </tr>
+          <tr>
+            <td>採用区分 <span class="badge badge-new">v0.8 FR115</span></td>
+            <td><span class="db-ref">Applicant.hire_type</span></td>
+            <td>新卒 / 中途 バッジ表示。デフォルトは列カスタマイズで非表示可。ソート対応（採用区分昇順/降順）</td>
+          </tr>
         </tbody>
       </table>
       <div class="info-box" style="margin-top:10px;"><strong>列カスタマイズ（FR099）:</strong> 表示列はスタッフごとに <span class="db-ref">StaffColumnPreference</span> に保存。デフォルト列セットをシステムが提供し、列の表示・非表示・並び順をユーザーが変更可。設定はログインユーザーにのみ適用。</div>
@@ -536,6 +551,11 @@
             <td>要架電者 <span class="badge badge-new">FR110</span></td>
             <td><span class="db-ref">Applicant.call_status</span></td>
             <td>チェックON → <code>call_status != 'none'</code> の学生に絞り込み（折り返し待ち / 連絡つかず）。学生一覧に🔵バッジで識別表示</td>
+          </tr>
+          <tr>
+            <td>採用区分 <span class="badge badge-new">v0.8 FR115</span></td>
+            <td><span class="db-ref">Applicant.hire_type</span></td>
+            <td>「新卒 / 中途 / 全体」でフィルタ。デフォルト：全体。ダッシュボードのタブ選択と連動（ダッシュボードから遷移した場合は選択値を引き継ぎ）</td>
           </tr>
         </tbody>
       </table>
@@ -1758,6 +1778,7 @@
       <div class="sub-tab"       onclick="swSub(this,'sa-offer','analytics')">内定承諾分析</div>
       <div class="sub-tab"       onclick="swSub(this,'sa-export','analytics')">CSVエクスポート</div>
       <div class="sub-tab"       onclick="swSub(this,'sa-reasons','analytics')">📊 理由別集計 <span class="badge badge-new" style="font-size:9px;">v0.7</span></div>
+      <div class="sub-tab"       onclick="swSub(this,'sa-cross','analytics')">📐 クロス集計 <span class="badge badge-new" style="font-size:9px;">v0.8</span></div>
     </div>
 
     <!-- ファネル分析 -->
@@ -2316,6 +2337,51 @@
         <div class="info-box" style="margin-top:10px;">理由が空（NULL・未入力）の場合は「理由未記入」としてカウント。フリーテキスト理由はそのままグルーピング（完全一致）。選択式の場合は選択肢ラベルで集計。</div>
       </div>
     </div><!-- /sa-reasons -->
+
+    <!-- クロス集計 -->
+    <div id="sa-cross" class="sub-content">
+      <div class="section">
+        <div class="spec-header">
+          <div class="spec-icon spec-icon-blue">📋</div>
+          <div class="spec-title">① 表示項目（クロス集計）<span class="badge badge-new" style="margin-left:6px;">FR117</span></div>
+        </div>
+        <table>
+          <thead><tr><th class="col-field">表示項目</th><th>内容</th></tr></thead>
+          <tbody>
+            <tr><td>行軸セレクタ</td><td>集計の行軸を選択（媒体 / 学校 / フロー / 職種区分 / 採用区分 / 月別）</td></tr>
+            <tr><td>列軸セレクタ</td><td>集計の列軸を選択（ステージ / 結果 / 媒体 / フロー）。行軸と同一は選択不可</td></tr>
+            <tr><td>クロス集計表</td><td>行軸×列軸でカウントしたマトリクス表。セルクリックで該当者一覧へドリルダウン（FR102連携）</td></tr>
+            <tr><td>通過率表示</td><td>列を「ステージ」にした場合、各セルに件数と通過率（%）を併記</td></tr>
+          </tbody>
+        </table>
+        <div class="cat-header" style="margin-top:16px;">フィルタ条件</div>
+        <table>
+          <thead><tr><th class="col-field">フィルタ項目</th><th>内容</th></tr></thead>
+          <tbody>
+            <tr><td>集計期間</td><td>開始日〜終了日（FR103連携）</td></tr>
+            <tr><td>採用区分</td><td>新卒 / 中途 / 全体（FR115連携）</td></tr>
+            <tr><td>職種区分</td><td>総合職 / 技能職 / 全体</td></tr>
+            <tr><td>フロー</td><td>特定SelectionFlowに絞り込み</td></tr>
+          </tbody>
+        </table>
+        <div class="cat-header" style="margin-top:16px;">エクスポート</div>
+        <table>
+          <thead><tr><th class="col-btn">ボタン</th><th>動作</th><th>API</th></tr></thead>
+          <tbody>
+            <tr>
+              <td><span class="btn-pill btn-secondary">CSV ダウンロード</span></td>
+              <td>現在の軸・フィルタ設定でCSV出力</td>
+              <td><span class="api-pill">GET /api/analytics/cross?row=...&col=...&format=csv</span></td>
+            </tr>
+            <tr>
+              <td><span class="btn-pill btn-secondary">Excel (.xlsx) ダウンロード</span></td>
+              <td>ヘッダー付きExcel形式で出力（会議資料向け）</td>
+              <td><span class="api-pill">GET /api/analytics/cross?row=...&col=...&format=xlsx</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div><!-- /sa-cross -->
 
   </div><!-- /s-analytics -->
 
