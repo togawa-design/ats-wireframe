@@ -84,7 +84,8 @@
 </div>
 
 <div class="page">
-  <h1>新卒採用管理システム（ATS）要件定義書</h1>
+  <h1>採用管理システム（ATS）要件定義書</h1>
+  <div style="font-size:12px;color:#666;margin-bottom:4px;">対象：新卒採用（新卒・既卒・第二新卒）／中途採用　※適用区分は各FRの <span style="display:inline-block;background:#1565c0;color:#fff;border-radius:10px;padding:1px 7px;font-size:10px;font-weight:700;">共通</span> / <span style="display:inline-block;background:#ad1457;color:#fff;border-radius:10px;padding:1px 7px;font-size:10px;font-weight:700;">新卒</span> バッジを参照</div>
   <div class="meta">
     <span>v0.9</span>
     <span>2026-07-21</span>
@@ -111,9 +112,9 @@
       <table>
         <thead><tr><th style="width:80px;">ID</th><th>業務ゴール</th></tr></thead>
         <tbody>
-          <tr><td class="fr-id">BG-01</td><td>新卒採用のエントリーから内定承諾まで、採用プロセス全体を1システムで完結させる</td></tr>
-          <tr><td class="fr-id">BG-02</td><td>複数媒体・流入経路からの応募者を一元管理し、情報の分散・二重入力を排除する</td></tr>
-          <tr><td class="fr-id">BG-03</td><td>LINEを主要コミュニケーションチャネルとして、学生との接点を最大化する</td></tr>
+          <tr><td class="fr-id">BG-01</td><td><strong>新卒・中途採用</strong>のエントリーから内定承諾まで、採用プロセス全体を1システムで完結させる</td></tr>
+          <tr><td class="fr-id">BG-02</td><td>複数媒体・流入経路からの応募者を一元管理し、情報の分散・二重入力を排除する（新卒・中途の採用区分を区別して管理）</td></tr>
+          <tr><td class="fr-id">BG-03</td><td><span class="badge badge-shinsostu" style="font-size:10px;">新卒</span> LINEを主要コミュニケーションチャネルとして学生との接点を最大化する。<span class="badge badge-both" style="font-size:10px;">中途</span> メール・システム内通知で候補者と連絡する</td></tr>
           <tr><td class="fr-id">BG-04</td><td>エントリー〜承諾の各ステップ遷移率を可視化し、採用活動の改善に活用する</td></tr>
           <tr><td class="fr-id">BG-05</td><td>内定承諾後はSalesforceと連携し、入社後の人材管理へシームレスに引き継ぐ</td></tr>
           <tr><td class="fr-id">BG-06</td><td>自社専用の閉じたシステムとして運用し、外部へのデータ流出リスクを最小化する</td></tr>
@@ -131,7 +132,8 @@
               <tr><td style="width:100px;font-weight:600;">採用担当者</td><td>管理画面全般を操作。メッセージ送信・選考管理・分析</td></tr>
               <tr><td style="font-weight:600;">面接官</td><td>面接評価の入力・閲覧（限定権限）</td></tr>
               <tr><td style="font-weight:600;">エージェント</td><td>カレンダー経由での面接予約調整</td></tr>
-              <tr><td style="font-weight:600;">応募者（学生）</td><td>LINEおよびLIFFマイページから操作</td></tr>
+              <tr><td style="font-weight:600;">応募者（学生）</td><td><span class="badge badge-shinsostu" style="font-size:10px;">新卒</span> LINEおよびLIFFマイページから操作</td></tr>
+              <tr><td style="font-weight:600;">候補者（中途）</td><td><span class="badge badge-both" style="font-size:10px;">中途</span> メール・システム内通知で操作（LINEなし）</td></tr>
             </tbody>
           </table>
         </div>
@@ -142,6 +144,7 @@
               <tr><td><span class="badge badge-new">新卒</span></td><td>大学・大学院在学中。卒業見込み年度あり</td></tr>
               <tr><td><span class="badge" style="background:#ff9800;color:#fff;">既卒</span></td><td>卒業後未就業。Re就活等から流入</td></tr>
               <tr><td><span class="badge" style="background:#9c27b0;color:#fff;">第二新卒</span></td><td>卒業後3年以内の転職者。Re就活から流入の可能性あり</td></tr>
+              <tr><td><span class="badge" style="background:#00796b;color:#fff;">中途採用</span></td><td>即戦力採用。ビズリーチ・doda等の中途媒体から流入。LINE連携なし</td></tr>
             </tbody>
           </table>
           <div class="warn-box" style="margin-top:8px;">⚠️ 第二新卒含むかは確認中（U-03）</div>
@@ -755,7 +758,8 @@
           <tr>
             <td>2026-07-21</td><td>v0.9</td>
             <td>
-              <span class="badge badge-update" style="margin-right:4px;">UPD</span> 全FR（50件）に適用区分バッジを追加：<span class="badge badge-both" style="margin:0 2px;">共通</span>（新卒・中途両対応）/ <span class="badge badge-shinsostu" style="margin:0 2px;">新卒</span>（新卒のみ）。LINE連携・LIFF・選考会系（FR002/022/030〜036/055/072/104/105/108/119）を新卒のみに分類。
+              <span class="badge badge-update" style="margin-right:4px;">UPD</span> 全FR（50件）に適用区分バッジを追加：<span class="badge badge-both" style="margin:0 2px;">共通</span>（新卒・中途両対応）/ <span class="badge badge-shinsostu" style="margin:0 2px;">新卒</span>（新卒のみ）。LINE連携・LIFF・選考会系（FR002/022/030〜036/055/072/104/105/108/119）を新卒のみに分類。<br>
+              <span class="badge badge-update" style="margin-right:4px;">UPD</span> タイトルを「採用管理システム（ATS）要件定義書」に変更。BG-01・BG-03に中途採用の記載を追加。対象ユーザーに候補者（中途）を追加。応募者区分に中途採用を追加。
             </td>
           </tr>
           <tr>
