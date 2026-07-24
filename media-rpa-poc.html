@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>媒体応募データ自動取込 技術検証メモ</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Hiragino Sans', sans-serif; background: #f0f2f5; color: #1a1a2e; }
+
+  .page { max-width: 1100px; margin: 0 auto; padding: 32px 24px; }
+  h1 { font-size: 22px; font-weight: 700; margin-bottom: 6px; }
+  h2 { font-size: 16px; font-weight: 700; color: #1a1a2e; margin-bottom: 16px; border-left: 4px solid #7c83fd; padding-left: 10px; }
+  h3 { font-size: 13px; font-weight: 700; color: #555; margin-bottom: 10px; }
+  .meta { font-size: 12px; color: #999; margin-bottom: 28px; display:flex; gap:16px; align-items:center; flex-wrap:wrap; }
+
+  .section { background: #fff; border-radius: 12px; padding: 24px; margin-bottom: 24px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); }
+
+  .badge { display:inline-block; padding:2px 10px; border-radius:10px; font-size:11px; font-weight:700; white-space:nowrap; }
+  .badge-draft { background:#9e9e9e; color:#fff; }
+  .badge-tbd   { background:#ff9800; color:#fff; }
+
+  table { width:100%; border-collapse:collapse; font-size:13px; }
+  th { background:#f8f9fc; padding:9px 12px; text-align:left; font-weight:600; color:#555; font-size:12px; border-bottom:1px solid #e8eaf0; }
+  td { padding:10px 12px; border-bottom:1px solid #f0f2f5; vertical-align:top; line-height:1.6; }
+  tr:last-child td { border-bottom:none; }
+
+  code { font-family:'SF Mono','Menlo',monospace; font-size:11px; color:#7c83fd; background:#f0f0ff; padding:1px 5px; border-radius:4px; white-space:nowrap; }
+
+  .info-box  { background:#f0f0ff; border:1px solid #c5cae9; border-radius:8px; padding:12px 16px; font-size:12px; color:#3949ab; margin-top:10px; line-height:1.7; }
+  .warn-box  { background:#fff8e1; border:1px solid #ffcc80; border-radius:8px; padding:12px 16px; font-size:12px; color:#e65100; margin-top:10px; line-height:1.7; }
+
+  /* Step flow */
+  .steps { display: flex; flex-direction: column; gap: 0; }
+  .step {
+    display: flex; gap: 16px; align-items: flex-start;
+    padding: 16px 0; border-bottom: 1px solid #f0f2f5;
+  }
+  .step:last-child { border-bottom: none; }
+  .step-num {
+    width: 28px; height: 28px; border-radius: 50%;
+    background: #7c83fd; color: #fff;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px; font-weight: 700; flex-shrink: 0;
+  }
+  .step-num.orange { background: #ff9800; }
+  .step-num.green { background: #4caf50; }
+  .step-num.red { background: #e53935; }
+  .step-body { flex: 1; }
+  .step-title { font-size: 13px; font-weight: 600; margin-bottom: 4px; }
+  .step-desc { font-size: 12px; color: #666; line-height: 1.6; }
+  .step-tech { font-size: 11px; color: #7c83fd; background: #f0f0ff; border-radius: 4px; padding: 2px 8px; display: inline-block; margin-top: 6px; margin-right:6px; }
+  .step-warn { font-size: 11px; color: #e65100; background: #fff3e0; border-radius: 4px; padding: 2px 8px; display: inline-block; margin-top: 6px; }
+
+  .branch { display:grid; grid-template-columns: 1fr 1fr; gap:14px; margin-top:8px; }
+  .branch-card { border-radius:8px; padding:10px 14px; font-size:12px; line-height:1.6; }
+  .branch-ok   { background:#e8f5e9; border:1px solid #a5d6a7; color:#2e7d32; }
+  .branch-ng   { background:#ffebee; border:1px solid #ef9a9a; color:#c62828; }
+
+  ::-webkit-scrollbar { width: 4px; height: 4px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: #ccc; border-radius: 2px; }
+</style>
+</head>
+<body>
+
+<!-- Global Nav -->
+<div style="background:#1a1a2e;height:40px;display:flex;align-items:center;padding:0 20px;gap:24px;font-size:12px;flex-shrink:0;overflow-x:auto;">
+  <span style="color:#7c83fd;font-weight:700;letter-spacing:0.5px;white-space:nowrap;">ATS設計ドキュメント</span>
+  <a href="index.html"             style="color:#aaa;text-decoration:none;opacity:.7;white-space:nowrap;">🖥 ワイヤーフレーム</a>
+  <a href="requirements.html"      style="color:#aaa;text-decoration:none;opacity:.7;white-space:nowrap;">📋 要件定義書</a>
+  <a href="dataflow.html"          style="color:#aaa;text-decoration:none;opacity:.7;white-space:nowrap;">🔀 データフロー設計</a>
+  <a href="roadmap.html"           style="color:#aaa;text-decoration:none;opacity:.7;white-space:nowrap;">🗺️ ロードマップ</a>
+  <a href="screen-spec.html"       style="color:#aaa;text-decoration:none;opacity:.7;white-space:nowrap;">📐 画面仕様書</a>
+  <a href="table-spec.html"        style="color:#aaa;text-decoration:none;opacity:.7;white-space:nowrap;">🗃️ テーブル定義書</a>
+  <a href="integration-spec.html"  style="color:#aaa;text-decoration:none;opacity:.7;white-space:nowrap;">🔌 外部連携仕様書</a>
+  <a href="architecture.html"      style="color:#aaa;text-decoration:none;opacity:.7;white-space:nowrap;">🏗️ アーキテクチャ</a>
+  <a href="agency-wireframe.html"  style="color:#aaa;text-decoration:none;opacity:.7;white-space:nowrap;">🤝 エージェントWF</a>
+  <a href="security.html"          style="color:#aaa;text-decoration:none;opacity:.7;white-space:nowrap;">🔒 セキュリティ設計書</a>
+  <a href="media-rpa-poc.html"     style="color:#fff;text-decoration:none;border-bottom:2px solid #7c83fd;padding-bottom:2px;white-space:nowrap;">🧪 媒体取込 技術検証</a>
+</div>
+
+<div class="page">
+  <h1>媒体応募データ自動取込方式 技術検証メモ</h1>
+  <div class="meta">
+    <span class="badge badge-draft">DRAFT</span>
+    <span>2026-07-24</span>
+    <span>ステータス：技術検証中（要件定義外のメモ）</span>
+    <span class="badge badge-tbd">要件書には未反映</span>
+  </div>
+
+  <div class="section">
+    <h2>このメモの位置づけ</h2>
+    <div class="info-box">
+      本メモは、求人媒体からの応募データを本システムへ自動取込する方式について、<strong>技術的な実現性を検討するための内部メモ</strong>である。
+      [requirements.html](requirements.html) の要件（FR040 / FR118 等）とは切り離して管理し、正式な要件化は別途判断する。<br>
+      対象媒体の具体的な名称・数はここでは扱わない（媒体ごとに個別実装が必要な技術方式についてのみ記載する）。
+    </div>
+  </div>
+
+  <div class="section">
+    <h2>前提条件</h2>
+    <table>
+      <thead><tr><th style="width:180px;">前提</th><th>内容</th></tr></thead>
+      <tbody>
+        <tr>
+          <td>通知メールの受信</td>
+          <td>媒体の応募通知メールを、本システムが検知できる受信用アドレスに届ける。方式は媒体ごとに以下いずれか：
+            <div class="branch">
+              <div class="branch-card branch-ok"><strong>方式A</strong>：媒体の通知先メールアドレス設定画面から、自社側で追加登録する（媒体側への依頼が不要な場合）</div>
+              <div class="branch-card branch-ok"><strong>方式B</strong>：担当者の実メールボックス側で受信ルール（フィルタ・自動転送）を設定し、本システム宛に転送する（媒体側の協力が一切不要）</div>
+            </div>
+          </td>
+        </tr>
+        <tr>
+          <td>メール本文の情報量</td>
+          <td>通知メールには応募者のフル情報は含まれず、<strong>管理画面（媒体ポータル）への詳細ページリンクのみ</strong>が記載される想定。実データの取得にはログイン後のページアクセスが必要になる</td>
+        </tr>
+        <tr>
+          <td>ログインセッションの保持</td>
+          <td>媒体ごとに一度ログインしたセッション（Cookie／localStorage）を保存・使い回し、通常運用では毎回のログイン処理を発生させない</td>
+        </tr>
+        <tr>
+          <td>完全自動化を前提としない</td>
+          <td>CAPTCHA・2段階認証・セッション失効などで自動処理が止まるケースは必ず発生する前提で、人手介入によるフォールバック導線を用意する</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="section">
+    <h2>処理フロー</h2>
+    <div class="steps">
+
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-body">
+          <div class="step-title">応募者が媒体の求人へ応募</div>
+          <div class="step-desc">媒体側で応募が確定すると、媒体から担当者宛に「新着応募のお知らせ」メールが自動送信される</div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-body">
+          <div class="step-title">本システムの受信用アドレスにメールが到達</div>
+          <div class="step-desc">前提条件の方式A（CC登録）または方式B（転送ルール）により、通知メールが本システム管理下の受信アドレスに届く</div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-body">
+          <div class="step-title">Webhookでバックエンドに通知</div>
+          <div class="step-desc">メール受信をWebhookとして受け取るサービス（Inbound Email Parse系）経由で、件名・本文・送信元をバックエンドへリアルタイムに渡す</div>
+          <span class="step-tech">SendGrid Inbound Parse / Mailgun Routes / AWS SES + Lambda 等</span>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">4</div>
+        <div class="step-body">
+          <div class="step-title">メール本文をパースし、媒体種別と詳細リンクを特定</div>
+          <div class="step-desc">送信元・件名フォーマットから対象媒体を判定し、本文内の応募者詳細ページURLを抽出する。媒体ごとにメールテンプレートの解析ルールを個別に持つ</div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">5</div>
+        <div class="step-body">
+          <div class="step-title">Playwrightが保存済みセッションをロードして詳細リンクへアクセス</div>
+          <div class="step-desc">媒体別に保存しておいたCookie（<code>storageState</code>）を読み込んだブラウザコンテキストで、抽出したリンクへ直接遷移する</div>
+          <span class="step-tech">Playwright + storageState 再利用</span>
+
+          <div class="branch">
+            <div class="branch-card branch-ok"><strong>セッション有効</strong>：ログイン処理を経由せず、そのまま応募者詳細ページが開く（想定の主経路）</div>
+            <div class="branch-card branch-ng"><strong>セッション失効</strong>：ログイン画面にリダイレクトされる。ID/PWでの再ログインを試行し、2段階認証やCAPTCHAが出た場合は自動処理を止めて人手にエスカレーション</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">6</div>
+        <div class="step-body">
+          <div class="step-title">応募者データを取得</div>
+          <div class="step-desc">詳細ページから氏名・連絡先等の応募者情報をスクレイピングして取得する</div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">7</div>
+        <div class="step-body">
+          <div class="step-title">フィールドマッピングで正規化</div>
+          <div class="step-desc">媒体固有の項目名・データ形式を、本システム共通のフォーマットに変換する（既存の <code>Media.field_mapping</code> と同じ考え方を流用）</div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">8</div>
+        <div class="step-body">
+          <div class="step-title">重複チェック・UPSERTしてDBへ格納</div>
+          <div class="step-desc">メールアドレス／媒体側応募者IDで既存応募者レコードと突合し、存在すれば更新、なければ新規作成する（単純な新規追記ではない）</div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num" style="background:#e53935;">!</div>
+        <div class="step-body">
+          <div class="step-title">異常系：取得失敗時のアラート</div>
+          <div class="step-desc">リンク切れ・ページ構造変更・ログイン失敗などで取得できなかった場合、静かに取りこぼさないよう通知（Slack等）を出し、必要なら手動CSV取込にフォールバックする</div>
+          <span class="step-warn">完全自動を前提にしない設計とする</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="section">
+    <h2>技術的な考慮事項</h2>
+    <table>
+      <thead><tr><th style="width:200px;">観点</th><th>内容</th></tr></thead>
+      <tbody>
+        <tr><td>セッション（Cookie）管理</td><td>媒体ごとに<code>storageState</code>を暗号化して保存。ID/PWと同等の機密情報として扱う</td></tr>
+        <tr><td>送信元IPの安定化</td><td>データセンターIPは検知されやすいため、固定の送信元IPから実行し、頻繁に変えない</td></tr>
+        <tr><td>ブラウザフィンガープリントの一貫性</td><td>User-Agent・タイムゾーン・画面サイズ等のコンテキスト設定を毎回同一に保つ</td></tr>
+        <tr><td>アクセス頻度</td><td>cronによる定期ポーリングではなく、メール受信をトリガーとしたイベント駆動にすることで、不自然な規則的アクセスを避ける</td></tr>
+        <tr><td>CAPTCHA・2段階認証への対応方針</td><td>自動突破は行わず、発生時は処理を停止して人手にエスカレーションする（ToSリスクとアカウント停止リスクを避けるため）</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="section">
+    <h2>未確定事項・リスク</h2>
+    <table>
+      <thead><tr><th style="width:200px;">項目</th><th>内容</th></tr></thead>
+      <tbody>
+        <tr><td>通知先メールアドレスの追加可否</td><td>媒体ごとに、自社側だけで通知先アドレスを追加設定できるか（方式A）、それとも実担当者メールの転送ルールに頼る必要があるか（方式B）が未確認</td></tr>
+        <tr><td>メール本文の情報量</td><td>媒体によっては詳細リンクではなく、氏名程度の最低限情報のみを含む場合もあり得る。個別に実メールのサンプルで要確認</td></tr>
+        <tr><td>UI変更によるメンテナンス負荷</td><td>対象媒体が増えるほど、ログイン・抽出ロジックの個別メンテナンスコストが積み上がる</td></tr>
+        <tr><td>利用規約上の位置づけ</td><td>自社の正規アカウントでの自動アクセスであっても、媒体の利用規約次第ではアカウント停止等の措置を受けるリスクはゼロではない</td></tr>
+      </tbody>
+    </table>
+    <div class="warn-box">本メモの内容はあくまで技術検証段階の想定であり、正式な要件・仕様として確定したものではない。</div>
+  </div>
+
+</div><!-- /page -->
+
+</body>
+</html>
