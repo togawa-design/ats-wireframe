@@ -4,95 +4,99 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>ATS 要件定義書</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@400;500;700;900&family=IBM+Plex+Mono:wght@500;600;700&display=swap" rel="stylesheet">
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
-  body { font-family: -apple-system, BlinkMacSystemFont, 'Hiragino Sans', sans-serif; background: #f0f2f5; color: #1a1a2e; }
+  body { font-family: 'Zen Kaku Gothic New', 'Hiragino Sans', -apple-system, BlinkMacSystemFont, sans-serif; background: #E9EDEF; color: #1C2126; }
   .page { max-width: 1100px; margin: 0 auto; padding: 32px 24px; }
   h1 { font-size: 22px; font-weight: 700; margin-bottom: 4px; }
-  h2 { font-size: 15px; font-weight: 700; color: #1a1a2e; margin-bottom: 14px; padding-left: 12px; border-left: 4px solid #7c83fd; }
-  h3 { font-size: 13px; font-weight: 700; color: #555; margin-bottom: 10px; }
-  .meta { font-size: 12px; color: #999; margin-bottom: 28px; display:flex; gap:16px; }
-  .section { background: #fff; border-radius: 12px; padding: 22px 24px; margin-bottom: 20px; box-shadow: 0 1px 4px rgba(0,0,0,.06); }
+  h2 { font-size: 15px; font-weight: 700; color: #1C2126; margin-bottom: 14px; padding-left: 12px; border-left: 4px solid #2E6480; }
+  h3 { font-size: 13px; font-weight: 700; color: #4A535C; margin-bottom: 10px; }
+  .meta { font-size: 12px; color: #94A0A8; margin-bottom: 28px; display:flex; gap:16px; }
+  .section { background: #fff; border-radius: 12px; padding: 22px 24px; margin-bottom: 20px; border:1px solid #D9E0E3; }
 
   /* Tabs */
-  .tabs { display:flex; gap:0; border-bottom:2px solid #e8eaf0; margin-bottom:22px; flex-wrap:wrap; }
-  .tab { padding:10px 18px; font-size:13px; cursor:pointer; color:#888; border-bottom:2px solid transparent; margin-bottom:-2px; transition:all .15s; white-space:nowrap; }
-  .tab.active { color:#7c83fd; border-bottom-color:#7c83fd; font-weight:600; }
+  .tabs { display:flex; gap:0; border-bottom:2px solid #D9E0E3; margin-bottom:22px; flex-wrap:wrap; }
+  .tab { padding:10px 18px; font-size:13px; cursor:pointer; color:#7E8891; border-bottom:2px solid transparent; margin-bottom:-2px; transition:all .15s; white-space:nowrap; }
+  .tab.active { color:#2E6480; border-bottom-color:#2E6480; font-weight:600; }
   .tab-content { display:none; }
   .tab-content.active { display:block; }
 
   /* Table */
   table { width:100%; border-collapse:collapse; font-size:13px; }
-  th { background:#f8f9fc; padding:9px 12px; text-align:left; font-weight:600; color:#555; font-size:12px; border-bottom:1px solid #e8eaf0; }
-  td { padding:10px 12px; border-bottom:1px solid #f0f2f5; vertical-align:top; line-height:1.6; }
+  th { background:#F2F5F6; padding:9px 12px; text-align:left; font-weight:600; color:#4A535C; font-size:12px; border-bottom:1px solid #D9E0E3; }
+  td { padding:10px 12px; border-bottom:1px solid #E9EDEF; vertical-align:top; line-height:1.6; }
   tr:last-child td { border-bottom:none; }
-  tr:hover td { background:#fafbff; }
+  tr:hover td { background:#F4F7F8; }
 
   /* Badges */
   .badge { display:inline-block; padding:2px 8px; border-radius:10px; font-size:10px; font-weight:700; white-space:nowrap; }
-  .badge-done   { background:#4caf50; color:#fff; }
-  .badge-open   { background:#ff9800; color:#fff; }
-  .badge-risk   { background:#ff6b6b; color:#fff; }
-  .badge-high   { background:#ff6b6b; color:#fff; }
-  .badge-mid    { background:#ff9800; color:#fff; }
-  .badge-low    { background:#9e9e9e; color:#fff; }
-  .badge-new       { background:#7c83fd; color:#fff; }
+  .badge-done   { background:#4C8C6B; color:#fff; }
+  .badge-open   { background:#C9862A; color:#fff; }
+  .badge-risk   { background:#B3493C; color:#fff; }
+  .badge-high   { background:#B3493C; color:#fff; }
+  .badge-mid    { background:#C9862A; color:#fff; }
+  .badge-low    { background:#8A959C; color:#fff; }
+  .badge-new       { background:#2E6480; color:#fff; }
   .badge-update    { background:#00897b; color:#fff; }
-  .badge-both      { background:#1565c0; color:#fff; }
-  .badge-shinsostu { background:#ad1457; color:#fff; }
+  .badge-both      { background:#3E7490; color:#fff; }
+  .badge-shinsostu { background:#A13D63; color:#fff; }
 
   /* FR ID */
-  .fr-id { font-family:monospace; font-size:11px; color:#7c83fd; font-weight:700; white-space:nowrap; }
-  .fr-cat { font-size:11px; color:#aaa; }
+  .fr-id { font-family:'IBM Plex Mono','SF Mono',monospace; font-size:11px; color:#2E6480; font-weight:700; white-space:nowrap; }
+  .fr-cat { font-size:11px; color:#A9B3BA; }
 
   /* Info / warn boxes */
-  .info-box { background:#f0f0ff; border:1px solid #c5cae9; border-radius:8px; padding:10px 14px; font-size:12px; color:#3949ab; margin-top:10px; }
-  .warn-box  { background:#fff8e1; border:1px solid #ffcc80; border-radius:8px; padding:10px 14px; font-size:12px; color:#e65100; margin-top:10px; }
-  .ok-box    { background:#e8f5e9; border:1px solid #a5d6a7; border-radius:8px; padding:10px 14px; font-size:12px; color:#2e7d32; margin-top:10px; }
+  .info-box { background:#E6EEF1; border:1px solid #C3CBD0; border-radius:8px; padding:10px 14px; font-size:12px; color:#1B3F52; margin-top:10px; }
+  .warn-box  { background:#F3E8D6; border:1px solid #C9862A; border-radius:8px; padding:10px 14px; font-size:12px; color:#9C5A1D; margin-top:10px; }
+  .ok-box    { background:#E3EFE8; border:1px solid #a5d6a7; border-radius:8px; padding:10px 14px; font-size:12px; color:#2F5A42; margin-top:10px; }
 
   /* Summary cards */
   .summary-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:12px; margin-bottom:20px; }
-  .summary-card { background:#fff; border-radius:10px; padding:14px 16px; box-shadow:0 1px 4px rgba(0,0,0,.06); text-align:center; }
+  .summary-card { background:#fff; border-radius:10px; padding:14px 16px; border:1px solid #D9E0E3; text-align:center; }
   .summary-num  { font-size:28px; font-weight:700; }
-  .summary-label{ font-size:11px; color:#888; margin-top:4px; }
+  .summary-label{ font-size:11px; color:#7E8891; margin-top:4px; }
 
   /* Category header */
-  .cat-header { background:#f8f9fc; border-radius:8px; padding:8px 14px; font-size:12px; font-weight:700; color:#555; margin:14px 0 8px; border-left:3px solid #7c83fd; }
+  .cat-header { background:#F2F5F6; border-radius:8px; padding:8px 14px; font-size:12px; font-weight:700; color:#4A535C; margin:14px 0 8px; border-left:3px solid #2E6480; }
 
   /* Two col */
   .two-col { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
 
   /* Cost table */
-  .cost-total { background:#1a1a2e; color:#fff; border-radius:8px; padding:14px 18px; font-size:14px; font-weight:700; margin-top:12px; display:flex; justify-content:space-between; align-items:center; }
+  .cost-total { background:#1C2126; color:#fff; border-radius:8px; padding:14px 18px; font-size:14px; font-weight:700; margin-top:12px; display:flex; justify-content:space-between; align-items:center; }
 </style>
 </head>
 <body>
 
 <!-- Global Nav -->
-<div style="background:#1a1a2e;height:40px;display:flex;align-items:center;padding:0 20px;gap:24px;font-size:12px;">
-  <span style="color:#7c83fd;font-weight:700;letter-spacing:0.5px;">ATS設計ドキュメント</span>
-  <a href="index.html"        style="color:#aaa;text-decoration:none;opacity:.7;">🖥 ワイヤーフレーム</a>
-  <a href="requirements.html" style="color:#fff;text-decoration:none;border-bottom:2px solid #7c83fd;padding-bottom:2px;">📋 要件定義書</a>
-  <a href="dataflow.html"     style="color:#aaa;text-decoration:none;opacity:.7;">🔀 データフロー設計</a>
-  <a href="roadmap.html"      style="color:#aaa;text-decoration:none;opacity:.7;">🗺️ ロードマップ</a>
-  <a href="screen-spec.html"  style="color:#aaa;text-decoration:none;opacity:.7;">📐 画面仕様書</a>
-  <a href="table-spec.html"   style="color:#aaa;text-decoration:none;opacity:.7;">🗃️ テーブル定義書</a>
-  <a href="integration-spec.html" style="color:#aaa;text-decoration:none;opacity:.7;">🔌 外部連携仕様書</a>
-  <a href="architecture.html"    style="color:#aaa;text-decoration:none;opacity:.7;">🏗️ アーキテクチャ</a>
-  <a href="agency-wireframe.html" style="color:#aaa;text-decoration:none;opacity:.7;">🤝 エージェントWF</a>
-  <a href="security.html"        style="color:#aaa;text-decoration:none;opacity:.7;">🔒 セキュリティ設計書</a>
+<div style="background:#1C2126;height:40px;display:flex;align-items:center;padding:0 20px;gap:24px;font-size:12px;">
+  <span style="color:#2E6480;font-weight:700;letter-spacing:0.5px;">ATS設計ドキュメント</span>
+  <a href="index.html"        style="color:#A9B3BA;text-decoration:none;opacity:.7;">🖥 ワイヤーフレーム</a>
+  <a href="requirements.html" style="color:#fff;text-decoration:none;border-bottom:2px solid #2E6480;padding-bottom:2px;">📋 要件定義書</a>
+  <a href="dataflow.html"     style="color:#A9B3BA;text-decoration:none;opacity:.7;">🔀 データフロー設計</a>
+  <a href="roadmap.html"      style="color:#A9B3BA;text-decoration:none;opacity:.7;">🗺️ ロードマップ</a>
+  <a href="screen-spec.html"  style="color:#A9B3BA;text-decoration:none;opacity:.7;">📐 画面仕様書</a>
+  <a href="table-spec.html"   style="color:#A9B3BA;text-decoration:none;opacity:.7;">🗃️ テーブル定義書</a>
+  <a href="integration-spec.html" style="color:#A9B3BA;text-decoration:none;opacity:.7;">🔌 外部連携仕様書</a>
+  <a href="architecture.html"    style="color:#A9B3BA;text-decoration:none;opacity:.7;">🏗️ アーキテクチャ</a>
+  <a href="agency-wireframe.html" style="color:#A9B3BA;text-decoration:none;opacity:.7;">🤝 エージェントWF</a>
+  <a href="security.html"        style="color:#A9B3BA;text-decoration:none;opacity:.7;">🔒 セキュリティ設計書</a>
+  <a href="liff-wireframe.html" style="color:#A9B3BA;text-decoration:none;opacity:.7;white-space:nowrap;">📱 LIFF画面WF</a>
 </div>
 
 <div class="page">
   <h1>採用管理システム（ATS）要件定義書</h1>
-  <div style="font-size:12px;color:#666;margin-bottom:4px;">対象：新卒採用（新卒・既卒・第二新卒）／中途採用　※適用区分は各FRの <span style="display:inline-block;background:#1565c0;color:#fff;border-radius:10px;padding:1px 7px;font-size:10px;font-weight:700;">共通</span> / <span style="display:inline-block;background:#ad1457;color:#fff;border-radius:10px;padding:1px 7px;font-size:10px;font-weight:700;">新卒</span> バッジを参照</div>
+  <div style="font-size:12px;color:#5B6670;margin-bottom:4px;">対象：新卒採用（新卒・既卒・第二新卒）／中途採用　※適用区分は各FRの <span style="display:inline-block;background:#3E7490;color:#fff;border-radius:10px;padding:1px 7px;font-size:10px;font-weight:700;">共通</span> / <span style="display:inline-block;background:#A13D63;color:#fff;border-radius:10px;padding:1px 7px;font-size:10px;font-weight:700;">新卒</span> バッジを参照</div>
   <div class="meta">
-    <span>v0.9</span>
-    <span>2026-07-21</span>
+    <span>v0.11</span>
+    <span>2026-10-11</span>
     <span>ステータス：ヒアリング中</span>
-    <span style="color:#4caf50;">確定済み：U-02, U-04</span>
-    <span><span style="display:inline-block;background:#1565c0;color:#fff;border-radius:10px;padding:1px 7px;font-size:10px;font-weight:700;">共通</span> 新卒・中途両対応</span>
-    <span><span style="display:inline-block;background:#ad1457;color:#fff;border-radius:10px;padding:1px 7px;font-size:10px;font-weight:700;">新卒</span> 新卒採用のみ</span>
+    <span style="color:#4C8C6B;">確定済み：U-02, U-04</span>
+    <span><span style="display:inline-block;background:#3E7490;color:#fff;border-radius:10px;padding:1px 7px;font-size:10px;font-weight:700;">共通</span> 新卒・中途両対応</span>
+    <span><span style="display:inline-block;background:#A13D63;color:#fff;border-radius:10px;padding:1px 7px;font-size:10px;font-weight:700;">新卒</span> 新卒採用のみ</span>
   </div>
 
   <div class="tabs">
@@ -142,9 +146,9 @@
           <table>
             <tbody>
               <tr><td><span class="badge badge-new">新卒</span></td><td>大学・大学院在学中。卒業見込み年度あり</td></tr>
-              <tr><td><span class="badge" style="background:#ff9800;color:#fff;">既卒</span></td><td>卒業後未就業。Re就活等から流入</td></tr>
+              <tr><td><span class="badge" style="background:#C9862A;color:#fff;">既卒</span></td><td>卒業後未就業。Re就活等から流入</td></tr>
               <tr><td><span class="badge" style="background:#9c27b0;color:#fff;">第二新卒</span></td><td>卒業後3年以内の転職者。Re就活から流入の可能性あり</td></tr>
-              <tr><td><span class="badge" style="background:#00796b;color:#fff;">中途採用</span></td><td>即戦力採用。ビズリーチ・doda等の中途媒体から流入。LINE連携なし</td></tr>
+              <tr><td><span class="badge" style="background:#1D6E63;color:#fff;">中途採用</span></td><td>即戦力採用。ビズリーチ・doda等の中途媒体から流入。LINE連携なし</td></tr>
             </tbody>
           </table>
           <div class="warn-box" style="margin-top:8px;">⚠️ 第二新卒含むかは確認中（U-03）</div>
@@ -159,8 +163,8 @@
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
         <h2 style="margin-bottom:0;">機能要件一覧</h2>
         <div style="display:flex;gap:6px;font-size:11px;">
-          <span class="badge badge-new">NEW</span><span style="color:#888;">新規追加</span>
-          <span class="badge badge-update" style="margin-left:8px;">UPD</span><span style="color:#888;">変更あり</span>
+          <span class="badge badge-new">NEW</span><span style="color:#7E8891;">新規追加</span>
+          <span class="badge badge-update" style="margin-left:8px;">UPD</span><span style="color:#7E8891;">変更あり</span>
         </div>
       </div>
 
@@ -209,7 +213,8 @@
           <tr><td class="fr-id">FR033</td><td>送信履歴・開封集計</td><td>送信日時・送信数・開封率（集計値）の記録・表示。※個人単位の既読取得は LINE API 制約により不可</td><td><span class="badge badge-mid">中</span></td></tr>
           <tr><td class="fr-id">FR034 <span class="badge badge-shinsostu">新卒</span> <span class="badge badge-update">UPD</span></td><td>リッチメニュー管理</td><td><strong>複数メニューを管理・タグで自動割り当て</strong>（職種別・選考ステータス別等）。優先順位設定あり。公開中/下書きのステータス管理</td><td><span class="badge badge-high">高</span></td></tr>
           <tr><td class="fr-id">FR035 <span class="badge badge-shinsostu">新卒</span> <span class="badge badge-new">NEW</span></td><td>リッチメニュー自動切替</td><td>応募者のタグが変更された際に、RichMenuRule に基づき LINE 側のメニューを自動切り替え</td><td><span class="badge badge-high">高</span></td></tr>
-          <tr><td class="fr-id">FR036</td><td>LINEアンケート</td><td>LIFF経由のアンケートをLINEで送付・回答回収・集計</td><td><span class="badge badge-mid">中</span></td></tr>
+          <tr><td class="fr-id">FR036 <span class="badge badge-update">UPD</span></td><td>LINEアンケート</td><td>LIFF経由のアンケートをLINEで送付・回答回収・集計。<br>
+            <strong>未回答者の抽出・再送信（リマインド）</strong>に対応：集計画面から対象アンケートの未回答者だけを抽出し、LINE送信画面にその条件を引き継いで一括送信できる。</td><td><span class="badge badge-mid">中</span></td></tr>
         </tbody>
       </table>
 
@@ -430,6 +435,45 @@
         </tbody>
       </table>
 
+      <div class="cat-header">🆕 追加要件（v0.10）― リッチメニュー アクション種別拡張</div>
+      <table>
+        <thead><tr><th style="width:90px;">ID</th><th style="width:220px;">機能</th><th>詳細</th><th style="width:60px;">優先度</th></tr></thead>
+        <tbody>
+          <tr><td class="fr-id">FR120 <span class="badge badge-shinsostu">新卒</span> <span class="badge badge-new">NEW</span></td><td>リッチメニュー「メッセージ送信」の自動応答ロジック</td><td>
+            リッチメニューのボタンに「メッセージ送信」アクション（例：「よくある質問について教えて」）を設定した場合、LINE側は固定テキストを通常のメッセージとして送信するだけで、応答の中身までは自動生成されない。<br>
+            送信された固定テキストを<strong>キーワードとして判定し、あらかじめ登録した応答内容（テキスト／Flex Message／FAQリンク集など）を自動返信するボット側ロジック</strong>を新規実装する。<br>
+            キーワードと応答内容の組み合わせは管理画面から登録・編集可能とする（RichMenuAutoReply マスタ想定）。<br>
+            ユーザーが同一の文言を自分で手入力した場合も同じ応答が返る（ボタン経由か手入力かは区別しない）。
+          </td><td><span class="badge badge-mid">中</span></td></tr>
+          <tr><td class="fr-id">FR121 <span class="badge badge-shinsostu">新卒</span> <span class="badge badge-new">NEW</span></td><td>リッチメニュー「ポストバック」のイベント処理</td><td>
+            「ポストバック」アクションのボタンがタップされると、画面には何も表示されず、Webhookに<code>postback.data</code>（例：<code>action=contact_request</code>）のみが届く。<br>
+            この<strong>dataの値に応じて処理を振り分けるディスパッチ処理</strong>をボット側に新規実装する（例：担当者へ内部通知を送り、学生には「追ってご連絡します」と自動返信）。<br>
+            data文字列と処理内容の対応は管理画面から設定可能とする（RichMenuPostbackAction マスタ想定）。
+          </td><td><span class="badge badge-mid">中</span></td></tr>
+          <tr><td class="fr-id">FR122 <span class="badge badge-shinsostu">新卒</span> <span class="badge badge-new">NEW</span></td><td>リッチメニュー「日時選択」と面接希望日時の連携</td><td>
+            「日時選択」アクションでユーザーが日時を選択すると、Webhookに<code>postback.params.datetime</code>として選択値が届く。<br>
+            受信した日時候補を応募者の「面接希望日時」として記録し、選考管理画面に反映する。<br>
+            Phase2検討：候補日時とCalendarSlot（面接枠）の空き状況を自動照合し、重複する枠があれば自動で仮予約まで行う。
+          </td><td><span class="badge badge-mid">中</span></td></tr>
+          <tr><td class="fr-id">FR123 <span class="badge badge-shinsostu">新卒</span> <span class="badge badge-new">NEW</span></td><td>リッチメニュー「エイリアス」管理</td><td>
+            「リッチメニュー切り替え」アクションを使うには、LINE側に各メニューの<strong>エイリアスID</strong>を事前登録しておく必要がある（LINE公式のRich Menu Alias機能）。<br>
+            管理画面でリッチメニューを作成・公開する際、エイリアスIDを自動採番しLINEへ登録する処理を実装する。<br>
+            切替先の選択肢（本ワイヤーフレームで実装済みのプルダウン）は、登録済みリッチメニュー一覧と連動させる。<br>
+            他の3件（FR120〜122）と異なりWebhook処理は不要（LINE側で完結）だが、エイリアス管理の仕組み自体が前提として必要。
+          </td><td><span class="badge badge-low">低</span></td></tr>
+          <tr><td class="fr-id">FR124 <span class="badge badge-shinsostu">新卒</span> <span class="badge badge-new">NEW</span></td><td>友だち追加時のあいさつメッセージ管理</td><td>
+            学生がLINE友だち追加した直後（<code>follow</code>イベント受信時）に自動送信する<strong>あいさつメッセージ</strong>を、管理画面からテキスト編集・プレビューできるようにする。<br>
+            LINE公式アカウントのあいさつメッセージ機能をそのまま使うか、Webhookの<code>follow</code>イベントを自前で拾って送信するかは実装時に選定（後者は後続のFR125シナリオと連続実行しやすい）。
+          </td><td><span class="badge badge-mid">中</span></td></tr>
+          <tr><td class="fr-id">FR125 <span class="badge badge-shinsostu">新卒</span> <span class="badge badge-new">NEW</span></td><td>登録完了後の自動アクション（シナリオ）設計</td><td>
+            簡易登録フォーム送信完了を起点に、<strong>複数ステップの自動アクションを時間差で実行できるシナリオ機能</strong>を新規実装する。<br>
+            各ステップは「遅延時間（即時／n日後）」「アクション種別（メッセージ送信／アンケート送信／タグ付与／リッチメニュー切り替え）」「内容」で構成し、管理画面から順序・内容を編集できる。<br>
+            例：即時「登録ありがとうございますメッセージ」→ 1日後「初回アンケート送信（LIFF）」→ 3日後「総合職メニューへ切り替え」。<br>
+            バックエンドに遅延実行の仕組み（ジョブキュー／スケジューラ）が必要になる点に留意。ScenarioStep マスタ想定。
+          </td><td><span class="badge badge-mid">中</span></td></tr>
+        </tbody>
+      </table>
+
       <div class="cat-header">🆕 追加要件（v0.5）― エージェント・職種区分・合否連絡</div>
       <table>
         <thead><tr><th style="width:90px;">ID</th><th style="width:220px;">機能</th><th>詳細</th><th style="width:60px;">優先度</th></tr></thead>
@@ -486,7 +530,7 @@
         <thead><tr><th style="width:120px;">カテゴリ</th><th>要件</th></tr></thead>
         <tbody>
           <tr>
-            <td style="font-weight:600;color:#e53935;">セキュリティ</td>
+            <td style="font-weight:600;color:#9C3F2E;">セキュリティ</td>
             <td>
               HTTPS必須・認証必須（2要素認証推奨）・アクセスログ記録<br>
               自社専用クローズドシステム。外部からのアクセス制限（IP制限またはVPN推奨）<br>
@@ -494,7 +538,7 @@
             </td>
           </tr>
           <tr>
-            <td style="font-weight:600;color:#e53935;">個人情報保護</td>
+            <td style="font-weight:600;color:#9C3F2E;">個人情報保護</td>
             <td>
               個人情報保護法・採用情報の取り扱い規程に準拠<br>
               不採用者・辞退者データの保持期間ポリシーを定義（要ヒアリング）<br>
@@ -502,14 +546,14 @@
             </td>
           </tr>
           <tr>
-            <td style="font-weight:600;color:#ff9800;">可用性</td>
+            <td style="font-weight:600;color:#C9862A;">可用性</td>
             <td>
               採用繁忙期（10月〜3月）の安定稼働。目標稼働率 <strong>99.5%</strong> 以上<br>
               計画メンテナンスは深夜帯に実施
             </td>
           </tr>
           <tr>
-            <td style="font-weight:600;color:#ff9800;">性能</td>
+            <td style="font-weight:600;color:#C9862A;">性能</td>
             <td>
               学生一覧（500件）の表示：<strong>2秒以内</strong><br>
               LINE一斉送信（500名）：エラーなく完了（Messaging API のレート制限考慮）<br>
@@ -517,7 +561,7 @@
             </td>
           </tr>
           <tr>
-            <td style="font-weight:600;color:#7c83fd;">拡張性</td>
+            <td style="font-weight:600;color:#2E6480;">拡張性</td>
             <td>
               採用人数・担当者数増加時にスケールアウト可能な構成<br>
               媒体追加・フロー追加が管理画面から行える設計<br>
@@ -525,7 +569,7 @@
             </td>
           </tr>
           <tr>
-            <td style="font-weight:600;color:#4caf50;">操作性</td>
+            <td style="font-weight:600;color:#4C8C6B;">操作性</td>
             <td>
               採用担当者が直感的に操作できるUI<br>
               スマートフォンからの管理操作も考慮（レスポンシブ対応）<br>
@@ -533,7 +577,7 @@
             </td>
           </tr>
           <tr>
-            <td style="font-weight:600;color:#1565c0;">データ保全</td>
+            <td style="font-weight:600;color:#3E7490;">データ保全</td>
             <td>
               日次バックアップ。過去3年分のデータ保持を想定<br>
               Salesforce との同期ログも保持
@@ -551,13 +595,13 @@
       <table>
         <thead><tr><th style="width:80px;">ID</th><th style="width:80px;">状態</th><th style="width:200px;">確認事項</th><th>詳細・決定内容</th></tr></thead>
         <tbody>
-          <tr style="background:#e8f5e9;">
+          <tr style="background:#E3EFE8;">
             <td class="fr-id">U-01</td>
             <td><span class="badge badge-done">確認中</span></td>
             <td>LINE既読確認の代替案合意</td>
             <td>個人単位の既読取得はLINE API仕様上不可。<strong>マイページアクセス日時を「最終確認日」として代用</strong>する方向で調整中</td>
           </tr>
-          <tr style="background:#e8f5e9;">
+          <tr style="background:#E3EFE8;">
             <td class="fr-id">U-02</td>
             <td><span class="badge badge-done">✓ 確定</span></td>
             <td>連携媒体名の確定</td>
@@ -574,7 +618,7 @@
             <td>応募者スコープ（新卒のみ vs 第二新卒含む）</td>
             <td>Re就活が主に<strong>既卒・第二新卒向け</strong>のため確認が必要。スコープによってデータモデルの卒業年度フィールドや職歴フィールドの扱いが変わる。<br>→ 柔軟な設計（custom_fields）で対応できるよう準備済み</td>
           </tr>
-          <tr style="background:#e8f5e9;">
+          <tr style="background:#E3EFE8;">
             <td class="fr-id">U-04</td>
             <td><span class="badge badge-done">✓ 確定</span></td>
             <td>SF連携の主従関係</td>
@@ -624,7 +668,7 @@
             <td>内定承諾書類の受領方法</td>
             <td>電子署名での受領か、紙でのスキャン添付か。電子の場合は電子契約サービスとの連携要否</td>
           </tr>
-          <tr style="background:#e8f5e9;">
+          <tr style="background:#E3EFE8;">
             <td class="fr-id">U-11</td>
             <td><span class="badge badge-done">✓ クローズ</span></td>
             <td>カレンダー連携ツールの確定</td>
@@ -635,7 +679,7 @@
               ガルーンユーザーIDは Staff.garoon_user_id で管理。
             </td>
           </tr>
-          <tr style="background:#e8f5e9;">
+          <tr style="background:#E3EFE8;">
             <td class="fr-id">U-12</td>
             <td><span class="badge badge-done">✓ クローズ</span></td>
             <td>カレンダー連携の範囲（確定）</td>
@@ -741,11 +785,11 @@
     <div class="section" style="margin-bottom:16px;">
       <h2>関連ドキュメント</h2>
       <div style="display:flex;gap:12px;flex-wrap:wrap;">
-        <a href="dataflow.html" style="display:flex;align-items:center;gap:10px;background:#f0f0ff;border:1.5px solid #c5cae9;border-radius:10px;padding:12px 18px;text-decoration:none;color:#3949ab;font-size:13px;font-weight:600;">
-          🔀 データフロー設計 →<span style="font-size:11px;font-weight:400;color:#7c83fd;">ERD・LINE連携フロー・SF連携</span>
+        <a href="dataflow.html" style="display:flex;align-items:center;gap:10px;background:#E6EEF1;border:1.5px solid #C3CBD0;border-radius:10px;padding:12px 18px;text-decoration:none;color:#1B3F52;font-size:13px;font-weight:600;">
+          🔀 データフロー設計 →<span style="font-size:11px;font-weight:400;color:#2E6480;">ERD・LINE連携フロー・SF連携</span>
         </a>
-        <a href="index.html" style="display:flex;align-items:center;gap:10px;background:#f8f9fc;border:1.5px solid #e0e0e0;border-radius:10px;padding:12px 18px;text-decoration:none;color:#555;font-size:13px;font-weight:600;">
-          🖥 ワイヤーフレーム →<span style="font-size:11px;font-weight:400;color:#888;">画面構成・UI設計</span>
+        <a href="index.html" style="display:flex;align-items:center;gap:10px;background:#F2F5F6;border:1.5px solid #D3DADE;border-radius:10px;padding:12px 18px;text-decoration:none;color:#4A535C;font-size:13px;font-weight:600;">
+          🖥 ワイヤーフレーム →<span style="font-size:11px;font-weight:400;color:#7E8891;">画面構成・UI設計</span>
         </a>
       </div>
     </div>
@@ -755,6 +799,20 @@
       <table>
         <thead><tr><th style="width:100px;">日付</th><th style="width:60px;">Ver</th><th>変更内容</th></tr></thead>
         <tbody>
+          <tr>
+            <td>2026-10-11</td><td>v0.11</td>
+            <td>
+              <span class="badge badge-new" style="margin-right:4px;">NEW</span> FR124：友だち追加時のあいさつメッセージ管理。FR125：登録完了後の自動アクション（シナリオ）設計 — 遅延実行可能な複数ステップ（メッセージ送信／アンケート送信／タグ付与／リッチメニュー切り替え）。<br>
+              <span class="badge badge-update" style="margin-right:4px;">UPD</span> FR036：アンケート未回答者の抽出・LINE送信画面への引き継ぎに対応したことを明記。
+            </td>
+          </tr>
+          <tr>
+            <td>2026-10-10</td><td>v0.10</td>
+            <td>
+              <span class="badge badge-new" style="margin-right:4px;">NEW</span> FR120〜123：リッチメニューのアクション種別拡張に伴うボット側ロジックを追加。FR120メッセージ送信の自動応答（キーワード判定）、FR121ポストバックのイベント処理、FR122日時選択と面接希望日時の連携、FR123リッチメニューエイリアス管理。<br>
+              ワイヤーフレーム側でリンク先タイプにLINEの全アクション種別（外部URL／LIFF／メッセージ送信／ポストバック／日時選択／リッチメニュー切り替え）を選択できるようにしたことに伴う要件化。
+            </td>
+          </tr>
           <tr>
             <td>2026-07-21</td><td>v0.9</td>
             <td>
