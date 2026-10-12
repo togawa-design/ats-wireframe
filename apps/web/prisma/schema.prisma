@@ -1,0 +1,192 @@
+// Prisma schema for フジアルテ ATS.
+// Source of truth for table/column definitions: ../../table-spec.html
+// Build order follows ../../roadmap.html "データ構築順序":
+//   STEP 0 — 認証基盤: Staff, StaffSession, AuditLog
+//   STEP 1 — マスターデータ: Tag, School, Media, QRCode, SelectionFlow, SelectionStage
+// Later steps (Applicant, Selection, LINE/Survey/CalendarSlot, ...) are added as
+// subsequent migrations once STEP 0/1 are live.
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ===== STEP 0: 認証基盤 =====
+
+enum StaffRole {
+  admin
+  recruiter
+  interviewer
+  viewer
+
+  @@map("staff_role")
+}
+
+enum StaffPositionAccess {
+  sogo
+  gino
+  both
+
+  @@map("staff_position_access")
+}
+
+enum AuditAction {
+  login
+  logout
+  export
+  status_change
+  offer
+  acceptance
+  line_send
+  edit_applicant
+  document_export
+
+  @@map("audit_action")
+}
+
+/// 担当者テーブル。他の全テーブルの created_by / assigned_to / changed_by が参照する。
+model Staff {
+  id                   String              @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name                 String              @db.VarChar(100)
+  email                String              @unique @db.VarChar(255)
+  google_id            String              @unique @db.VarChar(255)
+  garoon_user_id       String?             @db.VarChar(100)
+  role                 StaffRole           @default(recruiter)
+  is_active            Boolean             @default(true)
+  position_type_access StaffPositionAccess @default(both)
+  created_at           DateTime            @default(now())
+  updated_at           DateTime            @updatedAt
+
+  sessions   StaffSession[]
+  audit_logs AuditLog[]
+  tags       Tag[]
+
+  @@index([email], map: "staff_email_idx")
+  @@index([google_id], map: "staff_google_id_idx")
+}
+
+/// セッション管理テーブル。
+model StaffSession {
+  id            String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  staff_id      String    @db.Uuid
+  ip_address    String    @db.VarChar(45)
+  user_agent    String    @db.VarChar(500)
+  logged_in_at  DateTime  @default(now())
+  logged_out_at DateTime?
+
+  staff Staff @relation(fields: [staff_id], references: [id], onDelete: Cascade)
+
+  @@index([staff_id, logged_out_at], map: "session_staff_idx")
+}
+
+/// 監査ログテーブル。INSERT ONLY（削除・更新禁止、保存期間3年）。
+model AuditLog {
+  id           String      @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  staff_id     String      @db.Uuid
+  action       AuditAction
+  target_type  String?     @db.VarChar(50)
+  target_id    String?     @db.Uuid
+  before_value Json?
+  after_value  Json?
+  ip_address   String      @db.VarChar(45)
+  created_at   DateTime    @default(now())
+
+  staff Staff @relation(fields: [staff_id], references: [id])
+
+  @@index([staff_id, created_at], map: "audit_staff_idx")
+  @@index([target_type, target_id], map: "audit_target_idx")
+}
+
+// ===== STEP 1: マスターデータ =====
+
+enum SchoolType {
+  university        @map("大学")
+  graduate_school   @map("大学院")
+  junior_college    @map("短大")
+  vocational_school @map("専門")
+  kosen             @map("高専")
+
+  @@map("school_type")
+}
+
+enum MediaSyncType {
+  api
+  csv
+
+  @@map("media_sync_type")
+}
+
+enum StageType {
+  entry
+  screening
+  interview_1st
+  interview_2nd
+  interview_final
+  offer
+  acceptance
+
+  @@map("stage_type")
+}
+
+/// タグマスター。
+model Tag {
+  id         String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name       String @unique @db.VarChar(50)
+  color      String @db.VarChar(7)
+  created_by String @db.Uuid
+
+  creator Staff @relation(fields: [created_by], references: [id])
+}
+
+/// 学校マスター。
+model School {
+  id            String     @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name          String     @unique @db.VarChar(200)
+  type          SchoolType
+  category      String?    @db.VarChar(50)
+  sf_account_id String?    @db.VarChar(20)
+}
+
+/// 求人媒体マスター。必須6媒体: マイナビ / Re就活キャンパス / OfferBox / キミスカ / キャリアチケット / ABABA
+model Media {
+  id            String        @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name          String        @unique @db.VarChar(100)
+  field_mapping Json
+  sync_type     MediaSyncType
+  cost          Int?
+}
+
+/// QRコードマスター。
+model QRCode {
+  id         String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  label      String @db.VarChar(100)
+  liff_url   String @db.VarChar(500)
+  auto_tags  Json
+  scan_count Int    @default(0)
+}
+
+/// 選考フロー定義。
+model SelectionFlow {
+  id         String  @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name       String  @db.VarChar(100)
+  is_default Boolean
+  is_active  Boolean
+
+  stages SelectionStage[]
+}
+
+/// 選考ステージ定義。
+model SelectionStage {
+  id         String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  flow_id    String    @db.Uuid
+  name       String    @db.VarChar(50)
+  order      Int       @db.SmallInt
+  stage_type StageType
+
+  flow SelectionFlow @relation(fields: [flow_id], references: [id])
+}

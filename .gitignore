@@ -1,0 +1,32 @@
+node_modules/
+baitai.txt
+.env
+poc/downloads/
+poc/screenshots/
+poc/*.png
+poc/storageState.json
+poc/ws-endpoint.txt
+poc/chrome-profile/
+poc/chrome-profile-monitor/
+poc/cdp-ready.flag
+poc/timeout-fine-results.json
+poc/applicant-list-raw.html
+poc/doda/applicant-list-raw.html
+poc/*/applicant-list-raw.html
+poc/applicant-snapshot.json
+poc/new-applicants-log.jsonl
+poc/applicant-list-skeleton.json
+poc/rekatsu/storageState.json
+poc/*/storageState.json
+poc/*/chrome-profile/
+poc/*/inner-url.txt
+poc/idle-long-log.txt
+poc/keepalive-log.txt
+poc/inner-url.txt
+apps/*/dist/
+apps/*/snapshot.json
+
+# 媒体から取得した応募者個人情報(閲覧検証で取得したスナップショット)は
+# 絶対にコミットしない
+poc/snapshot.json
+poc/*/snapshot.json

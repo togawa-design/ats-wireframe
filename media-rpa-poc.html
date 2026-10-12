@@ -4,88 +4,92 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>媒体応募データ自動取込 技術検証メモ</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@400;500;700;900&family=IBM+Plex+Mono:wght@500;600;700&display=swap" rel="stylesheet">
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
-  body { font-family: -apple-system, BlinkMacSystemFont, 'Hiragino Sans', sans-serif; background: #f0f2f5; color: #1a1a2e; }
+  body { font-family: 'Zen Kaku Gothic New', 'Hiragino Sans', -apple-system, BlinkMacSystemFont, sans-serif; background: #E9EDEF; color: #1C2126; }
 
   .page { max-width: 1100px; margin: 0 auto; padding: 32px 24px; }
   h1 { font-size: 22px; font-weight: 700; margin-bottom: 6px; }
-  h2 { font-size: 16px; font-weight: 700; color: #1a1a2e; margin-bottom: 16px; border-left: 4px solid #7c83fd; padding-left: 10px; }
-  h3 { font-size: 13px; font-weight: 700; color: #555; margin-bottom: 10px; }
-  .meta { font-size: 12px; color: #999; margin-bottom: 28px; display:flex; gap:16px; align-items:center; flex-wrap:wrap; }
+  h2 { font-size: 16px; font-weight: 700; color: #1C2126; margin-bottom: 16px; border-left: 4px solid #2E6480; padding-left: 10px; }
+  h3 { font-size: 13px; font-weight: 700; color: #4A535C; margin-bottom: 10px; }
+  .meta { font-size: 12px; color: #94A0A8; margin-bottom: 28px; display:flex; gap:16px; align-items:center; flex-wrap:wrap; }
 
-  .section { background: #fff; border-radius: 12px; padding: 24px; margin-bottom: 24px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); }
+  .section { background: #fff; border-radius: 12px; padding: 24px; margin-bottom: 24px; border:1px solid #D9E0E3; }
 
   .badge { display:inline-block; padding:2px 10px; border-radius:10px; font-size:11px; font-weight:700; white-space:nowrap; }
-  .badge-draft { background:#9e9e9e; color:#fff; }
-  .badge-tbd   { background:#ff9800; color:#fff; }
+  .badge-draft { background:#8A959C; color:#fff; }
+  .badge-tbd   { background:#C9862A; color:#fff; }
 
   table { width:100%; border-collapse:collapse; font-size:13px; }
-  th { background:#f8f9fc; padding:9px 12px; text-align:left; font-weight:600; color:#555; font-size:12px; border-bottom:1px solid #e8eaf0; }
-  td { padding:10px 12px; border-bottom:1px solid #f0f2f5; vertical-align:top; line-height:1.6; }
+  th { background:#F2F5F6; padding:9px 12px; text-align:left; font-weight:600; color:#4A535C; font-size:12px; border-bottom:1px solid #D9E0E3; }
+  td { padding:10px 12px; border-bottom:1px solid #E9EDEF; vertical-align:top; line-height:1.6; }
   tr:last-child td { border-bottom:none; }
 
-  code { font-family:'SF Mono','Menlo',monospace; font-size:11px; color:#7c83fd; background:#f0f0ff; padding:1px 5px; border-radius:4px; white-space:nowrap; }
+  code { font-family:'IBM Plex Mono','SF Mono','Menlo',monospace; font-size:11px; color:#2E6480; background:#E6EEF1; padding:1px 5px; border-radius:4px; white-space:nowrap; }
 
-  .info-box  { background:#f0f0ff; border:1px solid #c5cae9; border-radius:8px; padding:12px 16px; font-size:12px; color:#3949ab; margin-top:10px; line-height:1.7; }
-  .warn-box  { background:#fff8e1; border:1px solid #ffcc80; border-radius:8px; padding:12px 16px; font-size:12px; color:#e65100; margin-top:10px; line-height:1.7; }
+  .info-box  { background:#E6EEF1; border:1px solid #C3CBD0; border-radius:8px; padding:12px 16px; font-size:12px; color:#1B3F52; margin-top:10px; line-height:1.7; }
+  .warn-box  { background:#F3E8D6; border:1px solid #C9862A; border-radius:8px; padding:12px 16px; font-size:12px; color:#9C5A1D; margin-top:10px; line-height:1.7; }
 
   /* Step flow */
   .steps { display: flex; flex-direction: column; gap: 0; }
   .step {
     display: flex; gap: 16px; align-items: flex-start;
-    padding: 16px 0; border-bottom: 1px solid #f0f2f5;
+    padding: 16px 0; border-bottom: 1px solid #E9EDEF;
   }
   .step:last-child { border-bottom: none; }
   .step-num {
     width: 28px; height: 28px; border-radius: 50%;
-    background: #7c83fd; color: #fff;
+    background: #2E6480; color: #fff;
     display: flex; align-items: center; justify-content: center;
     font-size: 12px; font-weight: 700; flex-shrink: 0;
   }
-  .step-num.orange { background: #ff9800; }
-  .step-num.green { background: #4caf50; }
-  .step-num.red { background: #e53935; }
+  .step-num.orange { background: #C9862A; }
+  .step-num.green { background: #4C8C6B; }
+  .step-num.red { background: #9C3F2E; }
   .step-body { flex: 1; }
   .step-title { font-size: 13px; font-weight: 600; margin-bottom: 4px; }
-  .step-desc { font-size: 12px; color: #666; line-height: 1.6; }
-  .step-tech { font-size: 11px; color: #7c83fd; background: #f0f0ff; border-radius: 4px; padding: 2px 8px; display: inline-block; margin-top: 6px; margin-right:6px; }
-  .step-warn { font-size: 11px; color: #e65100; background: #fff3e0; border-radius: 4px; padding: 2px 8px; display: inline-block; margin-top: 6px; }
+  .step-desc { font-size: 12px; color: #5B6670; line-height: 1.6; }
+  .step-tech { font-size: 11px; color: #2E6480; background: #E6EEF1; border-radius: 4px; padding: 2px 8px; display: inline-block; margin-top: 6px; margin-right:6px; }
+  .step-warn { font-size: 11px; color: #9C5A1D; background: #F3E8D6; border-radius: 4px; padding: 2px 8px; display: inline-block; margin-top: 6px; }
 
   .branch { display:grid; grid-template-columns: 1fr 1fr; gap:14px; margin-top:8px; }
   .branch-card { border-radius:8px; padding:10px 14px; font-size:12px; line-height:1.6; }
-  .branch-ok   { background:#e8f5e9; border:1px solid #a5d6a7; color:#2e7d32; }
-  .branch-ng   { background:#ffebee; border:1px solid #ef9a9a; color:#c62828; }
+  .branch-ok   { background:#E3EFE8; border:1px solid #a5d6a7; color:#2F5A42; }
+  .branch-ng   { background:#F3E2DF; border:1px solid #ef9a9a; color:#8C352A; }
 
   ::-webkit-scrollbar { width: 4px; height: 4px; }
   ::-webkit-scrollbar-track { background: transparent; }
-  ::-webkit-scrollbar-thumb { background: #ccc; border-radius: 2px; }
+  ::-webkit-scrollbar-thumb { background: #C3CBD0; border-radius: 2px; }
 </style>
 </head>
 <body>
 
 <!-- Global Nav -->
-<div style="background:#1a1a2e;height:40px;display:flex;align-items:center;padding:0 20px;gap:24px;font-size:12px;flex-shrink:0;overflow-x:auto;">
-  <span style="color:#7c83fd;font-weight:700;letter-spacing:0.5px;white-space:nowrap;">ATS設計ドキュメント</span>
-  <a href="index.html"             style="color:#aaa;text-decoration:none;opacity:.7;white-space:nowrap;">🖥 ワイヤーフレーム</a>
-  <a href="requirements.html"      style="color:#aaa;text-decoration:none;opacity:.7;white-space:nowrap;">📋 要件定義書</a>
-  <a href="dataflow.html"          style="color:#aaa;text-decoration:none;opacity:.7;white-space:nowrap;">🔀 データフロー設計</a>
-  <a href="roadmap.html"           style="color:#aaa;text-decoration:none;opacity:.7;white-space:nowrap;">🗺️ ロードマップ</a>
-  <a href="screen-spec.html"       style="color:#aaa;text-decoration:none;opacity:.7;white-space:nowrap;">📐 画面仕様書</a>
-  <a href="table-spec.html"        style="color:#aaa;text-decoration:none;opacity:.7;white-space:nowrap;">🗃️ テーブル定義書</a>
-  <a href="integration-spec.html"  style="color:#aaa;text-decoration:none;opacity:.7;white-space:nowrap;">🔌 外部連携仕様書</a>
-  <a href="architecture.html"      style="color:#aaa;text-decoration:none;opacity:.7;white-space:nowrap;">🏗️ アーキテクチャ</a>
-  <a href="agency-wireframe.html"  style="color:#aaa;text-decoration:none;opacity:.7;white-space:nowrap;">🤝 エージェントWF</a>
-  <a href="security.html"          style="color:#aaa;text-decoration:none;opacity:.7;white-space:nowrap;">🔒 セキュリティ設計書</a>
-  <a href="media-rpa-poc.html"     style="color:#fff;text-decoration:none;border-bottom:2px solid #7c83fd;padding-bottom:2px;white-space:nowrap;">🧪 媒体取込 技術検証</a>
+<div style="background:#1C2126;height:40px;display:flex;align-items:center;padding:0 20px;gap:24px;font-size:12px;flex-shrink:0;overflow-x:auto;">
+  <span style="color:#2E6480;font-weight:700;letter-spacing:0.5px;white-space:nowrap;">ATS設計ドキュメント</span>
+  <a href="index.html"             style="color:#A9B3BA;text-decoration:none;opacity:.7;white-space:nowrap;">🖥 ワイヤーフレーム</a>
+  <a href="requirements.html"      style="color:#A9B3BA;text-decoration:none;opacity:.7;white-space:nowrap;">📋 要件定義書</a>
+  <a href="dataflow.html"          style="color:#A9B3BA;text-decoration:none;opacity:.7;white-space:nowrap;">🔀 データフロー設計</a>
+  <a href="roadmap.html"           style="color:#A9B3BA;text-decoration:none;opacity:.7;white-space:nowrap;">🗺️ ロードマップ</a>
+  <a href="screen-spec.html"       style="color:#A9B3BA;text-decoration:none;opacity:.7;white-space:nowrap;">📐 画面仕様書</a>
+  <a href="table-spec.html"        style="color:#A9B3BA;text-decoration:none;opacity:.7;white-space:nowrap;">🗃️ テーブル定義書</a>
+  <a href="integration-spec.html"  style="color:#A9B3BA;text-decoration:none;opacity:.7;white-space:nowrap;">🔌 外部連携仕様書</a>
+  <a href="architecture.html"      style="color:#A9B3BA;text-decoration:none;opacity:.7;white-space:nowrap;">🏗️ アーキテクチャ</a>
+  <a href="agency-wireframe.html"  style="color:#A9B3BA;text-decoration:none;opacity:.7;white-space:nowrap;">🤝 エージェントWF</a>
+  <a href="security.html"          style="color:#A9B3BA;text-decoration:none;opacity:.7;white-space:nowrap;">🔒 セキュリティ設計書</a>
+  <a href="media-rpa-poc.html"     style="color:#fff;text-decoration:none;border-bottom:2px solid #2E6480;padding-bottom:2px;white-space:nowrap;">🧪 媒体取込 技術検証</a>
+  <a href="liff-wireframe.html" style="color:#A9B3BA;text-decoration:none;opacity:.7;white-space:nowrap;">📱 LIFF画面WF</a>
 </div>
 
 <div class="page">
   <h1>媒体応募データ自動取込方式 技術検証メモ</h1>
   <div class="meta">
-    <span class="badge badge-draft">DRAFT</span>
-    <span>2026-07-24</span>
-    <span>ステータス：技術検証中（要件定義外のメモ）</span>
+    <span class="badge" style="background:#4C8C6B;color:#fff;">実機検証済み</span>
+    <span>2026-07-24 作成 / 2026-10-08 更新</span>
+    <span>ステータス：7媒体中6媒体で実アカウント検証完了（要件定義外のメモ）</span>
     <span class="badge badge-tbd">要件書には未反映</span>
   </div>
 
@@ -94,120 +98,194 @@
     <div class="info-box">
       本メモは、求人媒体からの応募データを本システムへ自動取込する方式について、<strong>技術的な実現性を検討するための内部メモ</strong>である。
       [requirements.html](requirements.html) の要件（FR040 / FR118 等）とは切り離して管理し、正式な要件化は別途判断する。<br>
-      対象媒体の具体的な名称・数はここでは扱わない（媒体ごとに個別実装が必要な技術方式についてのみ記載する）。
+      対象媒体の具体的な名称・数はここでは扱わない（媒体ごとに個別実装が必要な技術方式についてのみ記載する）。<br>
+      ただし下記「媒体別検証状況 ToDo」は、実機検証の進捗管理のため例外的に媒体名を記載する。
+    </div>
+    <div class="info-box" style="margin-top:10px;">
+      <strong>2026-09-17時点の要約：</strong> 実アカウントを用いた技術検証の結果、当初の想定（メール受信をトリガーに毎回ログインし直す方式）は誤りで、
+      <strong>「初回ログインのみ人手対応（必要な場合）→ セッションを保存 → 保存済みセッションを使い回して定期的に一覧画面をポーリングし、差分で新着応募者を検知する」</strong>方式が
+      7媒体中6媒体で技術的に成立することを確認した。詳細は「媒体別検証状況 ToDo」「汎用監視アーキテクチャ」の各セクションを参照。
     </div>
   </div>
 
   <div class="section">
-    <h2>前提条件</h2>
+    <h2>媒体別検証状況 ToDo</h2>
     <table>
-      <thead><tr><th style="width:180px;">前提</th><th>内容</th></tr></thead>
+      <thead><tr><th style="width:140px;">媒体</th><th>ログイン方式</th><th>セッション再利用</th><th>状況</th><th>次のTODO</th></tr></thead>
       <tbody>
         <tr>
-          <td>通知メールの受信</td>
-          <td>媒体の応募通知メールを、本システムが検知できる受信用アドレスに届ける。方式は媒体ごとに以下いずれか：
-            <div class="branch">
-              <div class="branch-card branch-ok"><strong>方式A</strong>：媒体の通知先メールアドレス設定画面から、自社側で追加登録する（媒体側への依頼が不要な場合）</div>
-              <div class="branch-card branch-ok"><strong>方式B</strong>：担当者の実メールボックス側で受信ルール（フィルタ・自動転送）を設定し、本システム宛に転送する（媒体側の協力が一切不要）</div>
-            </div>
-          </td>
+          <td>マイナビ</td>
+          <td>reCAPTCHA + 場合により2段階認証（手動必須）</td>
+          <td>✅ 確認済み（本命ページ=MIWSへの深いリンクなら別プロセスでも再利用可）</td>
+          <td><span class="badge" style="background:#4C8C6B;color:#fff;">検証完了</span></td>
+          <td>✅ 抽出ロジック実装済み（<code>poc/mynavi/adapter.js</code>）。ATS DB取込ロジックへの接続が次工程</td>
         </tr>
         <tr>
-          <td>メール本文の情報量</td>
-          <td>通知メールには応募者のフル情報は含まれず、<strong>管理画面（媒体ポータル）への詳細ページリンクのみ</strong>が記載される想定。実データの取得にはログイン後のページアクセスが必要になる</td>
+          <td>Re就活</td>
+          <td>CAPTCHAなし・完全自動ログイン可</td>
+          <td>✅ 確認済み</td>
+          <td><span class="badge" style="background:#4C8C6B;color:#fff;">検証完了</span></td>
+          <td>✅ 抽出ロジック実装済み（<code>poc/rekatsu/adapter.js</code>、headed運用が必要）。ただし求人単位の件数監視まで。個別応募者へのドリルダウンは未実装</td>
         </tr>
         <tr>
-          <td>ログインセッションの保持</td>
-          <td>媒体ごとに一度ログインしたセッション（Cookie／localStorage）を保存・使い回し、通常運用では毎回のログイン処理を発生させない</td>
+          <td>OfferBox</td>
+          <td>CAPTCHAなし・完全自動ログイン可・headlessも問題なし</td>
+          <td>✅ 確認済み</td>
+          <td><span class="badge" style="background:#4C8C6B;color:#fff;">検証完了</span></td>
+          <td>✅ 抽出ロジック実装済み（<code>poc/offerbox/adapter.js</code>）。学生カードは通常のDOMでは取得できず、背後のAPI応答に埋め込まれたHTML断片を解析する方式</td>
         </tr>
         <tr>
-          <td>完全自動化を前提としない</td>
-          <td>CAPTCHA・2段階認証・セッション失効などで自動処理が止まるケースは必ず発生する前提で、人手介入によるフォールバック導線を用意する</td>
+          <td>キャリアチケット</td>
+          <td>ログインID/PWに加え、<strong>毎回メール認証コード(6桁・有効期限30分)が必須</strong></td>
+          <td>未検証（認証コード入力より先に進めていない）</td>
+          <td><span class="badge badge-tbd">要対応</span></td>
+          <td>クライアントにアカウント発行を依頼済み。発行され次第、認証コード受信用メールのIMAP連携を検討</td>
+        </tr>
+        <tr>
+          <td>キミスカ</td>
+          <td>CAPTCHAなし・完全自動ログイン可・headlessも問題なし</td>
+          <td>✅ 確認済み</td>
+          <td><span class="badge" style="background:#4C8C6B;color:#fff;">検証完了</span></td>
+          <td>✅ 抽出ロジック実装済み（<code>poc/kimisuka/adapter.js</code>、エントリー一覧21件で動作確認）</td>
+        </tr>
+        <tr style="background:#f3e8ff;">
+          <td>マイナビ転職（中途）</td>
+          <td>reCAPTCHA的な隠しフィールドはあるが可視チャレンジなし</td>
+          <td>▲ 2026-09-10時点ではzhe19アカウントで確認済みだったが、2026-10-08の再検証では同アカウントで「認証できません」エラーとなり、ログイン自体ができなかった</td>
+          <td><span class="badge badge-tbd">要再確認</span></td>
+          <td>fji21・zhe19とも現在ログイン不可。パスワード変更/一時ロック/Bot判定の可能性があり、クライアントへの確認が必要。遷移経路・抽出ロジックの実装自体は完了済み（<code>poc/mynavi-tenshoku/adapter.js</code>）</td>
+        </tr>
+        <tr style="background:#f3e8ff;">
+          <td>DODA</td>
+          <td>Okta(SSO基盤)によるログイン。CAPTCHA・MFAなし、完全自動ログイン可</td>
+          <td>✅ 確認済み</td>
+          <td><span class="badge" style="background:#4C8C6B;color:#fff;">検証完了</span></td>
+          <td>✅ 抽出ロジック実装済み（<code>poc/doda/adapter.js</code>）。igGridの描画元データを返すAjax応答を横取りする方式で100件取得を確認</td>
+        </tr>
+      </tbody>
+    </table>
+    <div class="info-box">中途採用アカウント（2026-09-17受領）分は背景色を変えて区別している。</div>
+  </div>
+
+  <div class="section">
+    <h2>汎用監視フレームワーク（実装）</h2>
+    <div class="info-box">
+      <code>poc/lib/watcher-core.js</code> に差分検知・スナップショット保存・セッション失効アラートの共通ロジックを実装。
+      各媒体は <code>poc/&lt;media&gt;/adapter.js</code> に <code>statePath</code>（保存セッション）・<code>listUrl</code>（一覧ページURL）・<code>isLoginPage(url)</code>（セッション失効判定）・<code>extract(page)</code>（一覧抽出）の4点だけを実装すればよい。
+      実行は <code>node poc/run-watcher.js &lt;media&gt; [--headed]</code>。
+    </div>
+    <table>
+      <thead><tr><th style="width:160px;">媒体</th><th>抽出ロジック</th><th>動作確認</th></tr></thead>
+      <tbody>
+        <tr><td>マイナビ</td><td>✅ 実装済み</td><td>セッション有効時に実データで動作確認済み（別途、長期保存セッションでは失効を検知し異常系に正しく入ることも確認）</td></tr>
+        <tr><td>Re就活</td><td>✅ 実装済み（求人単位の件数監視）</td><td>13件のベースライン取得を確認</td></tr>
+        <tr><td>キミスカ</td><td>✅ 実装済み（エントリー一覧）</td><td>21件のベースライン取得を確認</td></tr>
+        <tr><td>OfferBox</td><td>✅ 実装済み（API応答内のHTML断片を解析）</td><td>20件（1ページ目）のベースライン取得を確認。ページング・詳細項目は未対応</td></tr>
+        <tr><td>DODA</td><td>✅ 実装済み（Ajax応答を横取り）</td><td>100件のベースライン取得を確認</td></tr>
+        <tr><td>マイナビ転職（中途）</td><td>✅ 実装済み</td><td>アカウントが現在ログイン不可のため再検証待ち</td></tr>
+        <tr><td>キャリアチケット</td><td>未着手</td><td>メール連携待ち</td></tr>
+      </tbody>
+    </table>
+    <div class="info-box">
+      <strong>DODA・OfferBoxの抽出方式について：</strong> どちらも画面のDOM構造が複雑（igGridの仮想スクロール、Reactの動的レンダリング）で、通常のHTML解析では行データを取得できなかった。
+      そこで、ページ自身が初期表示時に自動的に行うAjax通信（検索結果取得）の応答を横取りする方式に変更した。これは新たなリクエストを発行するものではなく、ページが元々行う通信を観察するだけの読み取り専用の手法である。
+    </div>
+    <div class="warn-box">
+      <strong>MIWS(マイナビ系)の仕様として判明したこと：</strong> セッション失効時に表示されるエラー画面に「同一アカウントで別端末からのログインがあった場合、MIWSでは同一アカウントでの複数同時ログインができない」「一定時間操作をされなかった場合」の2つが失効理由として明記されていた。
+      実運用で人がMIWSにログインしている間、同じアカウントでRPAが並行アクセスすると、どちらかのセッションが強制的に無効化される可能性がある点に注意。
+    </div>
+    <div class="info-box">
+      <strong>本番導入に向けた推奨：</strong> 上記の「同一アカウント複数同時ログイン不可」の制約があるため、本番運用では<strong>採用担当者が日常的に使う本番アカウントとは別に、RPA監視専用のアカウントをクライアントに用意してもらう</strong>べき。
+      技術検証時に使用した今回のアカウント（baitai.txt記載）は検証用の共有アカウントであり、本番ではこの方針をクライアントに依頼する想定。
+    </div>
+  </div>
+
+  <div class="section">
+    <h2>検証で確定した結論</h2>
+    <table>
+      <thead><tr><th style="width:260px;">当初の想定（廃案）</th><th>実機検証での結論</th></tr></thead>
+      <tbody>
+        <tr>
+          <td>応募通知メールを都度検知し、その都度ログインして詳細ページへアクセスする（イベント駆動）</td>
+          <td>❌ CAPTCHA/2段階認証がある媒体では、応募のたびに人手対応が必要になり非現実的。<strong>ログインは初回の1回（人手が必要な場合はそこだけ）に限定し、以降は保存したセッションを使い回すべき</strong></td>
+        </tr>
+        <tr>
+          <td>セッションは数十秒〜数分で失効する可能性がある（マイナビの初期テストでの誤検知）</td>
+          <td>✅ 実際には、正しい対象ページ（例：マイナビ新卒ならMIWS、中途ならhr-miws）であれば<strong>60分放置しても失効しない</strong>ことを確認。当初の「即失効」という結果は、ログイン入口ページ自体を対象にテストしていたこと、および<code>reload()</code>によるPOSTフォーム再送信という検証方法の誤りが原因だった</td>
+        </tr>
+        <tr>
+          <td>通知メールには応募者詳細への直リンクが記載され、そこへ直接アクセスする</td>
+          <td>▲ 未確認。実メールのサンプル確認が必要（後述の未確定事項）。ただし直リンクがなくても、保存済みセッションで一覧画面を定期ポーリングする方式で代替可能なことを確認済み</td>
+        </tr>
+        <tr>
+          <td>CAPTCHA・2段階認証・メール認証コードは自動突破しない</td>
+          <td>✅ 方針として継続。マイナビはreCAPTCHA必須（人手）、キャリアチケットはメール認証コード必須（IMAP連携を検討中）、それ以外4媒体（Re就活・OfferBox・キミスカ・DODA）はCAPTCHAなしで完全自動ログイン可能だった</td>
         </tr>
       </tbody>
     </table>
   </div>
 
   <div class="section">
-    <h2>処理フロー</h2>
+    <h2>汎用監視アーキテクチャ（実検証で確定した設計）</h2>
+    <div class="info-box">
+      media-rpa配下に媒体ごとの実装フォルダを持ち、各媒体は「ログイン処理」「一覧ページのURL・抽出セレクタ」の2点だけを個別実装する<strong>アダプタ方式</strong>とする。
+      セッション保存・差分検知・通知・DB取込のロジックは全媒体共通（PoCの<code>watcher.js</code>相当）。
+    </div>
     <div class="steps">
 
       <div class="step">
         <div class="step-num">1</div>
         <div class="step-body">
-          <div class="step-title">応募者が媒体の求人へ応募</div>
-          <div class="step-desc">媒体側で応募が確定すると、媒体から担当者宛に「新着応募のお知らせ」メールが自動送信される</div>
+          <div class="step-title">初回ログイン（媒体アダプタ）</div>
+          <div class="step-desc">媒体ごとに用意したログイン処理を実行する。CAPTCHA・2段階認証・メール認証コードがある媒体（マイナビ・キャリアチケット）はここだけ人手対応が必要。それ以外（Re就活・OfferBox・キミスカ・DODA・マイナビ転職）はID/PWのみで完全自動</div>
+          <span class="step-tech">Playwright</span>
         </div>
       </div>
 
       <div class="step">
         <div class="step-num">2</div>
         <div class="step-body">
-          <div class="step-title">本システムの受信用アドレスにメールが到達</div>
-          <div class="step-desc">前提条件の方式A（CC登録）または方式B（転送ルール）により、通知メールが本システム管理下の受信アドレスに届く</div>
+          <div class="step-title">セッションを保存</div>
+          <div class="step-desc">ログイン後のCookie（<code>storageState</code>）をファイルに保存する。ID/PWと同等の機密情報として暗号化して扱う</div>
+          <span class="step-tech">context.storageState()</span>
         </div>
       </div>
 
       <div class="step">
         <div class="step-num">3</div>
         <div class="step-body">
-          <div class="step-title">Webhookでバックエンドに通知</div>
-          <div class="step-desc">メール受信をWebhookとして受け取るサービス（Inbound Email Parse系）経由で、件名・本文・送信元をバックエンドへリアルタイムに渡す</div>
-          <span class="step-tech">SendGrid Inbound Parse / Mailgun Routes / AWS SES + Lambda 等</span>
+          <div class="step-title">監視スクリプトを定期実行</div>
+          <div class="step-desc">cron等で数分〜十数分おきに起動し、保存済みセッションで応募者一覧・エントリー一覧ページに<strong>ログインなしで</strong>アクセスする（別プロセス・headlessでの再利用は6媒体で確認済み）</div>
+          <span class="step-tech">headless再実行</span>
+
+          <div class="branch">
+            <div class="branch-card branch-ok"><strong>セッション有効</strong>：一覧ページがそのまま開く（想定の主経路。マイナビは60分放置でも維持を確認）</div>
+            <div class="branch-card branch-ng"><strong>セッション失効</strong>：ログイン画面にリダイレクトされる。自動再ログインは試みず、処理を止めて人手にアラート（下記④）</div>
+          </div>
         </div>
       </div>
 
       <div class="step">
         <div class="step-num">4</div>
         <div class="step-body">
-          <div class="step-title">メール本文をパースし、媒体種別と詳細リンクを特定</div>
-          <div class="step-desc">送信元・件名フォーマットから対象媒体を判定し、本文内の応募者詳細ページURLを抽出する。媒体ごとにメールテンプレートの解析ルールを個別に持つ</div>
+          <div class="step-title">一覧を抽出し、前回スナップショットと差分比較</div>
+          <div class="step-desc">応募者管理ID等のキーで、前回取得時の一覧（JSON保存）と突合し、新規に増えたレコードを検知する。UIのCSSクラス名（jssXXX等）は不安定なため、構造的なセレクタを使う</div>
         </div>
       </div>
 
       <div class="step">
         <div class="step-num">5</div>
         <div class="step-body">
-          <div class="step-title">Playwrightが保存済みセッションをロードして詳細リンクへアクセス</div>
-          <div class="step-desc">媒体別に保存しておいたCookie（<code>storageState</code>）を読み込んだブラウザコンテキストで、抽出したリンクへ直接遷移する</div>
-          <span class="step-tech">Playwright + storageState 再利用</span>
-
-          <div class="branch">
-            <div class="branch-card branch-ok"><strong>セッション有効</strong>：ログイン処理を経由せず、そのまま応募者詳細ページが開く（想定の主経路）</div>
-            <div class="branch-card branch-ng"><strong>セッション失効</strong>：ログイン画面にリダイレクトされる。ID/PWでの再ログインを試行し、2段階認証やCAPTCHAが出た場合は自動処理を止めて人手にエスカレーション</div>
-          </div>
+          <div class="step-title">新着があればフィールドマッピングで正規化しDBへUPSERT</div>
+          <div class="step-desc">媒体固有の項目名・データ形式を本システム共通フォーマットに変換（既存の<code>Media.field_mapping</code>と同じ考え方）。メールアドレス／媒体側応募者IDで重複チェックし、UPSERTする</div>
         </div>
       </div>
 
       <div class="step">
-        <div class="step-num">6</div>
+        <div class="step-num" style="background:#9C3F2E;">!</div>
         <div class="step-body">
-          <div class="step-title">応募者データを取得</div>
-          <div class="step-desc">詳細ページから氏名・連絡先等の応募者情報をスクレイピングして取得する</div>
-        </div>
-      </div>
-
-      <div class="step">
-        <div class="step-num">7</div>
-        <div class="step-body">
-          <div class="step-title">フィールドマッピングで正規化</div>
-          <div class="step-desc">媒体固有の項目名・データ形式を、本システム共通のフォーマットに変換する（既存の <code>Media.field_mapping</code> と同じ考え方を流用）</div>
-        </div>
-      </div>
-
-      <div class="step">
-        <div class="step-num">8</div>
-        <div class="step-body">
-          <div class="step-title">重複チェック・UPSERTしてDBへ格納</div>
-          <div class="step-desc">メールアドレス／媒体側応募者IDで既存応募者レコードと突合し、存在すれば更新、なければ新規作成する（単純な新規追記ではない）</div>
-        </div>
-      </div>
-
-      <div class="step">
-        <div class="step-num" style="background:#e53935;">!</div>
-        <div class="step-body">
-          <div class="step-title">異常系：取得失敗時のアラート</div>
-          <div class="step-desc">リンク切れ・ページ構造変更・ログイン失敗などで取得できなかった場合、静かに取りこぼさないよう通知（Slack等）を出し、必要なら手動CSV取込にフォールバックする</div>
+          <div class="step-title">異常系：セッション失効・取得失敗時のアラート</div>
+          <div class="step-desc">ログイン画面へのリダイレクト検知、想定した要素が見つからない等の場合は、静かに取りこぼさないよう通知（Slack等）を出し、人手による再ログイン（CAPTCHA/2段階認証/認証コードの解決を含む）を依頼する。再ログイン後は再びセッションが保存され、監視が自動的に再開する</div>
           <span class="step-warn">完全自動を前提にしない設計とする</span>
         </div>
       </div>
@@ -220,11 +298,11 @@
     <table>
       <thead><tr><th style="width:200px;">観点</th><th>内容</th></tr></thead>
       <tbody>
-        <tr><td>セッション（Cookie）管理</td><td>媒体ごとに<code>storageState</code>を暗号化して保存。ID/PWと同等の機密情報として扱う</td></tr>
-        <tr><td>送信元IPの安定化</td><td>データセンターIPは検知されやすいため、固定の送信元IPから実行し、頻繁に変えない</td></tr>
-        <tr><td>ブラウザフィンガープリントの一貫性</td><td>User-Agent・タイムゾーン・画面サイズ等のコンテキスト設定を毎回同一に保つ</td></tr>
-        <tr><td>アクセス頻度</td><td>cronによる定期ポーリングではなく、メール受信をトリガーとしたイベント駆動にすることで、不自然な規則的アクセスを避ける</td></tr>
-        <tr><td>CAPTCHA・2段階認証への対応方針</td><td>自動突破は行わず、発生時は処理を停止して人手にエスカレーションする（ToSリスクとアカウント停止リスクを避けるため）</td></tr>
+        <tr><td>セッション（Cookie）管理</td><td>媒体ごとに<code>storageState</code>を暗号化して保存。ID/PWと同等の機密情報として扱う。実検証では正しい対象ページであれば長時間（60分以上）維持されることを確認した</td></tr>
+        <tr><td>headless実行の可否は媒体依存</td><td>Re就活のみ、headless実行だとBot対策で403になる（headed運用が必要）。他5媒体はheadlessで問題なし</td></tr>
+        <tr><td>UI抽出セレクタの安定性</td><td>Material-UI等のフレームワークが自動生成するクラス名（jssXXX等）はページ読み込みごとに変わりうるため使用しない。DOM構造・見出し行との位置関係など、より安定した手がかりでセレクタを組む</td></tr>
+        <tr><td>アクセス頻度・連続ログイン試行</td><td>短時間に何度もログインを試みると、一時的なログインエラーやレート制限（429等）が発生することを実際に確認した。技術検証・初回セットアップ時は試行間隔を空ける。定常運用（数分〜数十分おきのポーリング）自体は問題を確認していない</td></tr>
+        <tr><td>CAPTCHA・2段階認証・メール認証コードへの対応方針</td><td>自動突破は行わず、発生時は処理を停止して人手にエスカレーションする（ToSリスクとアカウント停止リスクを避けるため）。メール認証コードが必須な媒体（キャリアチケット）は、コード受信用メールアドレスへのIMAP等のアクセスがあれば自動化できる見込み</td></tr>
       </tbody>
     </table>
   </div>
@@ -234,13 +312,14 @@
     <table>
       <thead><tr><th style="width:200px;">項目</th><th>内容</th></tr></thead>
       <tbody>
-        <tr><td>通知先メールアドレスの追加可否</td><td>媒体ごとに、自社側だけで通知先アドレスを追加設定できるか（方式A）、それとも実担当者メールの転送ルールに頼る必要があるか（方式B）が未確認</td></tr>
-        <tr><td>メール本文の情報量</td><td>媒体によっては詳細リンクではなく、氏名程度の最低限情報のみを含む場合もあり得る。個別に実メールのサンプルで要確認</td></tr>
+        <tr><td>キャリアチケットの認証コード自動化</td><td>ログイン時に毎回、登録メールアドレス宛の6桁認証コード（有効期限30分）が必須。自動化にはコード受信用メールのIMAP接続情報等が必要で、現在準備待ち</td></tr>
+        <tr><td>マイナビ転職 fji21アカウントのログイン不可</td><td>もう一方のzhe19アカウントは問題なくログインできたため、マイナビ転職全体の問題ではなく当該アカウント固有の問題（パスワード相違・未有効化等）の可能性が高い。クライアントに確認要</td></tr>
+        <tr><td>通知メール本文の情報量</td><td>応募者詳細への直リンクが含まれるかは媒体ごとに未確認。ただし直リンクがなくても、一覧ページの定期ポーリング＋差分検知で代替できることを確認済み（マイナビで実装・動作確認済み）</td></tr>
         <tr><td>UI変更によるメンテナンス負荷</td><td>対象媒体が増えるほど、ログイン・抽出ロジックの個別メンテナンスコストが積み上がる</td></tr>
         <tr><td>利用規約上の位置づけ</td><td>自社の正規アカウントでの自動アクセスであっても、媒体の利用規約次第ではアカウント停止等の措置を受けるリスクはゼロではない</td></tr>
       </tbody>
     </table>
-    <div class="warn-box">本メモの内容はあくまで技術検証段階の想定であり、正式な要件・仕様として確定したものではない。</div>
+    <div class="warn-box">本メモの内容は技術検証段階の結果であり、正式な要件・仕様として確定したものではない。</div>
   </div>
 
 </div><!-- /page -->

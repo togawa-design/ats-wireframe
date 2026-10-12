@@ -1,0 +1,17 @@
+name: ats-web-e2e
+services:
+  postgres:
+    image: postgres:16-alpine
+    restart: "no"
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: ats_e2e
+    ports:
+      # 本番Cloud SQL(5432)やローカル開発用DBと衝突しないようホスト側は5433に逃がす。
+      - "5433:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 2s
+      timeout: 3s
+      retries: 20

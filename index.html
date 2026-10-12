@@ -4,39 +4,81 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>採用管理システム ATS - 画面構成案</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@400;500;700;900&family=IBM+Plex+Mono:wght@500;600;700&display=swap" rel="stylesheet">
 <style>
+  :root {
+    --ink: #1C2126;
+    --panel-dark: #1C2126;
+    --panel-dark-hover: #2A3338;
+    --steel: #2E6480;
+    --steel-dark: #244F65;
+    --steel-tint: #6FA0B5;
+    --steel-deep: #1B3F52;
+    --paper: #E9EDEF;
+    --line: #D9E0E3;
+    --line-strong: #C3CBD0;
+    --panel: #F2F5F6;
+    --row-hover: #F4F7F8;
+    --input-border: #D3DADE;
+    --text-mid: #5B6670;
+    --text-soft: #4A535C;
+    --text-faint: #7E8891;
+    --text-fainter: #94A0A8;
+    --text-faintest: #A9B3BA;
+    --danger: #B3493C;
+    --danger-bg: #F3E2DF;
+    --danger-text: #8C352A;
+    --success: #4C8C6B;
+    --success-bg: #E3EFE8;
+    --success-text: #2F5A42;
+    --caution: #C9862A;
+    --caution-bg: #F3E8D6;
+    --caution-text: #9C5A1D;
+    --plum: #6B4C7A;
+    --plum-bg: #EDE6EF;
+    --info-bg: #E6EEF1;
+    --line-brand: #06C755;
+    --new-grad: #A13D63;
+    --mid-career: #1D6E63;
+    --mid-career-bg: #DCEBE8;
+    --font-ui: 'Zen Kaku Gothic New', 'Hiragino Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+    --font-data: 'IBM Plex Mono', 'SF Mono', monospace;
+  }
+
   * { box-sizing: border-box; margin: 0; padding: 0; }
-  body { font-family: -apple-system, BlinkMacSystemFont, 'Hiragino Sans', sans-serif; background: #f0f2f5; color: #1a1a2e; display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
+  body { font-family: var(--font-ui); background: var(--paper); color: var(--ink); display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
   .layout-wrap { display: flex; flex: 1; overflow: hidden; min-height: 0; }
 
   /* Sidebar */
   .sidebar {
-    width: 220px; min-width: 220px; background: #1a1a2e; color: #fff;
+    width: 220px; min-width: 220px; background: var(--panel-dark); color: #fff;
     display: flex; flex-direction: column; height: 100%; overflow-y: auto;
   }
   .sidebar-logo {
-    padding: 20px 16px; font-size: 16px; font-weight: 700;
-    border-bottom: 1px solid #2d2d4e; letter-spacing: 0.5px;
-    color: #7c83fd;
+    padding: 22px 16px 18px; font-size: 15px; font-weight: 700;
+    border-bottom: 1px solid var(--panel-dark-hover); letter-spacing: 0.2px;
+    color: #fff;
   }
-  .sidebar-logo span { font-size: 11px; color: #888; display: block; margin-top: 2px; font-weight: 400; }
-  .nav-section { padding: 12px 0 4px; }
+  .sidebar-logo span { font-size: 11px; color: var(--steel-tint); display: block; margin-top: 3px; font-weight: 400; letter-spacing: 0.3px; }
+  .nav-section { padding: 14px 0 4px; }
   .nav-section-label {
-    font-size: 10px; color: #666; padding: 0 16px 6px;
-    letter-spacing: 1px; text-transform: uppercase;
+    font-size: 10.5px; color: #6B7580; padding: 0 16px 7px;
+    letter-spacing: 0.2px; font-weight: 500;
   }
   .nav-item {
     display: flex; align-items: center; gap: 10px;
-    padding: 9px 16px; cursor: pointer; font-size: 13px;
-    color: #bbb; border-radius: 6px; margin: 1px 8px;
-    transition: all 0.15s;
+    padding: 9px 16px 9px 13px; cursor: pointer; font-size: 13px;
+    color: #a8b0b8; border-left: 3px solid transparent;
+    margin: 0; transition: all 0.15s;
   }
-  .nav-item:hover { background: #2d2d4e; color: #fff; }
-  .nav-item.active { background: #7c83fd; color: #fff; }
+  .nav-item:hover { background: var(--panel-dark-hover); color: #fff; }
+  .nav-item.active { background: var(--panel-dark-hover); color: #fff; border-left-color: var(--steel-tint); font-weight: 600; }
   .nav-icon { font-size: 15px; width: 20px; text-align: center; }
   .nav-badge {
-    margin-left: auto; background: #ff6b6b; color: #fff;
-    border-radius: 10px; padding: 1px 6px; font-size: 10px;
+    margin-left: auto; background: var(--danger); color: #fff;
+    border-radius: 9px; padding: 1px 6px; font-size: 10px; font-family: var(--font-data);
   }
 
   /* Main */
@@ -44,173 +86,173 @@
   .topbar {
     background: #fff; padding: 0 24px; height: 56px;
     display: flex; align-items: center; justify-content: space-between;
-    border-bottom: 1px solid #e8eaf0; flex-shrink: 0;
+    border-bottom: 1px solid var(--line); flex-shrink: 0;
   }
-  .topbar-title { font-size: 16px; font-weight: 600; color: #1a1a2e; }
+  .topbar-title { font-size: 16px; font-weight: 700; color: var(--ink); }
   .topbar-actions { display: flex; gap: 10px; align-items: center; }
   .btn {
-    padding: 7px 16px; border-radius: 6px; border: none;
-    cursor: pointer; font-size: 13px; font-weight: 500;
+    padding: 7px 16px; border-radius: 4px; border: none;
+    cursor: pointer; font-size: 13px; font-weight: 600;
     transition: all 0.15s;
   }
-  .btn-primary { background: #7c83fd; color: #fff; }
-  .btn-primary:hover { background: #6970e8; }
-  .btn-secondary { background: #f0f2f5; color: #555; border: 1px solid #e0e0e0; }
-  .btn-secondary:hover { background: #e8eaf0; }
-  .btn-line { background: #06c755; color: #fff; }
-  .btn-danger { background: #ff6b6b; color: #fff; }
+  .btn-primary { background: var(--steel); color: #fff; }
+  .btn-primary:hover { background: var(--steel-dark); }
+  .btn-secondary { background: #fff; color: var(--text-soft); border: 1px solid var(--input-border); }
+  .btn-secondary:hover { background: var(--panel); }
+  .btn-line { background: var(--line-brand); color: #fff; }
+  .btn-danger { background: var(--danger); color: #fff; }
   .btn-sm { padding: 5px 12px; font-size: 12px; }
 
   .content { flex: 1; overflow-y: auto; padding: 24px; }
 
-  /* Cards */
+  /* Cards: structural containers get a hairline rule, not a shadow.
+     Radius is reserved for interactive tokens (buttons/tags/avatars). */
   .card {
-    background: #fff; border-radius: 10px; padding: 20px;
-    box-shadow: 0 1px 4px rgba(0,0,0,0.06); margin-bottom: 16px;
+    background: #fff; border-radius: 3px; padding: 20px;
+    border: 1px solid var(--line); margin-bottom: 16px;
   }
-  .card-title { font-size: 14px; font-weight: 600; color: #444; margin-bottom: 16px; }
+  .card-title { font-size: 13px; font-weight: 700; color: var(--text-soft); margin-bottom: 16px; letter-spacing: 0.1px; }
 
   /* KPI Grid */
-  .kpi-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 16px; }
+  .kpi-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1px; margin-bottom: 16px; background: var(--line); border: 1px solid var(--line); border-radius: 3px; overflow: hidden; }
   .kpi-card {
-    background: #fff; border-radius: 10px; padding: 18px 20px;
-    box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+    background: #fff; padding: 16px 18px; border-top: 3px solid var(--steel);
   }
-  .kpi-label { font-size: 11px; color: #888; margin-bottom: 6px; }
-  .kpi-value { font-size: 28px; font-weight: 700; color: #1a1a2e; }
-  .kpi-sub { font-size: 11px; color: #aaa; margin-top: 4px; }
-  .kpi-up { color: #4caf50; }
-  .kpi-down { color: #ff6b6b; }
+  .kpi-label { font-size: 11.5px; color: var(--text-faint); margin-bottom: 8px; }
+  .kpi-value { font-family: var(--font-data); font-size: 26px; font-weight: 600; color: var(--ink); font-variant-numeric: tabular-nums; }
+  .kpi-sub { font-size: 11px; color: var(--text-faintest); margin-top: 5px; font-family: var(--font-data); }
+  .kpi-up { color: var(--success); }
+  .kpi-down { color: var(--danger); }
 
   /* Funnel */
   .funnel-row {
     display: flex; align-items: center; gap: 0; margin-bottom: 8px;
   }
-  .funnel-label { width: 80px; font-size: 12px; color: #666; text-align: right; padding-right: 12px; }
-  .funnel-bar-wrap { flex: 1; background: #f0f2f5; border-radius: 4px; height: 28px; position: relative; }
+  .funnel-label { width: 80px; font-size: 12px; color: var(--text-mid); text-align: right; padding-right: 12px; }
+  .funnel-bar-wrap { flex: 1; background: var(--panel); border-radius: 2px; height: 28px; position: relative; }
   .funnel-bar {
-    height: 100%; border-radius: 4px;
+    height: 100%; border-radius: 2px;
     display: flex; align-items: center; padding: 0 10px;
-    font-size: 12px; color: #fff; font-weight: 600;
+    font-size: 12px; color: #fff; font-weight: 600; font-family: var(--font-data);
     transition: width 0.5s;
   }
-  .funnel-rate { width: 60px; font-size: 11px; color: #888; padding-left: 10px; }
+  .funnel-rate { width: 60px; font-size: 11px; color: var(--text-faint); padding-left: 10px; font-family: var(--font-data); }
 
   /* Table */
   table { width: 100%; border-collapse: collapse; font-size: 13px; }
-  th { background: #f8f9fc; padding: 10px 14px; text-align: left; font-weight: 600; color: #666; font-size: 12px; border-bottom: 1px solid #e8eaf0; }
-  td { padding: 11px 14px; border-bottom: 1px solid #f0f2f5; vertical-align: middle; }
-  tr:hover td { background: #fafbff; }
+  th { background: var(--panel); padding: 10px 14px; text-align: left; font-weight: 700; color: var(--text-mid); font-size: 12px; border-bottom: 1px solid var(--line); }
+  td { padding: 11px 14px; border-bottom: 1px solid var(--line); vertical-align: middle; }
+  tr:hover td { background: var(--row-hover); }
   .avatar {
     width: 32px; height: 32px; border-radius: 50%;
-    background: #7c83fd; color: #fff;
+    background: var(--steel); color: #fff;
     display: inline-flex; align-items: center; justify-content: center;
     font-size: 12px; font-weight: 600; margin-right: 8px;
   }
   .student-name { font-weight: 500; }
-  .student-school { font-size: 11px; color: #999; }
+  .student-school { font-size: 11px; color: var(--text-fainter); }
 
   /* Tags */
   .tag {
-    display: inline-block; padding: 2px 8px; border-radius: 10px;
+    display: inline-block; padding: 2px 8px; border-radius: 9px;
     font-size: 11px; font-weight: 500; margin: 1px;
   }
-  .tag-blue { background: #e8f0fe; color: #4a6cf7; }
-  .tag-green { background: #e8f5e9; color: #388e3c; }
-  .tag-orange { background: #fff3e0; color: #e65100; }
-  .tag-purple { background: #f3e5f5; color: #7b1fa2; }
-  .tag-red { background: #ffebee; color: #c62828; }
-  .tag-gray { background: #f0f2f5; color: #666; }
+  .tag-blue { background: #E6EEF1; color: var(--steel); }
+  .tag-green { background: var(--success-bg); color: var(--success-text); }
+  .tag-orange { background: var(--caution-bg); color: var(--caution-text); }
+  .tag-purple { background: var(--plum-bg); color: var(--plum); }
+  .tag-red { background: var(--danger-bg); color: var(--danger-text); }
+  .tag-gray { background: var(--panel); color: var(--text-mid); }
 
   /* Status badges */
   .status {
-    display: inline-block; padding: 3px 10px; border-radius: 12px;
+    display: inline-block; padding: 3px 10px; border-radius: 10px;
     font-size: 11px; font-weight: 600;
   }
-  .status-entry { background: #e8f0fe; color: #4a6cf7; }
-  .status-booked { background: #fff3e0; color: #e65100; }
-  .status-done { background: #e8f5e9; color: #388e3c; }
-  .status-offer { background: #f3e5f5; color: #7b1fa2; }
-  .status-accept { background: #4caf50; color: #fff; }
-  .status-ng { background: #ffebee; color: #c62828; }
+  .status-entry { background: #E6EEF1; color: var(--steel); }
+  .status-booked { background: var(--caution-bg); color: var(--caution-text); }
+  .status-done { background: var(--success-bg); color: var(--success-text); }
+  .status-offer { background: var(--plum-bg); color: var(--plum); }
+  .status-accept { background: var(--success); color: #fff; }
+  .status-ng { background: var(--danger-bg); color: var(--danger-text); }
 
   /* Pipeline Kanban */
   .kanban { display: flex; gap: 12px; overflow-x: auto; padding-bottom: 8px; }
   .kanban-col {
-    min-width: 180px; background: #f8f9fc; border-radius: 10px; padding: 12px;
+    min-width: 180px; background: var(--panel); border-radius: 3px; padding: 12px; border: 1px solid var(--line);
   }
   .kanban-col-title {
-    font-size: 12px; font-weight: 700; color: #444;
+    font-size: 12px; font-weight: 700; color: var(--text-soft);
     margin-bottom: 10px; display: flex; justify-content: space-between;
   }
   .kanban-count {
-    background: #7c83fd; color: #fff; border-radius: 10px;
-    padding: 1px 7px; font-size: 10px;
+    background: var(--steel); color: #fff; border-radius: 9px;
+    padding: 1px 7px; font-size: 10px; font-family: var(--font-data);
   }
   .kanban-card {
-    background: #fff; border-radius: 8px; padding: 10px 12px;
-    margin-bottom: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.07);
+    background: #fff; border-radius: 3px; padding: 10px 12px;
+    margin-bottom: 8px; border: 1px solid var(--line); border-left: 3px solid var(--steel-tint);
     cursor: pointer; transition: all 0.15s;
   }
-  .kanban-card:hover { box-shadow: 0 3px 8px rgba(0,0,0,0.1); transform: translateY(-1px); }
+  .kanban-card:hover { border-left-color: var(--steel); box-shadow: 0 2px 6px rgba(28,33,38,0.08); }
   .kanban-card-name { font-size: 13px; font-weight: 500; margin-bottom: 4px; }
-  .kanban-card-sub { font-size: 11px; color: #999; }
+  .kanban-card-sub { font-size: 11px; color: var(--text-fainter); }
 
   /* Calendar */
   .calendar-grid {
     display: grid; grid-template-columns: 60px repeat(5, 1fr); gap: 1px;
-    background: #e8eaf0; border-radius: 8px; overflow: hidden;
+    background: var(--line); border-radius: 3px; overflow: hidden; border: 1px solid var(--line);
   }
-  .cal-header { background: #f8f9fc; padding: 8px; font-size: 12px; font-weight: 600; text-align: center; color: #444; }
-  .cal-time { background: #fff; padding: 8px; font-size: 11px; color: #999; text-align: right; }
+  .cal-header { background: var(--panel); padding: 8px; font-size: 12px; font-weight: 700; text-align: center; color: var(--text-soft); }
+  .cal-time { background: #fff; padding: 8px; font-size: 11px; color: var(--text-fainter); text-align: right; font-family: var(--font-data); }
   .cal-cell { background: #fff; padding: 4px; min-height: 48px; position: relative; }
   .cal-event {
-    background: #7c83fd; color: #fff; border-radius: 4px;
+    background: var(--steel); color: #fff; border-radius: 3px;
     padding: 4px 7px; font-size: 11px; margin-bottom: 2px; cursor: pointer;
   }
-  .cal-event.line-event { background: #06c755; }
-  .cal-event.agent-event { background: #ff9800; }
+  .cal-event.line-event { background: var(--line-brand); }
+  .cal-event.agent-event { background: var(--caution); }
 
   /* LINE Message */
   .line-composer {
-    background: #f0f2f5; border-radius: 10px; padding: 16px;
+    background: var(--panel); border-radius: 3px; padding: 16px; border: 1px solid var(--line);
   }
   .line-preview {
-    background: #e8f5e9; border-radius: 10px; padding: 16px;
+    background: #DCEBE0; border-radius: 10px; padding: 16px;
     max-width: 320px; font-size: 13px;
   }
   .line-bubble {
     background: #fff; border-radius: 12px; padding: 10px 14px;
     font-size: 13px; display: inline-block; margin-bottom: 8px;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.1); max-width: 240px;
+    box-shadow: 0 1px 3px rgba(28,33,38,0.1); max-width: 240px;
   }
-  .line-bubble.sent { background: #06c755; color: #fff; }
+  .line-bubble.sent { background: var(--line-brand); color: #fff; }
 
   /* Forms */
   input[type="text"], textarea, select {
-    width: 100%; padding: 8px 12px; border: 1px solid #e0e0e0;
-    border-radius: 6px; font-size: 13px; color: #333;
+    width: 100%; padding: 8px 12px; border: 1px solid var(--input-border);
+    border-radius: 3px; font-size: 13px; color: var(--ink); font-family: var(--font-ui);
     outline: none; transition: border 0.15s;
   }
-  input[type="text"]:focus, textarea:focus, select:focus { border-color: #7c83fd; }
+  input[type="text"]:focus, textarea:focus, select:focus { border-color: var(--steel); }
   textarea { resize: vertical; min-height: 80px; }
-  label { font-size: 12px; color: #666; display: block; margin-bottom: 4px; }
+  label { font-size: 12px; color: var(--text-mid); display: block; margin-bottom: 4px; }
   .form-row { margin-bottom: 14px; }
   .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
 
   /* Progress bar */
-  .progress-wrap { background: #f0f2f5; border-radius: 4px; height: 8px; overflow: hidden; }
-  .progress-bar { height: 100%; border-radius: 4px; background: #7c83fd; }
+  .progress-wrap { background: var(--panel); border-radius: 2px; height: 8px; overflow: hidden; }
+  .progress-bar { height: 100%; border-radius: 2px; background: var(--steel); }
 
   /* Tabs */
-  .tabs { display: flex; gap: 0; border-bottom: 2px solid #e8eaf0; margin-bottom: 20px; }
+  .tabs { display: flex; gap: 0; border-bottom: 1px solid var(--line); margin-bottom: 20px; }
   .tab {
     padding: 10px 20px; font-size: 13px; cursor: pointer;
-    color: #888; border-bottom: 2px solid transparent; margin-bottom: -2px;
+    color: var(--text-faint); border-bottom: 2px solid transparent; margin-bottom: -1px;
     transition: all 0.15s;
   }
-  .tab.active { color: #7c83fd; border-bottom-color: #7c83fd; font-weight: 600; }
-  .tab:hover { color: #555; }
+  .tab.active { color: var(--steel); border-bottom-color: var(--steel); font-weight: 700; }
+  .tab:hover { color: var(--text-soft); }
 
   /* Pages */
   .page { display: none; }
@@ -221,46 +263,105 @@
   .detail-profile { text-align: center; padding: 20px; }
   .avatar-lg {
     width: 72px; height: 72px; border-radius: 50%;
-    background: #7c83fd; color: #fff;
+    background: var(--steel); color: #fff;
     display: flex; align-items: center; justify-content: center;
     font-size: 24px; font-weight: 700; margin: 0 auto 12px;
   }
   .timeline { padding: 0; }
   .timeline-item {
     display: flex; gap: 12px; padding-bottom: 16px;
-    border-left: 2px solid #e8eaf0; margin-left: 8px; padding-left: 16px;
+    border-left: 2px solid var(--line); margin-left: 8px; padding-left: 16px;
     position: relative;
   }
   .timeline-dot {
-    width: 10px; height: 10px; border-radius: 50%; background: #7c83fd;
+    width: 10px; height: 10px; border-radius: 50%; background: var(--steel);
     position: absolute; left: -6px; top: 4px;
   }
   .timeline-text { font-size: 13px; }
-  .timeline-date { font-size: 11px; color: #999; }
+  .timeline-date { font-size: 11px; color: var(--text-fainter); font-family: var(--font-data); }
 
   /* Analytics */
   .analytics-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
   .source-bar { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
-  .source-label { width: 100px; font-size: 12px; color: #555; }
-  .source-bar-wrap { flex: 1; background: #f0f2f5; border-radius: 4px; height: 20px; }
-  .source-bar-fill { height: 100%; border-radius: 4px; display: flex; align-items: center; padding: 0 8px; font-size: 11px; color: #fff; font-weight: 600; }
-  .source-count { width: 40px; font-size: 12px; color: #666; text-align: right; }
+  .source-label { width: 100px; font-size: 12px; color: var(--text-soft); }
+  .source-bar-wrap { flex: 1; background: var(--panel); border-radius: 2px; height: 20px; }
+  .source-bar-fill { height: 100%; border-radius: 2px; display: flex; align-items: center; padding: 0 8px; font-size: 11px; color: #fff; font-weight: 600; font-family: var(--font-data); }
+  .source-count { width: 40px; font-size: 12px; color: var(--text-mid); text-align: right; font-family: var(--font-data); }
 
   /* QR */
   .qr-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
-  .qr-card { border: 1px solid #e8eaf0; border-radius: 10px; padding: 16px; text-align: center; }
+  .qr-card { border: 1px solid var(--line); border-radius: 3px; padding: 16px; text-align: center; }
   .qr-placeholder {
-    width: 100px; height: 100px; background: #f0f2f5; border-radius: 8px;
+    width: 100px; height: 100px; background: var(--panel); border-radius: 6px;
     margin: 0 auto 10px; display: flex; align-items: center; justify-content: center;
     font-size: 32px;
   }
   .qr-name { font-size: 13px; font-weight: 600; margin-bottom: 4px; }
-  .qr-count { font-size: 11px; color: #999; }
+  .qr-count { font-size: 11px; color: var(--text-fainter); font-family: var(--font-data); }
+
+  /* Rich menu image mock (LINE公式のリッチメニューは「1枚の画像」+「タップ領域の座標指定」で構成される。
+     背景＝アップロード画像、前面＝タップ領域オーバーレイ、という2層構造を表現する) */
+  .rm-image {
+    position: relative; aspect-ratio: 2500 / 1686; border-radius: 3px; overflow: hidden;
+    display: flex; flex-direction: column;
+  }
+  .rm-image.compact { aspect-ratio: 2500 / 843; }
+  .rm-image-deco { position: absolute; border-radius: 50%; background: rgba(255,255,255,0.08); }
+  .rm-image-brand {
+    position: absolute; top: 10px; left: 14px; color: rgba(255,255,255,0.92);
+    font-size: 11px; font-weight: 700; letter-spacing: 0.3px;
+  }
+  .rm-tap-grid { position: relative; flex: 1; display: grid; }
+  .rm-tap {
+    position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 2px; color: #fff; font-size: 10.5px; font-weight: 600; text-align: center;
+    border: 1px dashed rgba(255,255,255,0.45); cursor: pointer; transition: background 0.15s;
+  }
+  .rm-tap:hover { background: rgba(255,255,255,0.12); }
+  .rm-tap-num {
+    position: absolute; top: 4px; left: 5px; font-family: var(--font-data); font-size: 9px;
+    color: rgba(255,255,255,0.75); background: rgba(0,0,0,0.25); border-radius: 3px; padding: 0 3px;
+  }
+  .rm-tap-icon { font-size: 18px; line-height: 1; filter: drop-shadow(0 1px 2px rgba(0,0,0,.3)); }
+  .rm-tap-label { text-shadow: 0 1px 2px rgba(0,0,0,.35); }
+  .rm-upload-zone {
+    border: 2px dashed var(--input-border); border-radius: 3px; padding: 22px 16px;
+    text-align: center; color: var(--text-faint); font-size: 12px; cursor: pointer;
+    transition: all 0.15s;
+  }
+  .rm-upload-zone:hover { border-color: var(--steel-tint); background: var(--panel); }
+  .rm-size-toggle { display: flex; border: 1px solid var(--input-border); border-radius: 4px; overflow: hidden; }
+  .rm-size-toggle button {
+    flex: 1; padding: 6px 10px; font-size: 11.5px; font-weight: 600; border: none;
+    background: #fff; color: var(--text-mid); cursor: pointer;
+  }
+  .rm-size-toggle button.active { background: var(--steel); color: #fff; }
+
+  /* リンク先タイプの小さい切り替え(タップ領域テーブル用) */
+  .link-type-toggle { display: flex; border: 1px solid var(--input-border); border-radius: 4px; overflow: hidden; width: 132px; }
+  .link-type-toggle button {
+    flex: 1; padding: 4px 0; font-size: 10.5px; font-weight: 600; border: none;
+    background: #fff; color: var(--text-mid); cursor: pointer;
+  }
+  .link-type-toggle button.active { background: var(--steel); color: #fff; }
+  .link-field select, .link-field input[type="text"] { font-size: 11px; width: 132px; }
+
+  /* 自動化シナリオ ステップ */
+  .scenario-connector { width: 2px; height: 14px; background: var(--line-strong); margin: 0 auto; }
+  .scenario-step { border: 1px solid var(--line); border-radius: 4px; padding: 10px 12px; }
+  .scenario-step-row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+  .scenario-step select, .scenario-step input[type="text"] {
+    font-size: 11.5px; padding: 6px 8px; width: auto;
+  }
+  .scenario-step .delay-select { width: 90px; }
+  .scenario-step .type-select { width: 140px; }
+  .scenario-step .content-field { flex: 1; min-width: 140px; }
+  .scenario-step-remove { margin-left: auto; color: var(--danger); background: none; border: none; cursor: pointer; font-size: 11px; }
 
   /* Scrollbar */
   ::-webkit-scrollbar { width: 4px; height: 4px; }
   ::-webkit-scrollbar-track { background: transparent; }
-  ::-webkit-scrollbar-thumb { background: #ccc; border-radius: 2px; }
+  ::-webkit-scrollbar-thumb { background: var(--line-strong); border-radius: 2px; }
 
   /* Student detail tab content */
   .tab-content { display: none; }
@@ -270,17 +371,18 @@
 <body>
 
 <!-- Global Nav -->
-<div style="background:#1a1a2e;height:40px;display:flex;align-items:center;padding:0 20px;gap:24px;font-size:12px;flex-shrink:0;">
-  <span style="color:#7c83fd;font-weight:700;letter-spacing:0.5px;">ATS設計ドキュメント</span>
-  <a href="index.html"       style="color:#fff;text-decoration:none;opacity:1;border-bottom:2px solid #7c83fd;padding-bottom:2px;">🖥 ワイヤーフレーム</a>
-  <a href="requirements.html" style="color:#aaa;text-decoration:none;opacity:.7;">📋 要件定義書</a>
-  <a href="dataflow.html"    style="color:#aaa;text-decoration:none;opacity:.7;">🔀 データフロー設計</a>
-  <a href="roadmap.html"      style="color:#aaa;text-decoration:none;opacity:.7;">🗺️ ロードマップ</a>
-  <a href="screen-spec.html"  style="color:#aaa;text-decoration:none;opacity:.7;">📐 画面仕様書</a>
-  <a href="table-spec.html"   style="color:#aaa;text-decoration:none;opacity:.7;">🗃️ テーブル定義書</a>
-  <a href="integration-spec.html" style="color:#aaa;text-decoration:none;opacity:.7;">🔌 外部連携仕様書</a>
-  <a href="architecture.html"    style="color:#aaa;text-decoration:none;opacity:.7;">🏗️ アーキテクチャ</a>
-  <a href="agency-wireframe.html" style="color:#aaa;text-decoration:none;opacity:.7;">🤝 エージェントWF</a>
+<div style="background:#1C2126;height:40px;display:flex;align-items:center;padding:0 20px;gap:24px;font-size:12px;flex-shrink:0;">
+  <span style="color:#6FA0B5;font-weight:700;letter-spacing:0.5px;">ATS設計ドキュメント</span>
+  <a href="index.html"       style="color:#fff;text-decoration:none;opacity:1;border-bottom:2px solid #6FA0B5;padding-bottom:2px;">🖥 ワイヤーフレーム</a>
+  <a href="requirements.html" style="color:#A9B3BA;text-decoration:none;opacity:.7;">📋 要件定義書</a>
+  <a href="dataflow.html"    style="color:#A9B3BA;text-decoration:none;opacity:.7;">🔀 データフロー設計</a>
+  <a href="roadmap.html"      style="color:#A9B3BA;text-decoration:none;opacity:.7;">🗺️ ロードマップ</a>
+  <a href="screen-spec.html"  style="color:#A9B3BA;text-decoration:none;opacity:.7;">📐 画面仕様書</a>
+  <a href="table-spec.html"   style="color:#A9B3BA;text-decoration:none;opacity:.7;">🗃️ テーブル定義書</a>
+  <a href="integration-spec.html" style="color:#A9B3BA;text-decoration:none;opacity:.7;">🔌 外部連携仕様書</a>
+  <a href="architecture.html"    style="color:#A9B3BA;text-decoration:none;opacity:.7;">🏗️ アーキテクチャ</a>
+  <a href="agency-wireframe.html" style="color:#A9B3BA;text-decoration:none;opacity:.7;">🤝 エージェントWF</a>
+  <a href="liff-wireframe.html" style="color:#A9B3BA;text-decoration:none;opacity:.7;white-space:nowrap;">📱 LIFF画面WF</a>
 </div>
 
 <div class="layout-wrap">
@@ -309,7 +411,7 @@
   </div>
 
   <div class="nav-section">
-    <div class="nav-section-label">LINE <span style="font-size:9px;background:#ad1457;color:#fff;border-radius:8px;padding:1px 5px;vertical-align:middle;">新卒のみ</span></div>
+    <div class="nav-section-label">LINE <span style="font-size:9px;background:#A13D63;color:#fff;border-radius:8px;padding:1px 5px;vertical-align:middle;">新卒のみ</span></div>
     <div class="nav-item" onclick="showPage('line-send')">
       <span class="nav-icon">💬</span> メッセージ送信
     </div>
@@ -318,6 +420,9 @@
     </div>
     <div class="nav-item" onclick="showPage('richmenu')">
       <span class="nav-icon">🎛️</span> リッチメニュー
+    </div>
+    <div class="nav-item" onclick="showPage('automation'); renderScenarioStepsOnce();">
+      <span class="nav-icon">🔄</span> 自動化シナリオ
     </div>
   </div>
 
@@ -351,7 +456,7 @@
     <div class="topbar-actions">
       <button class="btn btn-secondary btn-sm" onclick="showPage('students')">＋ 応募者追加</button>
       <button class="btn btn-line btn-sm" onclick="showPage('line-send')">LINE送信</button>
-      <div style="width:32px;height:32px;border-radius:50%;background:#7c83fd;color:#fff;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;">小</div>
+      <div style="width:32px;height:32px;border-radius:50%;background:#2E6480;color:#fff;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;">小</div>
     </div>
   </div>
 
@@ -363,12 +468,12 @@
 
       <!-- 採用区分タブ -->
       <div style="display:flex;gap:8px;margin-bottom:16px;align-items:center;">
-        <div style="display:flex;background:#fff;border-radius:8px;border:1px solid #e0e0e0;overflow:hidden;">
-          <button onclick="switchHireType(this,'all')" style="padding:6px 16px;font-size:12px;font-weight:700;border:none;background:#7c83fd;color:#fff;cursor:pointer;">全体</button>
-          <button onclick="switchHireType(this,'new_grad')" style="padding:6px 16px;font-size:12px;font-weight:600;border:none;background:transparent;color:#888;cursor:pointer;border-left:1px solid #e0e0e0;">新卒</button>
-          <button onclick="switchHireType(this,'mid_career')" style="padding:6px 16px;font-size:12px;font-weight:600;border:none;background:transparent;color:#888;cursor:pointer;border-left:1px solid #e0e0e0;">中途</button>
+        <div style="display:flex;background:#fff;border-radius:8px;border:1px solid #D3DADE;overflow:hidden;">
+          <button onclick="switchHireType(this,'all')" style="padding:6px 16px;font-size:12px;font-weight:700;border:none;background:#2E6480;color:#fff;cursor:pointer;">全体</button>
+          <button onclick="switchHireType(this,'new_grad')" style="padding:6px 16px;font-size:12px;font-weight:600;border:none;background:transparent;color:#7E8891;cursor:pointer;border-left:1px solid #D3DADE;">新卒</button>
+          <button onclick="switchHireType(this,'mid_career')" style="padding:6px 16px;font-size:12px;font-weight:600;border:none;background:transparent;color:#7E8891;cursor:pointer;border-left:1px solid #D3DADE;">中途</button>
         </div>
-        <span id="hire-type-label" style="font-size:11px;color:#888;">※ 全採用区分を表示中</span>
+        <span id="hire-type-label" style="font-size:11px;color:#7E8891;">※ 全採用区分を表示中</span>
       </div>
 
       <div class="kpi-grid">
@@ -401,42 +506,42 @@
             <div class="funnel-row">
               <div class="funnel-label">エントリー</div>
               <div class="funnel-bar-wrap">
-                <div class="funnel-bar" style="width:100%;background:#7c83fd;">348名</div>
+                <div class="funnel-bar" style="width:100%;background:#2E6480;">348名</div>
               </div>
               <div class="funnel-rate">—</div>
             </div>
             <div class="funnel-row">
               <div class="funnel-label">説明会予約</div>
               <div class="funnel-bar-wrap">
-                <div class="funnel-bar" style="width:76%;background:#9c88fd;">264名</div>
+                <div class="funnel-bar" style="width:76%;background:#6FA0B5;">264名</div>
               </div>
               <div class="funnel-rate">76%</div>
             </div>
             <div class="funnel-row">
               <div class="funnel-label">1次面接</div>
               <div class="funnel-bar-wrap">
-                <div class="funnel-bar" style="width:52%;background:#7c83fd;">182名</div>
+                <div class="funnel-bar" style="width:52%;background:#2E6480;">182名</div>
               </div>
               <div class="funnel-rate">69%</div>
             </div>
             <div class="funnel-row">
               <div class="funnel-label">最終面接</div>
               <div class="funnel-bar-wrap">
-                <div class="funnel-bar" style="width:28%;background:#5c6bc0;">98名</div>
+                <div class="funnel-bar" style="width:28%;background:#3E7490;">98名</div>
               </div>
               <div class="funnel-rate">54%</div>
             </div>
             <div class="funnel-row">
               <div class="funnel-label">内定</div>
               <div class="funnel-bar-wrap">
-                <div class="funnel-bar" style="width:12%;background:#3949ab;">42名</div>
+                <div class="funnel-bar" style="width:12%;background:#1B3F52;">42名</div>
               </div>
               <div class="funnel-rate">43%</div>
             </div>
             <div class="funnel-row">
               <div class="funnel-label">承諾</div>
               <div class="funnel-bar-wrap">
-                <div class="funnel-bar" style="width:10%;background:#4caf50;">34名</div>
+                <div class="funnel-bar" style="width:10%;background:#4C8C6B;">34名</div>
               </div>
               <div class="funnel-rate">81%</div>
             </div>
@@ -447,24 +552,24 @@
           <div class="card-title">本日のスケジュール</div>
           <table>
             <tr>
-              <td style="width:70px;font-size:12px;color:#888;">10:00</td>
+              <td style="width:70px;font-size:12px;color:#7E8891;">10:00</td>
               <td><span class="status status-done">1次面接</span></td>
-              <td style="font-size:13px;">佐藤 花子<div style="font-size:11px;color:#999;">東京大学 / 担当：山田</div></td>
+              <td style="font-size:13px;">佐藤 花子<div style="font-size:11px;color:#94A0A8;">東京大学 / 担当：山田</div></td>
             </tr>
             <tr>
-              <td style="font-size:12px;color:#888;">13:00</td>
+              <td style="font-size:12px;color:#7E8891;">13:00</td>
               <td><span class="status status-booked">最終面接</span></td>
-              <td style="font-size:13px;">田中 一郎<div style="font-size:11px;color:#999;">早稲田大学 / 担当：鈴木・代表</div></td>
+              <td style="font-size:13px;">田中 一郎<div style="font-size:11px;color:#94A0A8;">早稲田大学 / 担当：鈴木・代表</div></td>
             </tr>
             <tr>
-              <td style="font-size:12px;color:#888;">14:30</td>
+              <td style="font-size:12px;color:#7E8891;">14:30</td>
               <td><span class="status status-booked">1次面接</span></td>
-              <td style="font-size:13px;">伊藤 美咲<div style="font-size:11px;color:#999;">慶應大学 / 担当：山田</div></td>
+              <td style="font-size:13px;">伊藤 美咲<div style="font-size:11px;color:#94A0A8;">慶應大学 / 担当：山田</div></td>
             </tr>
             <tr>
-              <td style="font-size:12px;color:#888;">16:00</td>
+              <td style="font-size:12px;color:#7E8891;">16:00</td>
               <td><span class="status status-booked">最終面接</span></td>
-              <td style="font-size:13px;">山本 健太<div style="font-size:11px;color:#999;">明治大学 / 担当：代表</div></td>
+              <td style="font-size:13px;">山本 健太<div style="font-size:11px;color:#94A0A8;">明治大学 / 担当：代表</div></td>
             </tr>
           </table>
         </div>
@@ -481,29 +586,29 @@
           <tbody>
             <tr>
               <td><span class="avatar">山</span><span class="student-name">山口 沙織</span></td>
-              <td><span style="font-size:10px;background:#ad1457;color:#fff;border-radius:8px;padding:1px 6px;">新卒</span></td>
+              <td><span style="font-size:10px;background:#A13D63;color:#fff;border-radius:8px;padding:1px 6px;">新卒</span></td>
               <td style="font-size:12px;">東京工業大学</td>
               <td><span class="tag tag-blue">マイナビ</span></td>
               <td><span class="status status-entry">エントリー</span></td>
-              <td style="font-size:12px;color:#999;">2025/10/28</td>
+              <td style="font-size:12px;color:#94A0A8;">2025/10/28</td>
               <td><button class="btn btn-secondary btn-sm" onclick="showPage('student-detail')">詳細</button></td>
             </tr>
             <tr>
               <td><span class="avatar">中</span><span class="student-name">中村 翔太</span></td>
-              <td><span style="font-size:10px;background:#00796b;color:#fff;border-radius:8px;padding:1px 6px;">中途</span></td>
+              <td><span style="font-size:10px;background:#1D6E63;color:#fff;border-radius:8px;padding:1px 6px;">中途</span></td>
               <td style="font-size:12px;">前職：製造業（5年）</td>
-              <td><span class="tag" style="background:#e0f2f1;color:#00796b;">ビズリーチ</span></td>
+              <td><span class="tag" style="background:#DCEBE8;color:#1D6E63;">ビズリーチ</span></td>
               <td><span class="status status-booked">書類選考</span></td>
-              <td style="font-size:12px;color:#999;">2025/10/27</td>
+              <td style="font-size:12px;color:#94A0A8;">2025/10/27</td>
               <td><button class="btn btn-secondary btn-sm" onclick="showPage('student-detail')">詳細</button></td>
             </tr>
             <tr>
               <td><span class="avatar">林</span><span class="student-name">林 奈々</span></td>
-              <td><span style="font-size:10px;background:#ad1457;color:#fff;border-radius:8px;padding:1px 6px;">新卒</span></td>
+              <td><span style="font-size:10px;background:#A13D63;color:#fff;border-radius:8px;padding:1px 6px;">新卒</span></td>
               <td style="font-size:12px;">名古屋大学</td>
               <td><span class="tag tag-orange">学校訪問QR</span></td>
               <td><span class="status status-offer">内定</span></td>
-              <td style="font-size:12px;color:#999;">2025/10/01</td>
+              <td style="font-size:12px;color:#94A0A8;">2025/10/01</td>
               <td><button class="btn btn-secondary btn-sm" onclick="showPage('student-detail')">詳細</button></td>
             </tr>
           </tbody>
@@ -571,56 +676,56 @@
             <tr>
               <td><input type="checkbox"></td>
               <td onclick="showPage('student-detail')" style="cursor:pointer;"><span class="avatar">田</span><span class="student-name">田中 一郎</span></td>
-              <td><span style="font-size:10px;background:#ad1457;color:#fff;border-radius:8px;padding:1px 6px;">新卒</span></td>
-              <td><div style="font-size:13px;">早稲田大学</div><div style="font-size:11px;color:#999;">政治経済学部</div></td>
+              <td><span style="font-size:10px;background:#A13D63;color:#fff;border-radius:8px;padding:1px 6px;">新卒</span></td>
+              <td><div style="font-size:13px;">早稲田大学</div><div style="font-size:11px;color:#94A0A8;">政治経済学部</div></td>
               <td><span class="tag tag-blue">マイナビ</span></td>
               <td><span class="status status-offer">内定</span></td>
               <td><span style="color:#06c755;font-size:12px;">LINE ✓</span></td>
-              <td style="font-size:11px;color:#999;">最終面接 10/25</td>
+              <td style="font-size:11px;color:#94A0A8;">最終面接 10/25</td>
               <td><button class="btn btn-secondary btn-sm" onclick="showPage('student-detail')">詳細</button></td>
             </tr>
             <tr>
               <td><input type="checkbox"></td>
               <td onclick="showPage('student-detail')" style="cursor:pointer;"><span class="avatar">佐</span><span class="student-name">佐藤 花子</span></td>
-              <td><span style="font-size:10px;background:#ad1457;color:#fff;border-radius:8px;padding:1px 6px;">新卒</span></td>
-              <td><div style="font-size:13px;">東京大学</div><div style="font-size:11px;color:#999;">工学部</div></td>
+              <td><span style="font-size:10px;background:#A13D63;color:#fff;border-radius:8px;padding:1px 6px;">新卒</span></td>
+              <td><div style="font-size:13px;">東京大学</div><div style="font-size:11px;color:#94A0A8;">工学部</div></td>
               <td><span class="tag tag-green">リクナビ</span></td>
               <td><span class="status status-done">1次面接済</span></td>
               <td><span style="color:#06c755;font-size:12px;">LINE ✓</span></td>
-              <td style="font-size:11px;color:#999;">1次面接 10/28</td>
+              <td style="font-size:11px;color:#94A0A8;">1次面接 10/28</td>
               <td><button class="btn btn-secondary btn-sm" onclick="showPage('student-detail')">詳細</button></td>
             </tr>
             <tr>
               <td><input type="checkbox"></td>
               <td><span class="avatar">木</span><span class="student-name">木村 達也</span></td>
-              <td><span style="font-size:10px;background:#00796b;color:#fff;border-radius:8px;padding:1px 6px;">中途</span></td>
-              <td><div style="font-size:13px;">前職：機械メーカー</div><div style="font-size:11px;color:#999;">エンジニア（8年）</div></td>
-              <td><span class="tag" style="background:#e0f2f1;color:#00796b;">ビズリーチ</span></td>
+              <td><span style="font-size:10px;background:#1D6E63;color:#fff;border-radius:8px;padding:1px 6px;">中途</span></td>
+              <td><div style="font-size:13px;">前職：機械メーカー</div><div style="font-size:11px;color:#94A0A8;">エンジニア（8年）</div></td>
+              <td><span class="tag" style="background:#DCEBE8;color:#1D6E63;">ビズリーチ</span></td>
               <td><span class="status status-booked">書類選考</span></td>
-              <td><span style="color:#888;font-size:12px;">メール</span></td>
-              <td style="font-size:11px;color:#999;">書類受領 10/29</td>
+              <td><span style="color:#7E8891;font-size:12px;">メール</span></td>
+              <td style="font-size:11px;color:#94A0A8;">書類受領 10/29</td>
               <td><button class="btn btn-secondary btn-sm">詳細</button></td>
             </tr>
             <tr>
               <td><input type="checkbox"></td>
               <td><span class="avatar">伊</span><span class="student-name">伊藤 美咲</span></td>
-              <td><span style="font-size:10px;background:#ad1457;color:#fff;border-radius:8px;padding:1px 6px;">新卒</span></td>
-              <td><div style="font-size:13px;">大阪大学</div><div style="font-size:11px;color:#999;">医学部</div></td>
+              <td><span style="font-size:10px;background:#A13D63;color:#fff;border-radius:8px;padding:1px 6px;">新卒</span></td>
+              <td><div style="font-size:13px;">大阪大学</div><div style="font-size:11px;color:#94A0A8;">医学部</div></td>
               <td><span class="tag tag-purple">学校訪問QR</span></td>
               <td><span class="status status-accept">承諾</span></td>
               <td><span style="color:#06c755;font-size:12px;">LINE ✓</span></td>
-              <td style="font-size:11px;color:#999;">承諾書受領 10/20</td>
+              <td style="font-size:11px;color:#94A0A8;">承諾書受領 10/20</td>
               <td><button class="btn btn-secondary btn-sm">詳細</button></td>
             </tr>
             <tr>
               <td><input type="checkbox"></td>
               <td><span class="avatar">橋</span><span class="student-name">橋本 由美</span></td>
-              <td><span style="font-size:10px;background:#00796b;color:#fff;border-radius:8px;padding:1px 6px;">中途</span></td>
-              <td><div style="font-size:13px;">前職：化学メーカー</div><div style="font-size:11px;color:#999;">研究職（3年）</div></td>
-              <td><span class="tag" style="background:#e0f2f1;color:#00796b;">doda</span></td>
+              <td><span style="font-size:10px;background:#1D6E63;color:#fff;border-radius:8px;padding:1px 6px;">中途</span></td>
+              <td><div style="font-size:13px;">前職：化学メーカー</div><div style="font-size:11px;color:#94A0A8;">研究職（3年）</div></td>
+              <td><span class="tag" style="background:#DCEBE8;color:#1D6E63;">doda</span></td>
               <td><span class="status status-done">1次面接済</span></td>
-              <td><span style="color:#888;font-size:12px;">メール</span></td>
-              <td style="font-size:11px;color:#999;">1次面接 10/28</td>
+              <td><span style="color:#7E8891;font-size:12px;">メール</span></td>
+              <td style="font-size:11px;color:#94A0A8;">1次面接 10/28</td>
               <td><button class="btn btn-secondary btn-sm">詳細</button></td>
             </tr>
           </tbody>
@@ -647,7 +752,7 @@
             <div class="detail-profile">
               <div class="avatar-lg">田</div>
               <div style="font-size:16px;font-weight:700;">田中 一郎</div>
-              <div style="font-size:12px;color:#999;margin-top:4px;">早稲田大学 政治経済学部</div>
+              <div style="font-size:12px;color:#94A0A8;margin-top:4px;">早稲田大学 政治経済学部</div>
               <div style="margin-top:12px;display:flex;flex-wrap:wrap;gap:4px;justify-content:center;">
                 <span class="tag tag-blue">マイナビ</span>
                 <span class="tag tag-orange">関東</span>
@@ -656,8 +761,8 @@
               </div>
               <button class="btn btn-secondary btn-sm" style="margin-top:10px;">タグ編集</button>
             </div>
-            <hr style="border:none;border-top:1px solid #f0f2f5;margin:0 -20px 16px;">
-            <div style="font-size:12px;color:#666;line-height:2;">
+            <hr style="border:none;border-top:1px solid #E9EDEF;margin:0 -20px 16px;">
+            <div style="font-size:12px;color:#5B6670;line-height:2;">
               <div>📞 090-1234-5678</div>
               <div>📧 tanaka@example.com</div>
               <div>🎓 2026年3月卒業見込み</div>
@@ -677,7 +782,7 @@
                 <span>📎 成績証明書.pdf</span>
                 <button class="btn btn-secondary btn-sm">DL</button>
               </div>
-              <div style="display:flex;justify-content:space-between;align-items:center;color:#ccc;">
+              <div style="display:flex;justify-content:space-between;align-items:center;color:#C3CBD0;">
                 <span>📎 卒業見込証明書（未提出）</span>
                 <button class="btn btn-secondary btn-sm" style="opacity:0.4;">—</button>
               </div>
@@ -711,16 +816,16 @@
                   </div>
                 </div>
                 <div class="timeline-item">
-                  <div class="timeline-dot" style="background:#ff9800;"></div>
+                  <div class="timeline-dot" style="background:#C9862A;"></div>
                   <div>
                     <div class="timeline-text"><strong>承諾期限</strong> — 2025/11/10まで</div>
-                    <div class="timeline-date" style="color:#ff9800;">残り 12日</div>
+                    <div class="timeline-date" style="color:#C9862A;">残り 12日</div>
                   </div>
                 </div>
                 <div class="timeline-item">
-                  <div class="timeline-dot" style="background:#ccc;"></div>
+                  <div class="timeline-dot" style="background:#C3CBD0;"></div>
                   <div>
-                    <div class="timeline-text" style="color:#aaa;">承諾書受領（待ち）</div>
+                    <div class="timeline-text" style="color:#A9B3BA;">承諾書受領（待ち）</div>
                     <div class="timeline-date">—</div>
                   </div>
                 </div>
@@ -729,27 +834,27 @@
 
             <div id="tab-interview" class="tab-content">
               <div style="font-size:13px;">
-                <div style="background:#f8f9fc;border-radius:8px;padding:14px;margin-bottom:12px;">
+                <div style="background:#F2F5F6;border-radius:8px;padding:14px;margin-bottom:12px;">
                   <div style="font-weight:600;margin-bottom:8px;">1次面接 — 2025/10/15 13:00</div>
-                  <div class="form-grid" style="font-size:12px;color:#555;gap:8px;">
-                    <div><span style="color:#999;">面接官：</span>山田 太郎</div>
-                    <div><span style="color:#999;">場所：</span>オンライン（Zoom）</div>
-                    <div><span style="color:#999;">評価：</span>⭐⭐⭐⭐☆ (4/5)</div>
-                    <div><span style="color:#999;">結果：</span><span class="status status-done">通過</span></div>
+                  <div class="form-grid" style="font-size:12px;color:#4A535C;gap:8px;">
+                    <div><span style="color:#94A0A8;">面接官：</span>山田 太郎</div>
+                    <div><span style="color:#94A0A8;">場所：</span>オンライン（Zoom）</div>
+                    <div><span style="color:#94A0A8;">評価：</span>⭐⭐⭐⭐☆ (4/5)</div>
+                    <div><span style="color:#94A0A8;">結果：</span><span class="status status-done">通過</span></div>
                   </div>
-                  <div style="margin-top:8px;font-size:12px;color:#555;background:#fff;border-radius:6px;padding:8px;">
+                  <div style="margin-top:8px;font-size:12px;color:#4A535C;background:#fff;border-radius:6px;padding:8px;">
                     コミュニケーション能力高い。論理的思考力◎。入社意欲を要確認。
                   </div>
                 </div>
-                <div style="background:#f8f9fc;border-radius:8px;padding:14px;">
+                <div style="background:#F2F5F6;border-radius:8px;padding:14px;">
                   <div style="font-weight:600;margin-bottom:8px;">最終面接 — 2025/10/25 14:00</div>
-                  <div class="form-grid" style="font-size:12px;color:#555;gap:8px;">
-                    <div><span style="color:#999;">面接官：</span>鈴木 代表・山田</div>
-                    <div><span style="color:#999;">場所：</span>本社会議室</div>
-                    <div><span style="color:#999;">評価：</span>⭐⭐⭐⭐⭐ (5/5)</div>
-                    <div><span style="color:#999;">結果：</span><span class="status status-offer">内定</span></div>
+                  <div class="form-grid" style="font-size:12px;color:#4A535C;gap:8px;">
+                    <div><span style="color:#94A0A8;">面接官：</span>鈴木 代表・山田</div>
+                    <div><span style="color:#94A0A8;">場所：</span>本社会議室</div>
+                    <div><span style="color:#94A0A8;">評価：</span>⭐⭐⭐⭐⭐ (5/5)</div>
+                    <div><span style="color:#94A0A8;">結果：</span><span class="status status-offer">内定</span></div>
                   </div>
-                  <div style="margin-top:8px;font-size:12px;color:#555;background:#fff;border-radius:6px;padding:8px;">
+                  <div style="margin-top:8px;font-size:12px;color:#4A535C;background:#fff;border-radius:6px;padding:8px;">
                     志望動機明確。即戦力として期待大。採用決定。
                   </div>
                 </div>
@@ -757,8 +862,8 @@
             </div>
 
             <div id="tab-line" class="tab-content">
-              <div style="background:#e8f5e9;border-radius:10px;padding:14px;min-height:200px;">
-                <div style="font-size:12px;color:#666;text-align:center;margin-bottom:12px;">2025/10/26</div>
+              <div style="background:#E3EFE8;border-radius:10px;padding:14px;min-height:200px;">
+                <div style="font-size:12px;color:#5B6670;text-align:center;margin-bottom:12px;">2025/10/26</div>
                 <div><div class="line-bubble">内定おめでとうございます！🎉<br>詳細はマイページをご確認ください。</div></div>
                 <div style="text-align:right;margin-top:8px;"><div class="line-bubble sent" style="display:inline-block;">ありがとうございます！よろしくお願いします。</div></div>
                 <div style="margin-top:8px;"><div class="line-bubble">承諾書の提出期限は11/10です。マイページからご提出ください。</div></div>
@@ -771,9 +876,9 @@
 
             <div id="tab-survey" class="tab-content">
               <div style="font-size:13px;">
-                <div style="background:#f8f9fc;border-radius:8px;padding:14px;margin-bottom:10px;">
+                <div style="background:#F2F5F6;border-radius:8px;padding:14px;margin-bottom:10px;">
                   <div style="font-weight:600;margin-bottom:8px;">内定者アンケート（回答済み）</div>
-                  <div style="font-size:12px;line-height:2;color:#555;">
+                  <div style="font-size:12px;line-height:2;color:#4A535C;">
                     <div>Q1. 第一志望ですか？ → <strong>はい</strong></div>
                     <div>Q2. 懸念点はありますか？ → <strong>転勤の可能性について確認したい</strong></div>
                     <div>Q3. 入社意欲（10点満点）→ <strong>9点</strong></div>
@@ -810,7 +915,7 @@
           <div class="kanban-card"><div class="kanban-card-name">山口 沙織</div><div class="kanban-card-sub">東京工業大学 · マイナビ</div></div>
           <div class="kanban-card"><div class="kanban-card-name">小林 直人</div><div class="kanban-card-sub">明治大学 · リクナビ</div></div>
           <div class="kanban-card"><div class="kanban-card-name">加藤 彩花</div><div class="kanban-card-sub">立命館大学 · OfferBox</div></div>
-          <div style="font-size:11px;color:#aaa;text-align:center;padding-top:4px;">他 81名</div>
+          <div style="font-size:11px;color:#A9B3BA;text-align:center;padding-top:4px;">他 81名</div>
         </div>
         <div class="kanban-col">
           <div class="kanban-col-title">説明会予約 <span class="kanban-count">56</span></div>
@@ -829,12 +934,12 @@
         </div>
         <div class="kanban-col">
           <div class="kanban-col-title">内定 <span class="kanban-count">42</span></div>
-          <div class="kanban-card" style="border-left:3px solid #ff9800;"><div class="kanban-card-name">林 奈々</div><div class="kanban-card-sub" style="color:#ff9800;">承諾期限 11/5</div></div>
-          <div class="kanban-card"><div class="kanban-card-name">田中 一郎</div><div class="kanban-card-sub" style="color:#ff9800;">承諾期限 11/10</div></div>
+          <div class="kanban-card" style="border-left:3px solid #C9862A;"><div class="kanban-card-name">林 奈々</div><div class="kanban-card-sub" style="color:#C9862A;">承諾期限 11/5</div></div>
+          <div class="kanban-card"><div class="kanban-card-name">田中 一郎</div><div class="kanban-card-sub" style="color:#C9862A;">承諾期限 11/10</div></div>
         </div>
         <div class="kanban-col">
-          <div class="kanban-col-title">承諾 <span class="kanban-count" style="background:#4caf50;">34</span></div>
-          <div class="kanban-card" style="border-left:3px solid #4caf50;"><div class="kanban-card-name">伊藤 美咲</div><div class="kanban-card-sub">大阪大学 · 承諾済</div></div>
+          <div class="kanban-col-title">承諾 <span class="kanban-count" style="background:#4C8C6B;">34</span></div>
+          <div class="kanban-card" style="border-left:3px solid #4C8C6B;"><div class="kanban-card-name">伊藤 美咲</div><div class="kanban-card-sub">大阪大学 · 承諾済</div></div>
         </div>
       </div>
     </div>
@@ -846,12 +951,13 @@
         <span style="font-size:14px;font-weight:600;">2025年10月28日（月）〜 11月1日（金）</span>
         <button class="btn btn-secondary btn-sm">次週 →</button>
         <div style="margin-left:auto;display:flex;gap:8px;font-size:12px;">
-          <span style="display:flex;align-items:center;gap:4px;"><span style="width:10px;height:10px;border-radius:2px;background:#7c83fd;display:inline-block;"></span> 面接</span>
+          <span style="display:flex;align-items:center;gap:4px;"><span style="width:10px;height:10px;border-radius:2px;background:#2E6480;display:inline-block;"></span> 面接</span>
           <span style="display:flex;align-items:center;gap:4px;"><span style="width:10px;height:10px;border-radius:2px;background:#06c755;display:inline-block;"></span> 説明会</span>
-          <span style="display:flex;align-items:center;gap:4px;"><span style="width:10px;height:10px;border-radius:2px;background:#ff9800;display:inline-block;"></span> エージェント</span>
+          <span style="display:flex;align-items:center;gap:4px;"><span style="width:10px;height:10px;border-radius:2px;background:#C9862A;display:inline-block;"></span> エージェント</span>
         </div>
-        <button class="btn btn-primary btn-sm">＋ 枠追加</button>
+        <button class="btn btn-primary btn-sm" onclick="openSlotModal()">＋ 枠追加</button>
       </div>
+      <div id="cal-confirm-banner" style="display:none;background:#E3EFE8;color:#2F5A42;border-radius:6px;padding:10px 14px;font-size:12.5px;margin-bottom:12px;"></div>
       <div class="card" style="padding:0;overflow:hidden;">
         <div class="calendar-grid">
           <div class="cal-header"></div>
@@ -862,25 +968,73 @@
           <div class="cal-header">11/1 金</div>
 
           <div class="cal-time">10:00</div>
-          <div class="cal-cell"><div class="cal-event">佐藤 花子<br>1次面接</div></div>
-          <div class="cal-cell"></div>
-          <div class="cal-cell"><div class="cal-event line-event">オンライン説明会<br>20名</div></div>
-          <div class="cal-cell"></div>
-          <div class="cal-cell"></div>
+          <div class="cal-cell" data-day="28" data-time="10:00"><div class="cal-event">佐藤 花子<br>1次面接</div></div>
+          <div class="cal-cell" data-day="29" data-time="10:00"></div>
+          <div class="cal-cell" data-day="30" data-time="10:00"><div class="cal-event line-event">オンライン説明会<br>20名</div></div>
+          <div class="cal-cell" data-day="31" data-time="10:00"></div>
+          <div class="cal-cell" data-day="1"  data-time="10:00"></div>
 
           <div class="cal-time">13:00</div>
-          <div class="cal-cell"></div>
-          <div class="cal-cell"><div class="cal-event">中村 翔太<br>1次面接</div></div>
-          <div class="cal-cell"></div>
-          <div class="cal-cell"><div class="cal-event agent-event">エージェント<br>ABCキャリア</div></div>
-          <div class="cal-cell"><div class="cal-event">松本 愛<br>最終面接</div></div>
+          <div class="cal-cell" data-day="28" data-time="13:00"></div>
+          <div class="cal-cell" data-day="29" data-time="13:00"><div class="cal-event">中村 翔太<br>1次面接</div></div>
+          <div class="cal-cell" data-day="30" data-time="13:00"></div>
+          <div class="cal-cell" data-day="31" data-time="13:00"><div class="cal-event agent-event">エージェント<br>ABCキャリア</div></div>
+          <div class="cal-cell" data-day="1"  data-time="13:00"><div class="cal-event">松本 愛<br>最終面接</div></div>
 
           <div class="cal-time">15:00</div>
-          <div class="cal-cell"><div class="cal-event">木村 理恵<br>1次面接</div></div>
-          <div class="cal-cell"></div>
-          <div class="cal-cell"></div>
-          <div class="cal-cell"><div class="cal-event">加藤 彩花<br>1次面接</div></div>
-          <div class="cal-cell"></div>
+          <div class="cal-cell" data-day="28" data-time="15:00"><div class="cal-event">木村 理恵<br>1次面接</div></div>
+          <div class="cal-cell" data-day="29" data-time="15:00"></div>
+          <div class="cal-cell" data-day="30" data-time="15:00"></div>
+          <div class="cal-cell" data-day="31" data-time="15:00"><div class="cal-event">加藤 彩花<br>1次面接</div></div>
+          <div class="cal-cell" data-day="1"  data-time="15:00"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 枠追加モーダル（FR098：説明会・面接枠の一括登録） -->
+    <div id="slot-modal-overlay" style="display:none;position:fixed;inset:0;background:rgba(28,33,38,.45);z-index:100;align-items:center;justify-content:center;">
+      <div class="card" style="width:460px;max-width:92vw;margin:0;max-height:88vh;overflow-y:auto;">
+        <div class="card-title" style="display:flex;align-items:center;">
+          枠の一括登録
+          <button type="button" onclick="closeSlotModal()" style="margin-left:auto;border:none;background:none;color:#94A0A8;cursor:pointer;font-size:16px;">✕</button>
+        </div>
+        <div class="form-row">
+          <label>種別</label>
+          <select id="slot-type" onchange="updateSlotPreview()">
+            <option value="interview">面接</option>
+            <option value="seminar">説明会</option>
+            <option value="agent">エージェント枠</option>
+          </select>
+        </div>
+        <div class="form-row">
+          <label>日付（表示中の週から複数選択可）</label>
+          <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:6px;">
+            <label class="tag tag-gray" style="cursor:pointer;padding:5px 10px;"><input type="checkbox" class="slot-day" value="28" onchange="updateSlotPreview()"> 10/28(月)</label>
+            <label class="tag tag-gray" style="cursor:pointer;padding:5px 10px;"><input type="checkbox" class="slot-day" value="29" onchange="updateSlotPreview()"> 10/29(火)</label>
+            <label class="tag tag-gray" style="cursor:pointer;padding:5px 10px;"><input type="checkbox" class="slot-day" value="30" onchange="updateSlotPreview()"> 10/30(水)</label>
+            <label class="tag tag-gray" style="cursor:pointer;padding:5px 10px;"><input type="checkbox" class="slot-day" value="31" onchange="updateSlotPreview()"> 10/31(木)</label>
+            <label class="tag tag-gray" style="cursor:pointer;padding:5px 10px;"><input type="checkbox" class="slot-day" value="1" onchange="updateSlotPreview()"> 11/1(金)</label>
+          </div>
+        </div>
+        <div class="form-row">
+          <label>時間帯（複数選択可）</label>
+          <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:6px;">
+            <label class="tag tag-gray" style="cursor:pointer;padding:5px 10px;"><input type="checkbox" class="slot-time" value="10:00" onchange="updateSlotPreview()"> 10:00</label>
+            <label class="tag tag-gray" style="cursor:pointer;padding:5px 10px;"><input type="checkbox" class="slot-time" value="13:00" onchange="updateSlotPreview()"> 13:00</label>
+            <label class="tag tag-gray" style="cursor:pointer;padding:5px 10px;"><input type="checkbox" class="slot-time" value="15:00" onchange="updateSlotPreview()"> 15:00</label>
+          </div>
+        </div>
+        <div class="form-row" id="slot-capacity-row">
+          <label>定員（1枠あたり）</label>
+          <input type="text" id="slot-capacity" value="20">
+        </div>
+        <div style="background:#F2F5F6;border-radius:6px;padding:10px 12px;font-size:12.5px;color:#4A535C;" id="slot-preview">
+          日付・時間帯を選択してください
+        </div>
+        <div style="font-size:10.5px;color:#94A0A8;margin-top:8px;">作成後はガルーンへ自動同期されます（CalendarSlot → Garoon、一方向）</div>
+        <div style="display:flex;gap:8px;margin-top:14px;">
+          <button class="btn btn-secondary btn-sm" onclick="closeSlotModal()">キャンセル</button>
+          <button class="btn btn-primary btn-sm" style="margin-left:auto;" onclick="submitSlotCreation()">作成する</button>
         </div>
       </div>
     </div>
@@ -896,7 +1050,7 @@
               <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:6px;">
                 <span class="tag tag-blue" style="cursor:pointer;padding:5px 12px;">マイナビ</span>
                 <span class="tag tag-green" style="cursor:pointer;padding:5px 12px;">リクナビ</span>
-                <span class="tag tag-blue" style="cursor:pointer;padding:5px 12px;background:#4a6cf7;color:#fff;">理系 ✓</span>
+                <span class="tag tag-blue" style="cursor:pointer;padding:5px 12px;background:#2E6480;color:#fff;">理系 ✓</span>
                 <span class="tag tag-orange" style="cursor:pointer;padding:5px 12px;">関東</span>
                 <span class="tag tag-purple" style="cursor:pointer;padding:5px 12px;">内定者</span>
                 <span class="tag tag-gray" style="cursor:pointer;padding:5px 12px;">承諾者</span>
@@ -910,8 +1064,19 @@
                 <option>内定</option>
               </select>
             </div>
-            <div style="background:#f8f9fc;border-radius:8px;padding:12px;font-size:13px;">
-              対象：<strong style="color:#7c83fd;">47名</strong>（LINE連携済み）
+            <div class="form-row">
+              <label>アンケート回答状況で絞り込み</label>
+              <select id="ls-survey-select" onchange="updateLsAudience()">
+                <option value="">指定しない</option>
+                <option value="内定者アンケート" data-sent="42" data-answered="38">内定者アンケート（送信42・回答38）</option>
+                <option value="説明会満足度アンケート" data-sent="264" data-answered="198">説明会満足度アンケート（送信264・回答198）</option>
+              </select>
+              <label style="display:flex;align-items:center;gap:6px;margin-top:8px;font-size:12px;color:#4A535C;" id="ls-unanswered-row">
+                <input type="checkbox" id="ls-unanswered-only" onchange="updateLsAudience()"> 未回答のみに絞り込む
+              </label>
+            </div>
+            <div style="background:#F2F5F6;border-radius:8px;padding:12px;font-size:13px;" id="ls-audience-summary">
+              対象：<strong style="color:#2E6480;">47名</strong>（LINE連携済み）
             </div>
           </div>
 
@@ -919,7 +1084,7 @@
             <div class="card-title">メッセージ作成</div>
             <div class="form-row">
               <label>メッセージ種別</label>
-              <select>
+              <select id="ls-message-type">
                 <option>テキストメッセージ</option>
                 <option>アンケート添付</option>
                 <option>予約フォーム添付</option>
@@ -928,11 +1093,11 @@
             </div>
             <div class="form-row">
               <label>本文（差し込み：{氏名}）</label>
-              <textarea placeholder="{氏名}さん、お世話になっております。&#10;&#10;〇〇について..."></textarea>
+              <textarea id="ls-message-body" placeholder="{氏名}さん、お世話になっております。&#10;&#10;〇〇について..."></textarea>
             </div>
             <div style="display:flex;gap:8px;">
               <button class="btn btn-secondary">プレビュー</button>
-              <button class="btn btn-line" style="margin-left:auto;">47名に送信する</button>
+              <button class="btn btn-line" id="ls-send-btn" style="margin-left:auto;">47名に送信する</button>
             </div>
           </div>
         </div>
@@ -941,7 +1106,7 @@
           <div class="card">
             <div class="card-title">送信プレビュー</div>
             <div class="line-preview">
-              <div style="font-size:11px;color:#888;margin-bottom:10px;text-align:center;">LINEプレビュー</div>
+              <div style="font-size:11px;color:#7E8891;margin-bottom:10px;text-align:center;">LINEプレビュー</div>
               <div class="line-bubble">田中さん、お世話になっております。<br><br>最終面接の日程についてご連絡いたします。<br>下記よりご都合の良い日程をお選びください。<br><br>👉 日程選択はこちら</div>
             </div>
           </div>
@@ -980,43 +1145,90 @@
 
     <!-- ⑦ Survey -->
     <div id="page-survey" class="page">
-      <div style="display:flex;gap:10px;margin-bottom:16px;">
-        <button class="btn btn-primary btn-sm">＋ アンケート作成</button>
-      </div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
-        <div>
-          <div class="card-title" style="margin-bottom:12px;">アンケート一覧</div>
-          <div class="card" style="padding:14px;cursor:pointer;border:2px solid #7c83fd;">
-            <div style="font-size:13px;font-weight:600;">内定者アンケート</div>
-            <div style="font-size:11px;color:#999;margin-top:4px;">送信：42名 / 回答：38名 (90%)</div>
-            <div style="margin-top:8px;"><div class="progress-wrap"><div class="progress-bar" style="width:90%;"></div></div></div>
+      <div id="survey-list-view">
+        <div style="display:flex;gap:10px;margin-bottom:16px;">
+          <button class="btn btn-primary btn-sm" onclick="showSurveyEditor(-1)">＋ アンケート作成</button>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+          <div>
+            <div class="card-title" style="margin-bottom:12px;">アンケート一覧</div>
+            <div class="card" style="padding:14px;cursor:pointer;border:2px solid #2E6480;" onclick="showSurveyEditor(0)">
+              <div style="font-size:13px;font-weight:600;">内定者アンケート</div>
+              <div style="font-size:11px;color:#94A0A8;margin-top:4px;">送信：42名 / 回答：38名 (90%)</div>
+              <div style="margin-top:8px;"><div class="progress-wrap"><div class="progress-bar" style="width:90%;"></div></div></div>
+            </div>
+            <div class="card" style="padding:14px;cursor:pointer;" onclick="showSurveyEditor(1)">
+              <div style="font-size:13px;font-weight:600;">説明会満足度アンケート</div>
+              <div style="font-size:11px;color:#94A0A8;margin-top:4px;">送信：264名 / 回答：198名 (75%)</div>
+              <div style="margin-top:8px;"><div class="progress-wrap"><div class="progress-bar" style="width:75%;background:#06c755;"></div></div></div>
+            </div>
+            <div class="card" style="padding:14px;cursor:pointer;" onclick="showSurveyEditor(2)">
+              <div style="font-size:13px;font-weight:600;">志望動機確認アンケート</div>
+              <div style="font-size:11px;color:#94A0A8;margin-top:4px;">下書き</div>
+            </div>
           </div>
-          <div class="card" style="padding:14px;cursor:pointer;">
-            <div style="font-size:13px;font-weight:600;">説明会満足度アンケート</div>
-            <div style="font-size:11px;color:#999;margin-top:4px;">送信：264名 / 回答：198名 (75%)</div>
-            <div style="margin-top:8px;"><div class="progress-wrap"><div class="progress-bar" style="width:75%;background:#06c755;"></div></div></div>
-          </div>
-          <div class="card" style="padding:14px;cursor:pointer;">
-            <div style="font-size:13px;font-weight:600;">志望動機確認アンケート</div>
-            <div style="font-size:11px;color:#999;margin-top:4px;">下書き</div>
+          <div class="card">
+            <div class="card-title">内定者アンケート — 集計結果</div>
+            <div style="font-size:13px;margin-bottom:12px;">
+              <div style="font-weight:600;margin-bottom:8px;">Q1. 第一志望ですか？</div>
+              <div class="source-bar"><div class="source-label">はい</div><div class="source-bar-wrap"><div class="source-bar-fill" style="width:68%;background:#2E6480;">68%</div></div></div>
+              <div class="source-bar"><div class="source-label">第2志望</div><div class="source-bar-wrap"><div class="source-bar-fill" style="width:22%;background:#6FA0B5;">22%</div></div></div>
+              <div class="source-bar"><div class="source-label">その他</div><div class="source-bar-wrap"><div class="source-bar-fill" style="width:10%;background:#C3CBD0;">10%</div></div></div>
+            </div>
+            <hr style="border:none;border-top:1px solid #E9EDEF;margin:12px 0;">
+            <div style="font-size:13px;">
+              <div style="font-weight:600;margin-bottom:8px;">Q3. 入社意欲（平均）</div>
+              <div style="font-size:28px;font-weight:700;color:#2E6480;">8.4 <span style="font-size:14px;color:#94A0A8;">/ 10</span></div>
+            </div>
+            <div style="margin-top:12px;display:flex;gap:8px;">
+              <button class="btn btn-secondary btn-sm">CSV出力</button>
+              <button class="btn btn-line btn-sm" onclick="remindNonRespondents('内定者アンケート')">未回答者にリマインド</button>
+            </div>
           </div>
         </div>
-        <div class="card">
-          <div class="card-title">内定者アンケート — 集計結果</div>
-          <div style="font-size:13px;margin-bottom:12px;">
-            <div style="font-weight:600;margin-bottom:8px;">Q1. 第一志望ですか？</div>
-            <div class="source-bar"><div class="source-label">はい</div><div class="source-bar-wrap"><div class="source-bar-fill" style="width:68%;background:#7c83fd;">68%</div></div></div>
-            <div class="source-bar"><div class="source-label">第2志望</div><div class="source-bar-wrap"><div class="source-bar-fill" style="width:22%;background:#9c88fd;">22%</div></div></div>
-            <div class="source-bar"><div class="source-label">その他</div><div class="source-bar-wrap"><div class="source-bar-fill" style="width:10%;background:#ccc;">10%</div></div></div>
+      </div>
+
+      <!-- アンケート作成・編集ビュー -->
+      <div id="survey-edit-view" style="display:none;">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;">
+          <button class="btn btn-secondary btn-sm" onclick="document.getElementById('survey-list-view').style.display='';document.getElementById('survey-edit-view').style.display='none';">← 一覧に戻る</button>
+          <span style="font-size:14px;font-weight:700;" id="survey-edit-title">アンケートを編集</span>
+          <div style="margin-left:auto;display:flex;gap:8px;">
+            <button class="btn btn-secondary btn-sm">下書き保存</button>
+            <button class="btn btn-line btn-sm" onclick="sendSurveyFromEditor()">対象者に送信</button>
           </div>
-          <hr style="border:none;border-top:1px solid #f0f2f5;margin:12px 0;">
-          <div style="font-size:13px;">
-            <div style="font-weight:600;margin-bottom:8px;">Q3. 入社意欲（平均）</div>
-            <div style="font-size:28px;font-weight:700;color:#7c83fd;">8.4 <span style="font-size:14px;color:#999;">/ 10</span></div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+          <div>
+            <div class="card" style="margin-bottom:12px;">
+              <div class="card-title">基本設定</div>
+              <div class="form-row"><label>アンケート名</label><input type="text" id="survey-name-input" value="志望動機確認アンケート"></div>
+              <div class="form-row">
+                <label>送信対象（タグで絞り込み、複数選択可）</label>
+                <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:6px;">
+                  <span class="tag tag-blue" style="padding:4px 10px;cursor:pointer;">内定者 ✕</span>
+                  <span class="tag tag-gray" style="padding:4px 10px;cursor:pointer;">＋ タグ追加</span>
+                </div>
+              </div>
+              <div class="form-row">
+                <label>公開ステータス</label>
+                <select><option>下書き</option><option>公開中</option></select>
+              </div>
+            </div>
+
+            <div class="card">
+              <div class="card-title">質問項目</div>
+              <div id="survey-questions" style="display:flex;flex-direction:column;gap:10px;"></div>
+              <button class="btn btn-secondary btn-sm" style="margin-top:10px;" onclick="addSurveyQuestion()">＋ 質問を追加</button>
+            </div>
           </div>
-          <div style="margin-top:12px;display:flex;gap:8px;">
-            <button class="btn btn-secondary btn-sm">CSV出力</button>
-            <button class="btn btn-line btn-sm" onclick="showPage('line-send')">未回答者にリマインド</button>
+
+          <div>
+            <div class="card">
+              <div class="card-title">プレビュー</div>
+              <div style="font-size:11.5px;color:#7E8891;margin-bottom:10px;">学生側のLIFF画面で実際にどう見えるかを確認できます</div>
+              <a href="liff-wireframe.html#survey" target="_blank" class="btn btn-secondary btn-sm" style="text-decoration:none;display:inline-block;">👁 実際の画面をプレビュー</a>
+            </div>
           </div>
         </div>
       </div>
@@ -1112,16 +1324,16 @@
           <div class="kpi-value" style="font-size:22px;">38<span style="font-size:13px;">日</span></div>
           <div class="kpi-sub kpi-up">↑ 前年 45日</div>
         </div>
-        <div class="kpi-card" style="padding:14px 16px;border:1.5px solid #ff9800;">
-          <div class="kpi-label" style="color:#e65100;">辞退リスク者</div>
-          <div class="kpi-value" style="font-size:22px;color:#ff9800;">5</div>
-          <div class="kpi-sub" style="color:#e65100;">要フォロー</div>
+        <div class="kpi-card" style="padding:14px 16px;border:1.5px solid #C9862A;">
+          <div class="kpi-label" style="color:#9C5A1D;">辞退リスク者</div>
+          <div class="kpi-value" style="font-size:22px;color:#C9862A;">5</div>
+          <div class="kpi-sub" style="color:#9C5A1D;">要フォロー</div>
         </div>
       </div>
 
       <!-- Analytics tabs -->
-      <div style="background:#fff;border-radius:12px;box-shadow:0 1px 4px rgba(0,0,0,.06);overflow:hidden;">
-        <div style="display:flex;border-bottom:2px solid #f0f2f5;padding:0 8px;">
+      <div style="background:#fff;border-radius:3px;border:1px solid #D9E0E3;overflow:hidden;">
+        <div style="display:flex;border-bottom:2px solid #E9EDEF;padding:0 8px;">
           <div class="tab active" onclick="switchAnalyticsTab(this,'atab-funnel')" style="font-size:12px;padding:10px 14px;">📊 ファネル</div>
           <div class="tab" onclick="switchAnalyticsTab(this,'atab-source')" style="font-size:12px;padding:10px 14px;">📡 流入経路</div>
           <div class="tab" onclick="switchAnalyticsTab(this,'atab-speed')" style="font-size:12px;padding:10px 14px;">⏱️ 採用スピード</div>
@@ -1129,7 +1341,7 @@
           <div class="tab" onclick="switchAnalyticsTab(this,'atab-risk')" style="font-size:12px;padding:10px 14px;">⚠️ 辞退リスク</div>
           <div class="tab" onclick="switchAnalyticsTab(this,'atab-forecast')" style="font-size:12px;padding:10px 14px;">🔮 予測・目標</div>
           <div class="tab" onclick="switchAnalyticsTab(this,'atab-media')" style="font-size:12px;padding:10px 14px;">📱 媒体別分析</div>
-          <div class="tab" onclick="switchAnalyticsTab(this,'atab-cross')" style="font-size:12px;padding:10px 14px;">🔀 クロス集計 <span style="font-size:9px;background:#1565c0;color:#fff;border-radius:8px;padding:1px 5px;vertical-align:middle;">NEW</span></div>
+          <div class="tab" onclick="switchAnalyticsTab(this,'atab-cross')" style="font-size:12px;padding:10px 14px;">🔀 クロス集計 <span style="font-size:9px;background:#3E7490;color:#fff;border-radius:8px;padding:1px 5px;vertical-align:middle;">NEW</span></div>
         </div>
 
         <div style="padding:20px;">
@@ -1139,35 +1351,35 @@
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;">
               <div>
                 <div class="card-title">統合ファネル遷移率</div>
-                <div style="font-size:11px;color:#999;margin-bottom:10px;">※フローにないステージはバイパス通過としてカウント</div>
-                <div class="funnel-row"><div class="funnel-label">エントリー</div><div class="funnel-bar-wrap"><div class="funnel-bar" style="width:100%;background:#7c83fd;">348名</div></div><div class="funnel-rate" style="font-size:12px;color:#888;">—</div></div>
-                <div class="funnel-row"><div class="funnel-label">説明会</div><div class="funnel-bar-wrap"><div class="funnel-bar" style="width:76%;background:#7c83fd;">264名</div></div><div class="funnel-rate" style="font-size:12px;color:#555;font-weight:600;">76%</div></div>
-                <div class="funnel-row"><div class="funnel-label">1次面接</div><div class="funnel-bar-wrap"><div class="funnel-bar" style="width:52%;background:#6c73ed;">182名</div></div><div class="funnel-rate" style="font-size:12px;color:#555;font-weight:600;">69%</div></div>
-                <div class="funnel-row"><div class="funnel-label">2次面接</div><div class="funnel-bar-wrap"><div class="funnel-bar" style="width:36%;background:#5c63dd;">126名</div></div><div class="funnel-rate" style="font-size:12px;color:#555;font-weight:600;">69%</div></div>
-                <div class="funnel-row"><div class="funnel-label">最終面接</div><div class="funnel-bar-wrap"><div class="funnel-bar" style="width:28%;background:#4c53cd;">98名</div></div><div class="funnel-rate" style="font-size:12px;color:#555;font-weight:600;">78%</div></div>
-                <div class="funnel-row"><div class="funnel-label">内定</div><div class="funnel-bar-wrap"><div class="funnel-bar" style="width:12%;background:#3943a0;">42名</div></div><div class="funnel-rate" style="font-size:12px;color:#555;font-weight:600;">43%</div></div>
-                <div class="funnel-row"><div class="funnel-label">承諾</div><div class="funnel-bar-wrap"><div class="funnel-bar" style="width:10%;background:#4caf50;">34名</div></div><div class="funnel-rate" style="font-size:12px;color:#4caf50;font-weight:700;">81%</div></div>
-                <div style="margin-top:10px;font-size:11px;color:#888;">エントリー→承諾：<strong style="color:#7c83fd;">9.8%</strong></div>
+                <div style="font-size:11px;color:#94A0A8;margin-bottom:10px;">※フローにないステージはバイパス通過としてカウント</div>
+                <div class="funnel-row"><div class="funnel-label">エントリー</div><div class="funnel-bar-wrap"><div class="funnel-bar" style="width:100%;background:#2E6480;">348名</div></div><div class="funnel-rate" style="font-size:12px;color:#7E8891;">—</div></div>
+                <div class="funnel-row"><div class="funnel-label">説明会</div><div class="funnel-bar-wrap"><div class="funnel-bar" style="width:76%;background:#2E6480;">264名</div></div><div class="funnel-rate" style="font-size:12px;color:#4A535C;font-weight:600;">76%</div></div>
+                <div class="funnel-row"><div class="funnel-label">1次面接</div><div class="funnel-bar-wrap"><div class="funnel-bar" style="width:52%;background:#6c73ed;">182名</div></div><div class="funnel-rate" style="font-size:12px;color:#4A535C;font-weight:600;">69%</div></div>
+                <div class="funnel-row"><div class="funnel-label">2次面接</div><div class="funnel-bar-wrap"><div class="funnel-bar" style="width:36%;background:#5c63dd;">126名</div></div><div class="funnel-rate" style="font-size:12px;color:#4A535C;font-weight:600;">69%</div></div>
+                <div class="funnel-row"><div class="funnel-label">最終面接</div><div class="funnel-bar-wrap"><div class="funnel-bar" style="width:28%;background:#4c53cd;">98名</div></div><div class="funnel-rate" style="font-size:12px;color:#4A535C;font-weight:600;">78%</div></div>
+                <div class="funnel-row"><div class="funnel-label">内定</div><div class="funnel-bar-wrap"><div class="funnel-bar" style="width:12%;background:#3943a0;">42名</div></div><div class="funnel-rate" style="font-size:12px;color:#4A535C;font-weight:600;">43%</div></div>
+                <div class="funnel-row"><div class="funnel-label">承諾</div><div class="funnel-bar-wrap"><div class="funnel-bar" style="width:10%;background:#4C8C6B;">34名</div></div><div class="funnel-rate" style="font-size:12px;color:#4C8C6B;font-weight:700;">81%</div></div>
+                <div style="margin-top:10px;font-size:11px;color:#7E8891;">エントリー→承諾：<strong style="color:#2E6480;">9.8%</strong></div>
               </div>
               <div>
                 <div class="card-title">フロー別 ファネル比較</div>
                 <div style="display:flex;gap:8px;margin-bottom:12px;">
-                  <span style="background:#7c83fd;color:#fff;border-radius:4px;padding:3px 10px;font-size:11px;">新卒総合職</span>
-                  <span style="background:#f0f2f5;color:#555;border-radius:4px;padding:3px 10px;font-size:11px;cursor:pointer;">第二新卒</span>
+                  <span style="background:#2E6480;color:#fff;border-radius:4px;padding:3px 10px;font-size:11px;">新卒総合職</span>
+                  <span style="background:#E9EDEF;color:#4A535C;border-radius:4px;padding:3px 10px;font-size:11px;cursor:pointer;">第二新卒</span>
                 </div>
                 <table style="font-size:12px;">
                   <thead><tr><th>ステージ</th><th>人数</th><th>前ステージ比</th><th>前年比</th></tr></thead>
                   <tbody>
-                    <tr><td>エントリー</td><td>348名</td><td>—</td><td style="color:#4caf50;">+18%</td></tr>
-                    <tr><td>説明会</td><td>264名</td><td>76%</td><td style="color:#4caf50;">+5%</td></tr>
-                    <tr><td>1次面接</td><td>182名</td><td>69%</td><td style="color:#ff6b6b;">-4%</td></tr>
+                    <tr><td>エントリー</td><td>348名</td><td>—</td><td style="color:#4C8C6B;">+18%</td></tr>
+                    <tr><td>説明会</td><td>264名</td><td>76%</td><td style="color:#4C8C6B;">+5%</td></tr>
+                    <tr><td>1次面接</td><td>182名</td><td>69%</td><td style="color:#B3493C;">-4%</td></tr>
                     <tr><td>2次面接</td><td>126名</td><td>69%</td><td>—</td></tr>
-                    <tr><td>最終面接</td><td>98名</td><td>78%</td><td style="color:#4caf50;">+3%</td></tr>
-                    <tr><td>内定</td><td>42名</td><td>43%</td><td style="color:#ff6b6b;">-7%</td></tr>
-                    <tr><td><strong>承諾</strong></td><td><strong>34名</strong></td><td style="color:#4caf50;font-weight:700;">81%</td><td style="color:#ff6b6b;">-3%</td></tr>
+                    <tr><td>最終面接</td><td>98名</td><td>78%</td><td style="color:#4C8C6B;">+3%</td></tr>
+                    <tr><td>内定</td><td>42名</td><td>43%</td><td style="color:#B3493C;">-7%</td></tr>
+                    <tr><td><strong>承諾</strong></td><td><strong>34名</strong></td><td style="color:#4C8C6B;font-weight:700;">81%</td><td style="color:#B3493C;">-3%</td></tr>
                   </tbody>
                 </table>
-                <div style="margin-top:12px;background:#fff8e1;border-radius:8px;padding:10px 12px;font-size:12px;color:#e65100;">
+                <div style="margin-top:12px;background:#F3E8D6;border-radius:8px;padding:10px 12px;font-size:12px;color:#9C5A1D;">
                   ⚠️ <strong>1次面接の通過率が前年比-4%</strong>。担当面接官の評価基準を確認推奨。
                 </div>
               </div>
@@ -1182,26 +1394,26 @@
                 <table style="font-size:12px;">
                   <thead><tr><th>媒体</th><th>エントリー</th><th>内定</th><th>承諾</th><th>承諾率</th></tr></thead>
                   <tbody>
-                    <tr><td><span class="tag tag-blue" style="font-size:10px;">マイナビ</span></td><td>157名</td><td>22名</td><td>18名</td><td style="color:#4caf50;font-weight:700;">82%</td></tr>
-                    <tr><td><span class="tag tag-green" style="font-size:10px;">リクナビ</span></td><td>97名</td><td>11名</td><td>8名</td><td style="color:#ff9800;font-weight:700;">73%</td></tr>
-                    <tr><td><span class="tag tag-orange" style="font-size:10px;">OfferBox</span></td><td>42名</td><td>6名</td><td>6名</td><td style="color:#4caf50;font-weight:700;">100%</td></tr>
-                    <tr><td><span class="tag tag-purple" style="font-size:10px;">Re就活</span></td><td>21名</td><td>2名</td><td>1名</td><td style="color:#ff6b6b;font-weight:700;">50%</td></tr>
-                    <tr><td><span style="font-size:10px;">学校QR</span></td><td>31名</td><td>1名</td><td>1名</td><td style="color:#4caf50;font-weight:700;">100%</td></tr>
+                    <tr><td><span class="tag tag-blue" style="font-size:10px;">マイナビ</span></td><td>157名</td><td>22名</td><td>18名</td><td style="color:#4C8C6B;font-weight:700;">82%</td></tr>
+                    <tr><td><span class="tag tag-green" style="font-size:10px;">リクナビ</span></td><td>97名</td><td>11名</td><td>8名</td><td style="color:#C9862A;font-weight:700;">73%</td></tr>
+                    <tr><td><span class="tag tag-orange" style="font-size:10px;">OfferBox</span></td><td>42名</td><td>6名</td><td>6名</td><td style="color:#4C8C6B;font-weight:700;">100%</td></tr>
+                    <tr><td><span class="tag tag-purple" style="font-size:10px;">Re就活</span></td><td>21名</td><td>2名</td><td>1名</td><td style="color:#B3493C;font-weight:700;">50%</td></tr>
+                    <tr><td><span style="font-size:10px;">学校QR</span></td><td>31名</td><td>1名</td><td>1名</td><td style="color:#4C8C6B;font-weight:700;">100%</td></tr>
                   </tbody>
                 </table>
-                <div style="margin-top:12px;background:#e8f5e9;border-radius:8px;padding:10px 12px;font-size:12px;color:#2e7d32;">
+                <div style="margin-top:12px;background:#E3EFE8;border-radius:8px;padding:10px 12px;font-size:12px;color:#2F5A42;">
                   💡 <strong>OfferBox・学校QRは承諾率100%</strong>。エントリー数は少ないが質が高い。
                 </div>
               </div>
               <div>
                 <div class="card-title">学校別 エントリー数 TOP10</div>
-                <div class="source-bar"><div class="source-label" style="width:90px;font-size:11px;">早稲田大</div><div class="source-bar-wrap"><div class="source-bar-fill" style="width:72%;background:#7c83fd;font-size:10px;">28名</div></div></div>
-                <div class="source-bar"><div class="source-label" style="width:90px;font-size:11px;">慶應大</div><div class="source-bar-wrap"><div class="source-bar-fill" style="width:62%;background:#7c83fd;font-size:10px;">24名</div></div></div>
-                <div class="source-bar"><div class="source-label" style="width:90px;font-size:11px;">東京大</div><div class="source-bar-wrap"><div class="source-bar-fill" style="width:51%;background:#5c6bc0;font-size:10px;">20名</div></div></div>
-                <div class="source-bar"><div class="source-label" style="width:90px;font-size:11px;">大阪大</div><div class="source-bar-wrap"><div class="source-bar-fill" style="width:41%;background:#5c6bc0;font-size:10px;">16名</div></div></div>
-                <div class="source-bar"><div class="source-label" style="width:90px;font-size:11px;">明治大</div><div class="source-bar-wrap"><div class="source-bar-fill" style="width:33%;background:#9c88fd;font-size:10px;">13名</div></div></div>
-                <div class="source-bar"><div class="source-label" style="width:90px;font-size:11px;">立命館大</div><div class="source-bar-wrap"><div class="source-bar-fill" style="width:26%;background:#9c88fd;font-size:10px;">10名</div></div></div>
-                <div style="margin-top:10px;font-size:11px;color:#888;">学校訪問ROI：<strong>東京大（訪問済）→ 承諾率88%</strong></div>
+                <div class="source-bar"><div class="source-label" style="width:90px;font-size:11px;">早稲田大</div><div class="source-bar-wrap"><div class="source-bar-fill" style="width:72%;background:#2E6480;font-size:10px;">28名</div></div></div>
+                <div class="source-bar"><div class="source-label" style="width:90px;font-size:11px;">慶應大</div><div class="source-bar-wrap"><div class="source-bar-fill" style="width:62%;background:#2E6480;font-size:10px;">24名</div></div></div>
+                <div class="source-bar"><div class="source-label" style="width:90px;font-size:11px;">東京大</div><div class="source-bar-wrap"><div class="source-bar-fill" style="width:51%;background:#3E7490;font-size:10px;">20名</div></div></div>
+                <div class="source-bar"><div class="source-label" style="width:90px;font-size:11px;">大阪大</div><div class="source-bar-wrap"><div class="source-bar-fill" style="width:41%;background:#3E7490;font-size:10px;">16名</div></div></div>
+                <div class="source-bar"><div class="source-label" style="width:90px;font-size:11px;">明治大</div><div class="source-bar-wrap"><div class="source-bar-fill" style="width:33%;background:#6FA0B5;font-size:10px;">13名</div></div></div>
+                <div class="source-bar"><div class="source-label" style="width:90px;font-size:11px;">立命館大</div><div class="source-bar-wrap"><div class="source-bar-fill" style="width:26%;background:#6FA0B5;font-size:10px;">10名</div></div></div>
+                <div style="margin-top:10px;font-size:11px;color:#7E8891;">学校訪問ROI：<strong>東京大（訪問済）→ 承諾率88%</strong></div>
               </div>
             </div>
           </div>
@@ -1214,7 +1426,7 @@
                 <div style="margin-top:4px;">
                   <div class="source-bar" style="margin-bottom:10px;">
                     <div class="source-label" style="width:90px;font-size:11px;">エントリー</div>
-                    <div class="source-bar-wrap"><div class="source-bar-fill" style="width:20%;background:#4caf50;font-size:10px;">3日</div></div>
+                    <div class="source-bar-wrap"><div class="source-bar-fill" style="width:20%;background:#4C8C6B;font-size:10px;">3日</div></div>
                   </div>
                   <div class="source-bar" style="margin-bottom:10px;">
                     <div class="source-label" style="width:90px;font-size:11px;">説明会</div>
@@ -1222,18 +1434,18 @@
                   </div>
                   <div class="source-bar" style="margin-bottom:10px;">
                     <div class="source-label" style="width:90px;font-size:11px;">1次面接</div>
-                    <div class="source-bar-wrap"><div class="source-bar-fill" style="width:58%;background:#ff9800;font-size:10px;">9日 ⚠️</div></div>
+                    <div class="source-bar-wrap"><div class="source-bar-fill" style="width:58%;background:#C9862A;font-size:10px;">9日 ⚠️</div></div>
                   </div>
                   <div class="source-bar" style="margin-bottom:10px;">
                     <div class="source-label" style="width:90px;font-size:11px;">最終面接</div>
-                    <div class="source-bar-wrap"><div class="source-bar-fill" style="width:45%;background:#ff9800;font-size:10px;">7日</div></div>
+                    <div class="source-bar-wrap"><div class="source-bar-fill" style="width:45%;background:#C9862A;font-size:10px;">7日</div></div>
                   </div>
                   <div class="source-bar" style="margin-bottom:10px;">
                     <div class="source-label" style="width:90px;font-size:11px;">内定→承諾</div>
-                    <div class="source-bar-wrap"><div class="source-bar-fill" style="width:90%;background:#ff5722;font-size:10px;">14日 🔴</div></div>
+                    <div class="source-bar-wrap"><div class="source-bar-fill" style="width:90%;background:#B3493C;font-size:10px;">14日 🔴</div></div>
                   </div>
                 </div>
-                <div style="background:#fff3e0;border-radius:8px;padding:10px 12px;font-size:12px;color:#e65100;margin-top:8px;">
+                <div style="background:#F3E8D6;border-radius:8px;padding:10px 12px;font-size:12px;color:#9C5A1D;margin-top:8px;">
                   ⚠️ <strong>「内定→承諾」の14日が最長</strong>。承諾期限の短縮、またはフォローLINE強化を検討。
                 </div>
               </div>
@@ -1242,12 +1454,12 @@
                 <table style="font-size:12px;">
                   <thead><tr><th>面接官</th><th>担当数</th><th>通過率</th><th>平均スコア</th></tr></thead>
                   <tbody>
-                    <tr><td>山田 太郎</td><td>48名</td><td style="color:#4caf50;font-weight:600;">72%</td><td>3.8 / 5</td></tr>
-                    <tr><td>鈴木 代表</td><td>22名</td><td style="color:#ff9800;font-weight:600;">55%</td><td>3.2 / 5</td></tr>
-                    <tr><td>田中 部長</td><td>31名</td><td style="color:#4caf50;font-weight:600;">68%</td><td>3.6 / 5</td></tr>
+                    <tr><td>山田 太郎</td><td>48名</td><td style="color:#4C8C6B;font-weight:600;">72%</td><td>3.8 / 5</td></tr>
+                    <tr><td>鈴木 代表</td><td>22名</td><td style="color:#C9862A;font-weight:600;">55%</td><td>3.2 / 5</td></tr>
+                    <tr><td>田中 部長</td><td>31名</td><td style="color:#4C8C6B;font-weight:600;">68%</td><td>3.6 / 5</td></tr>
                   </tbody>
                 </table>
-                <div style="margin-top:12px;background:#e8f0fe;border-radius:8px;padding:10px 12px;font-size:12px;color:#3949ab;">
+                <div style="margin-top:12px;background:#E6EEF1;border-radius:8px;padding:10px 12px;font-size:12px;color:#1B3F52;">
                   💡 <strong>鈴木代表の通過率55%が最低</strong>。最終面接の評価基準のすり合わせを推奨。
                 </div>
               </div>
@@ -1262,21 +1474,21 @@
                 <table style="font-size:12px;">
                   <thead><tr><th>氏名</th><th>学校</th><th>区分</th><th>ステータス</th><th>期限</th></tr></thead>
                   <tbody>
-                    <tr><td>田中 一郎</td><td style="font-size:11px;">早稲田大</td><td><span class="tag tag-blue" style="font-size:9px;">新卒</span></td><td><span class="status status-offer">内定</span></td><td style="font-size:11px;color:#ff9800;font-weight:600;">11/10</td></tr>
-                    <tr><td>伊藤 美咲</td><td style="font-size:11px;">大阪大</td><td><span class="tag tag-blue" style="font-size:9px;">新卒</span></td><td><span class="status status-accept">承諾</span></td><td style="font-size:11px;color:#999;">済</td></tr>
-                    <tr><td>林 奈々</td><td style="font-size:11px;">名古屋大</td><td><span class="tag tag-blue" style="font-size:9px;">新卒</span></td><td><span class="status status-offer">内定</span></td><td style="font-size:11px;color:#ff6b6b;font-weight:700;">11/5 🔴</td></tr>
-                    <tr><td>渡辺 拓也</td><td style="font-size:11px;">慶應大</td><td><span class="tag tag-purple" style="font-size:9px;">第二新卒</span></td><td><span class="status status-ng">辞退</span></td><td style="font-size:11px;color:#999;">11/1</td></tr>
+                    <tr><td>田中 一郎</td><td style="font-size:11px;">早稲田大</td><td><span class="tag tag-blue" style="font-size:9px;">新卒</span></td><td><span class="status status-offer">内定</span></td><td style="font-size:11px;color:#C9862A;font-weight:600;">11/10</td></tr>
+                    <tr><td>伊藤 美咲</td><td style="font-size:11px;">大阪大</td><td><span class="tag tag-blue" style="font-size:9px;">新卒</span></td><td><span class="status status-accept">承諾</span></td><td style="font-size:11px;color:#94A0A8;">済</td></tr>
+                    <tr><td>林 奈々</td><td style="font-size:11px;">名古屋大</td><td><span class="tag tag-blue" style="font-size:9px;">新卒</span></td><td><span class="status status-offer">内定</span></td><td style="font-size:11px;color:#B3493C;font-weight:700;">11/5 🔴</td></tr>
+                    <tr><td>渡辺 拓也</td><td style="font-size:11px;">慶應大</td><td><span class="tag tag-purple" style="font-size:9px;">第二新卒</span></td><td><span class="status status-ng">辞退</span></td><td style="font-size:11px;color:#94A0A8;">11/1</td></tr>
                   </tbody>
                 </table>
                 <button class="btn btn-secondary btn-sm" style="margin-top:10px;">全件 CSVエクスポート</button>
               </div>
               <div>
                 <div class="card-title" style="margin-bottom:10px;">辞退理由の内訳</div>
-                <div class="source-bar"><div class="source-label" style="width:110px;font-size:11px;">他社に決めた</div><div class="source-bar-wrap"><div class="source-bar-fill" style="width:52%;background:#ff6b6b;font-size:10px;">52%（7名）</div></div></div>
-                <div class="source-bar"><div class="source-label" style="width:110px;font-size:11px;">条件面</div><div class="source-bar-wrap"><div class="source-bar-fill" style="width:22%;background:#ff9800;font-size:10px;">22%（3名）</div></div></div>
-                <div class="source-bar"><div class="source-label" style="width:110px;font-size:11px;">社風・働き方</div><div class="source-bar-wrap"><div class="source-bar-fill" style="width:15%;background:#ffcc80;font-size:10px;">15%（2名）</div></div></div>
-                <div class="source-bar"><div class="source-label" style="width:110px;font-size:11px;">その他</div><div class="source-bar-wrap"><div class="source-bar-fill" style="width:11%;background:#ccc;font-size:10px;">11%</div></div></div>
-                <div style="margin-top:12px;background:#ffebee;border-radius:8px;padding:10px 12px;font-size:12px;color:#c62828;">
+                <div class="source-bar"><div class="source-label" style="width:110px;font-size:11px;">他社に決めた</div><div class="source-bar-wrap"><div class="source-bar-fill" style="width:52%;background:#B3493C;font-size:10px;">52%（7名）</div></div></div>
+                <div class="source-bar"><div class="source-label" style="width:110px;font-size:11px;">条件面</div><div class="source-bar-wrap"><div class="source-bar-fill" style="width:22%;background:#C9862A;font-size:10px;">22%（3名）</div></div></div>
+                <div class="source-bar"><div class="source-label" style="width:110px;font-size:11px;">社風・働き方</div><div class="source-bar-wrap"><div class="source-bar-fill" style="width:15%;background:#C9862A;font-size:10px;">15%（2名）</div></div></div>
+                <div class="source-bar"><div class="source-label" style="width:110px;font-size:11px;">その他</div><div class="source-bar-wrap"><div class="source-bar-fill" style="width:11%;background:#C3CBD0;font-size:10px;">11%</div></div></div>
+                <div style="margin-top:12px;background:#F3E2DF;border-radius:8px;padding:10px 12px;font-size:12px;color:#8C352A;">
                   🔴 <strong>他社流出が52%</strong>。内定後のフォローLINEと懸念払拭アンケートの強化を推奨。
                 </div>
               </div>
@@ -1285,7 +1497,7 @@
 
           <!-- ⑤ 辞退リスク -->
           <div id="atab-risk" class="tab-content">
-            <div style="margin-bottom:14px;background:#fff3e0;border:1.5px solid #ffcc80;border-radius:8px;padding:12px 16px;font-size:12px;color:#e65100;">
+            <div style="margin-bottom:14px;background:#F3E8D6;border:1.5px solid #C9862A;border-radius:8px;padding:12px 16px;font-size:12px;color:#9C5A1D;">
               ⚠️ 以下の指標を組み合わせて辞退リスクスコアを算出しています：<strong>アンケート入社意欲スコア・LINEメッセージ開封率・マイページ最終アクセス・承諾期限までの残日数</strong>
             </div>
             <table style="font-size:12px;">
@@ -1296,32 +1508,32 @@
                 </tr>
               </thead>
               <tbody>
-                <tr style="background:#fff8e1;">
+                <tr style="background:#F3E8D6;">
                   <td style="font-weight:600;">林 奈々</td><td style="font-size:11px;">名古屋大</td>
-                  <td><span style="color:#ff6b6b;font-weight:700;">6/10</span></td>
-                  <td><span style="color:#ff6b6b;">未開封</span></td>
-                  <td style="font-size:11px;color:#ff6b6b;">4日前</td>
-                  <td style="font-size:11px;color:#ff6b6b;font-weight:700;">残1日</td>
-                  <td><span style="background:#ff6b6b;color:#fff;border-radius:10px;padding:2px 10px;font-size:11px;font-weight:700;">高 🔴</span></td>
+                  <td><span style="color:#B3493C;font-weight:700;">6/10</span></td>
+                  <td><span style="color:#B3493C;">未開封</span></td>
+                  <td style="font-size:11px;color:#B3493C;">4日前</td>
+                  <td style="font-size:11px;color:#B3493C;font-weight:700;">残1日</td>
+                  <td><span style="background:#B3493C;color:#fff;border-radius:10px;padding:2px 10px;font-size:11px;font-weight:700;">高 🔴</span></td>
                   <td><button class="btn btn-line btn-sm">今すぐLINE</button></td>
                 </tr>
-                <tr style="background:#fffde7;">
+                <tr style="background:#F9F6DE;">
                   <td style="font-weight:600;">田中 一郎</td><td style="font-size:11px;">早稲田大</td>
-                  <td><span style="color:#ff9800;font-weight:700;">7/10</span></td>
-                  <td><span style="color:#ff9800;">2日前</span></td>
-                  <td style="font-size:11px;color:#999;">3日前</td>
-                  <td style="font-size:11px;color:#ff9800;font-weight:600;">残6日</td>
-                  <td><span style="background:#ff9800;color:#fff;border-radius:10px;padding:2px 10px;font-size:11px;font-weight:700;">中 🟡</span></td>
+                  <td><span style="color:#C9862A;font-weight:700;">7/10</span></td>
+                  <td><span style="color:#C9862A;">2日前</span></td>
+                  <td style="font-size:11px;color:#94A0A8;">3日前</td>
+                  <td style="font-size:11px;color:#C9862A;font-weight:600;">残6日</td>
+                  <td><span style="background:#C9862A;color:#fff;border-radius:10px;padding:2px 10px;font-size:11px;font-weight:700;">中 🟡</span></td>
                   <td><button class="btn btn-secondary btn-sm">アンケート送付</button></td>
                 </tr>
                 <tr>
                   <td>松本 愛</td><td style="font-size:11px;">慶應大</td>
-                  <td><span style="color:#4caf50;font-weight:700;">9/10</span></td>
-                  <td><span style="color:#4caf50;">本日</span></td>
+                  <td><span style="color:#4C8C6B;font-weight:700;">9/10</span></td>
+                  <td><span style="color:#4C8C6B;">本日</span></td>
                   <td style="font-size:11px;">本日</td>
-                  <td style="font-size:11px;color:#999;">残10日</td>
-                  <td><span style="background:#e8f5e9;color:#2e7d32;border-radius:10px;padding:2px 10px;font-size:11px;font-weight:700;">低 🟢</span></td>
-                  <td style="font-size:11px;color:#999;">対応不要</td>
+                  <td style="font-size:11px;color:#94A0A8;">残10日</td>
+                  <td><span style="background:#E3EFE8;color:#2F5A42;border-radius:10px;padding:2px 10px;font-size:11px;font-weight:700;">低 🟢</span></td>
+                  <td style="font-size:11px;color:#94A0A8;">対応不要</td>
                 </tr>
               </tbody>
             </table>
@@ -1332,20 +1544,20 @@
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;">
               <div>
                 <div class="card-title">採用目標 達成予測</div>
-                <div style="background:#f8f9fc;border-radius:10px;padding:16px;text-align:center;margin-bottom:12px;">
-                  <div style="font-size:11px;color:#888;margin-bottom:4px;">現在の承諾数 / 目標</div>
-                  <div style="font-size:36px;font-weight:700;color:#7c83fd;">34 <span style="font-size:16px;color:#aaa;">/ 50名</span></div>
-                  <div style="margin:12px 0 4px;background:#e8eaf0;border-radius:6px;height:12px;overflow:hidden;">
-                    <div style="width:68%;height:100%;background:linear-gradient(to right,#7c83fd,#4caf50);border-radius:6px;"></div>
+                <div style="background:#F2F5F6;border-radius:10px;padding:16px;text-align:center;margin-bottom:12px;">
+                  <div style="font-size:11px;color:#7E8891;margin-bottom:4px;">現在の承諾数 / 目標</div>
+                  <div style="font-size:36px;font-weight:700;color:#2E6480;">34 <span style="font-size:16px;color:#A9B3BA;">/ 50名</span></div>
+                  <div style="margin:12px 0 4px;background:#D9E0E3;border-radius:6px;height:12px;overflow:hidden;">
+                    <div style="width:68%;height:100%;background:linear-gradient(to right,#2E6480,#4C8C6B);border-radius:6px;"></div>
                   </div>
-                  <div style="font-size:12px;color:#555;">達成率 <strong style="color:#7c83fd;">68%</strong></div>
+                  <div style="font-size:12px;color:#4A535C;">達成率 <strong style="color:#2E6480;">68%</strong></div>
                 </div>
-                <div style="background:#e8f5e9;border-radius:8px;padding:12px 14px;font-size:12px;line-height:2;">
+                <div style="background:#E3EFE8;border-radius:8px;padding:12px 14px;font-size:12px;line-height:2;">
                   <div>内定中（承諾待ち）：<strong>8名</strong></div>
                   <div>現ファネル予測：最終面接中 → さらに <strong>+4名</strong> 承諾見込み</div>
-                  <div>予測着地：<strong style="color:#7c83fd;">46名</strong>（目標 50名まであと4名不足）</div>
+                  <div>予測着地：<strong style="color:#2E6480;">46名</strong>（目標 50名まであと4名不足）</div>
                 </div>
-                <div style="background:#fff3e0;border-radius:8px;padding:10px 12px;font-size:12px;color:#e65100;margin-top:8px;">
+                <div style="background:#F3E8D6;border-radius:8px;padding:10px 12px;font-size:12px;color:#9C5A1D;margin-top:8px;">
                   ⚠️ 目標達成には追加エントリー獲得またはOfferBox強化が必要。
                 </div>
               </div>
@@ -1354,15 +1566,15 @@
                 <table style="font-size:12px;">
                   <thead><tr><th>指標</th><th>今年度</th><th>昨年度</th><th>差</th></tr></thead>
                   <tbody>
-                    <tr><td>エントリー数</td><td>348名</td><td>295名</td><td style="color:#4caf50;">+53</td></tr>
-                    <tr><td>承諾数</td><td>34名</td><td>37名</td><td style="color:#ff6b6b;">-3</td></tr>
-                    <tr><td>承諾率</td><td>81%</td><td>84%</td><td style="color:#ff6b6b;">-3%</td></tr>
-                    <tr><td>平均採用日数</td><td>38日</td><td>45日</td><td style="color:#4caf50;">-7日</td></tr>
-                    <tr><td>辞退率</td><td>19%</td><td>16%</td><td style="color:#ff6b6b;">+3%</td></tr>
-                    <tr><td>OfferBox承諾</td><td>6名</td><td>2名</td><td style="color:#4caf50;">+4</td></tr>
+                    <tr><td>エントリー数</td><td>348名</td><td>295名</td><td style="color:#4C8C6B;">+53</td></tr>
+                    <tr><td>承諾数</td><td>34名</td><td>37名</td><td style="color:#B3493C;">-3</td></tr>
+                    <tr><td>承諾率</td><td>81%</td><td>84%</td><td style="color:#B3493C;">-3%</td></tr>
+                    <tr><td>平均採用日数</td><td>38日</td><td>45日</td><td style="color:#4C8C6B;">-7日</td></tr>
+                    <tr><td>辞退率</td><td>19%</td><td>16%</td><td style="color:#B3493C;">+3%</td></tr>
+                    <tr><td>OfferBox承諾</td><td>6名</td><td>2名</td><td style="color:#4C8C6B;">+4</td></tr>
                   </tbody>
                 </table>
-                <div style="margin-top:12px;background:#e8f0fe;border-radius:8px;padding:10px 12px;font-size:12px;color:#3949ab;">
+                <div style="margin-top:12px;background:#E6EEF1;border-radius:8px;padding:10px 12px;font-size:12px;color:#1B3F52;">
                   💡 エントリー数は増加も承諾率が低下。<strong>量より質の改善</strong>が今年度の課題。
                 </div>
               </div>
@@ -1375,11 +1587,11 @@
             <!-- 媒体セレクター -->
             <div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap;">
               <button class="btn btn-primary btn-sm" onclick="selectMedia(this,'all')">全媒体比較</button>
-              <button class="btn btn-secondary btn-sm" onclick="selectMedia(this,'mynavi')" style="border-left:3px solid #e53935;">マイナビ</button>
-              <button class="btn btn-secondary btn-sm" onclick="selectMedia(this,'rikunabi')" style="border-left:3px solid #1565c0;">リクナビ</button>
-              <button class="btn btn-secondary btn-sm" onclick="selectMedia(this,'offerbox')" style="border-left:3px solid #e65100;">OfferBox</button>
-              <button class="btn btn-secondary btn-sm" onclick="selectMedia(this,'rekatsu')" style="border-left:3px solid #6a1b9a;">Re就活</button>
-              <button class="btn btn-secondary btn-sm" onclick="selectMedia(this,'qr')" style="border-left:3px solid #e91e63;">学校QR</button>
+              <button class="btn btn-secondary btn-sm" onclick="selectMedia(this,'mynavi')" style="border-left:3px solid #9C3F2E;">マイナビ</button>
+              <button class="btn btn-secondary btn-sm" onclick="selectMedia(this,'rikunabi')" style="border-left:3px solid #3E7490;">リクナビ</button>
+              <button class="btn btn-secondary btn-sm" onclick="selectMedia(this,'offerbox')" style="border-left:3px solid #9C5A1D;">OfferBox</button>
+              <button class="btn btn-secondary btn-sm" onclick="selectMedia(this,'rekatsu')" style="border-left:3px solid #6B4C7A;">Re就活</button>
+              <button class="btn btn-secondary btn-sm" onclick="selectMedia(this,'qr')" style="border-left:3px solid #3E7D7A;">学校QR</button>
             </div>
 
             <!-- 全媒体比較ビュー -->
@@ -1387,44 +1599,44 @@
 
               <!-- サマリーカード -->
               <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:16px;">
-                <div style="background:#fff;border-radius:10px;border-top:3px solid #e53935;padding:12px 14px;box-shadow:0 1px 4px rgba(0,0,0,.06);">
-                  <div style="font-size:11px;color:#888;margin-bottom:2px;">マイナビ</div>
+                <div style="background:#fff;border-radius:3px;border:1px solid #D9E0E3;border-top:3px solid #9C3F2E;padding:12px 14px;">
+                  <div style="font-size:11px;color:#7E8891;margin-bottom:2px;">マイナビ</div>
                   <div style="font-size:20px;font-weight:700;">157名</div>
                   <div style="display:flex;justify-content:space-between;font-size:11px;margin-top:6px;">
-                    <span style="color:#4caf50;font-weight:600;">承諾率 82%</span>
-                    <span style="color:#888;">内定 22名</span>
+                    <span style="color:#4C8C6B;font-weight:600;">承諾率 82%</span>
+                    <span style="color:#7E8891;">内定 22名</span>
                   </div>
                 </div>
-                <div style="background:#fff;border-radius:10px;border-top:3px solid #1565c0;padding:12px 14px;box-shadow:0 1px 4px rgba(0,0,0,.06);">
-                  <div style="font-size:11px;color:#888;margin-bottom:2px;">リクナビ</div>
+                <div style="background:#fff;border-radius:3px;border:1px solid #D9E0E3;border-top:3px solid #3E7490;padding:12px 14px;">
+                  <div style="font-size:11px;color:#7E8891;margin-bottom:2px;">リクナビ</div>
                   <div style="font-size:20px;font-weight:700;">97名</div>
                   <div style="display:flex;justify-content:space-between;font-size:11px;margin-top:6px;">
-                    <span style="color:#ff9800;font-weight:600;">承諾率 73%</span>
-                    <span style="color:#888;">内定 11名</span>
+                    <span style="color:#C9862A;font-weight:600;">承諾率 73%</span>
+                    <span style="color:#7E8891;">内定 11名</span>
                   </div>
                 </div>
-                <div style="background:#fff;border-radius:10px;border-top:3px solid #e65100;padding:12px 14px;box-shadow:0 1px 4px rgba(0,0,0,.06);">
-                  <div style="font-size:11px;color:#888;margin-bottom:2px;">OfferBox</div>
+                <div style="background:#fff;border-radius:3px;border:1px solid #D9E0E3;border-top:3px solid #9C5A1D;padding:12px 14px;">
+                  <div style="font-size:11px;color:#7E8891;margin-bottom:2px;">OfferBox</div>
                   <div style="font-size:20px;font-weight:700;">42名</div>
                   <div style="display:flex;justify-content:space-between;font-size:11px;margin-top:6px;">
-                    <span style="color:#4caf50;font-weight:700;">承諾率 100%</span>
-                    <span style="color:#888;">内定 6名</span>
+                    <span style="color:#4C8C6B;font-weight:700;">承諾率 100%</span>
+                    <span style="color:#7E8891;">内定 6名</span>
                   </div>
                 </div>
-                <div style="background:#fff;border-radius:10px;border-top:3px solid #6a1b9a;padding:12px 14px;box-shadow:0 1px 4px rgba(0,0,0,.06);">
-                  <div style="font-size:11px;color:#888;margin-bottom:2px;">Re就活</div>
+                <div style="background:#fff;border-radius:3px;border:1px solid #D9E0E3;border-top:3px solid #6B4C7A;padding:12px 14px;">
+                  <div style="font-size:11px;color:#7E8891;margin-bottom:2px;">Re就活</div>
                   <div style="font-size:20px;font-weight:700;">21名</div>
                   <div style="display:flex;justify-content:space-between;font-size:11px;margin-top:6px;">
-                    <span style="color:#ff6b6b;font-weight:600;">承諾率 50%</span>
-                    <span style="color:#888;">内定 2名</span>
+                    <span style="color:#B3493C;font-weight:600;">承諾率 50%</span>
+                    <span style="color:#7E8891;">内定 2名</span>
                   </div>
                 </div>
-                <div style="background:#fff;border-radius:10px;border-top:3px solid #e91e63;padding:12px 14px;box-shadow:0 1px 4px rgba(0,0,0,.06);">
-                  <div style="font-size:11px;color:#888;margin-bottom:2px;">学校QR</div>
+                <div style="background:#fff;border-radius:3px;border:1px solid #D9E0E3;border-top:3px solid #3E7D7A;padding:12px 14px;">
+                  <div style="font-size:11px;color:#7E8891;margin-bottom:2px;">学校QR</div>
                   <div style="font-size:20px;font-weight:700;">31名</div>
                   <div style="display:flex;justify-content:space-between;font-size:11px;margin-top:6px;">
-                    <span style="color:#4caf50;font-weight:700;">承諾率 100%</span>
-                    <span style="color:#888;">内定 1名</span>
+                    <span style="color:#4C8C6B;font-weight:700;">承諾率 100%</span>
+                    <span style="color:#7E8891;">内定 1名</span>
                   </div>
                 </div>
               </div>
@@ -1437,43 +1649,43 @@
                     <thead>
                       <tr>
                         <th>ステージ</th>
-                        <th style="color:#e53935;">マイナビ</th>
-                        <th style="color:#1565c0;">リクナビ</th>
-                        <th style="color:#e65100;">OfferBox</th>
-                        <th style="color:#6a1b9a;">Re就活</th>
+                        <th style="color:#9C3F2E;">マイナビ</th>
+                        <th style="color:#3E7490;">リクナビ</th>
+                        <th style="color:#9C5A1D;">OfferBox</th>
+                        <th style="color:#6B4C7A;">Re就活</th>
                       </tr>
                     </thead>
                     <tbody>
-                      <tr><td style="color:#888;font-size:11px;">エントリー</td><td>157</td><td>97</td><td>42</td><td>21</td></tr>
-                      <tr><td style="color:#888;font-size:11px;">説明会予約</td>
-                        <td>122 <span style="color:#4caf50;font-size:10px;">78%</span></td>
-                        <td>71 <span style="color:#4caf50;font-size:10px;">73%</span></td>
-                        <td>38 <span style="color:#4caf50;font-size:10px;">90%</span></td>
-                        <td>14 <span style="color:#ff9800;font-size:10px;">67%</span></td>
+                      <tr><td style="color:#7E8891;font-size:11px;">エントリー</td><td>157</td><td>97</td><td>42</td><td>21</td></tr>
+                      <tr><td style="color:#7E8891;font-size:11px;">説明会予約</td>
+                        <td>122 <span style="color:#4C8C6B;font-size:10px;">78%</span></td>
+                        <td>71 <span style="color:#4C8C6B;font-size:10px;">73%</span></td>
+                        <td>38 <span style="color:#4C8C6B;font-size:10px;">90%</span></td>
+                        <td>14 <span style="color:#C9862A;font-size:10px;">67%</span></td>
                       </tr>
-                      <tr><td style="color:#888;font-size:11px;">1次面接</td>
-                        <td>84 <span style="color:#4caf50;font-size:10px;">69%</span></td>
-                        <td>46 <span style="color:#ff9800;font-size:10px;">65%</span></td>
-                        <td>31 <span style="color:#4caf50;font-size:10px;">82%</span></td>
-                        <td>9 <span style="color:#ff6b6b;font-size:10px;">64%</span></td>
+                      <tr><td style="color:#7E8891;font-size:11px;">1次面接</td>
+                        <td>84 <span style="color:#4C8C6B;font-size:10px;">69%</span></td>
+                        <td>46 <span style="color:#C9862A;font-size:10px;">65%</span></td>
+                        <td>31 <span style="color:#4C8C6B;font-size:10px;">82%</span></td>
+                        <td>9 <span style="color:#B3493C;font-size:10px;">64%</span></td>
                       </tr>
-                      <tr><td style="color:#888;font-size:11px;">最終面接</td>
-                        <td>44 <span style="color:#4caf50;font-size:10px;">52%</span></td>
-                        <td>24 <span style="color:#ff9800;font-size:10px;">52%</span></td>
-                        <td>18 <span style="color:#4caf50;font-size:10px;">58%</span></td>
-                        <td>6 <span style="color:#ff6b6b;font-size:10px;">67%</span></td>
+                      <tr><td style="color:#7E8891;font-size:11px;">最終面接</td>
+                        <td>44 <span style="color:#4C8C6B;font-size:10px;">52%</span></td>
+                        <td>24 <span style="color:#C9862A;font-size:10px;">52%</span></td>
+                        <td>18 <span style="color:#4C8C6B;font-size:10px;">58%</span></td>
+                        <td>6 <span style="color:#B3493C;font-size:10px;">67%</span></td>
                       </tr>
-                      <tr style="background:#f8f9fc;"><td style="font-size:11px;font-weight:600;">内定</td>
-                        <td><strong>22</strong> <span style="color:#4caf50;font-size:10px;">50%</span></td>
-                        <td><strong>11</strong> <span style="color:#ff9800;font-size:10px;">46%</span></td>
-                        <td><strong>6</strong> <span style="color:#4caf50;font-size:10px;">33%</span></td>
-                        <td><strong>2</strong> <span style="color:#ff6b6b;font-size:10px;">33%</span></td>
+                      <tr style="background:#F2F5F6;"><td style="font-size:11px;font-weight:600;">内定</td>
+                        <td><strong>22</strong> <span style="color:#4C8C6B;font-size:10px;">50%</span></td>
+                        <td><strong>11</strong> <span style="color:#C9862A;font-size:10px;">46%</span></td>
+                        <td><strong>6</strong> <span style="color:#4C8C6B;font-size:10px;">33%</span></td>
+                        <td><strong>2</strong> <span style="color:#B3493C;font-size:10px;">33%</span></td>
                       </tr>
-                      <tr style="background:#e8f5e9;"><td style="font-size:11px;font-weight:700;">承諾</td>
-                        <td><strong style="color:#4caf50;">18</strong> <span style="color:#4caf50;font-size:10px;font-weight:700;">82%</span></td>
-                        <td><strong style="color:#ff9800;">8</strong> <span style="color:#ff9800;font-size:10px;font-weight:700;">73%</span></td>
-                        <td><strong style="color:#4caf50;">6</strong> <span style="color:#4caf50;font-size:10px;font-weight:700;">100%</span></td>
-                        <td><strong style="color:#ff6b6b;">1</strong> <span style="color:#ff6b6b;font-size:10px;font-weight:700;">50%</span></td>
+                      <tr style="background:#E3EFE8;"><td style="font-size:11px;font-weight:700;">承諾</td>
+                        <td><strong style="color:#4C8C6B;">18</strong> <span style="color:#4C8C6B;font-size:10px;font-weight:700;">82%</span></td>
+                        <td><strong style="color:#C9862A;">8</strong> <span style="color:#C9862A;font-size:10px;font-weight:700;">73%</span></td>
+                        <td><strong style="color:#4C8C6B;">6</strong> <span style="color:#4C8C6B;font-size:10px;font-weight:700;">100%</span></td>
+                        <td><strong style="color:#B3493C;">1</strong> <span style="color:#B3493C;font-size:10px;font-weight:700;">50%</span></td>
                       </tr>
                     </tbody>
                   </table>
@@ -1482,19 +1694,19 @@
                 <div>
                   <div class="card" style="margin-bottom:12px;">
                     <div class="card-title">承諾率 比較</div>
-                    <div class="source-bar"><div class="source-label" style="width:80px;font-size:11px;">OfferBox</div><div class="source-bar-wrap"><div class="source-bar-fill" style="width:100%;background:#e65100;">100%</div></div></div>
-                    <div class="source-bar"><div class="source-label" style="width:80px;font-size:11px;">学校QR</div><div class="source-bar-wrap"><div class="source-bar-fill" style="width:100%;background:#e91e63;">100%</div></div></div>
-                    <div class="source-bar"><div class="source-label" style="width:80px;font-size:11px;">マイナビ</div><div class="source-bar-wrap"><div class="source-bar-fill" style="width:82%;background:#7c83fd;">82%</div></div></div>
-                    <div class="source-bar"><div class="source-label" style="width:80px;font-size:11px;">リクナビ</div><div class="source-bar-wrap"><div class="source-bar-fill" style="width:73%;background:#5c6bc0;">73%</div></div></div>
+                    <div class="source-bar"><div class="source-label" style="width:80px;font-size:11px;">OfferBox</div><div class="source-bar-wrap"><div class="source-bar-fill" style="width:100%;background:#9C5A1D;">100%</div></div></div>
+                    <div class="source-bar"><div class="source-label" style="width:80px;font-size:11px;">学校QR</div><div class="source-bar-wrap"><div class="source-bar-fill" style="width:100%;background:#3E7D7A;">100%</div></div></div>
+                    <div class="source-bar"><div class="source-label" style="width:80px;font-size:11px;">マイナビ</div><div class="source-bar-wrap"><div class="source-bar-fill" style="width:82%;background:#2E6480;">82%</div></div></div>
+                    <div class="source-bar"><div class="source-label" style="width:80px;font-size:11px;">リクナビ</div><div class="source-bar-wrap"><div class="source-bar-fill" style="width:73%;background:#3E7490;">73%</div></div></div>
                     <div class="source-bar"><div class="source-label" style="width:80px;font-size:11px;">Re就活</div><div class="source-bar-wrap"><div class="source-bar-fill" style="width:50%;background:#9c27b0;">50%</div></div></div>
                   </div>
                   <div class="card">
                     <div class="card-title">平均採用日数 比較</div>
-                    <div class="source-bar"><div class="source-label" style="width:80px;font-size:11px;">OfferBox</div><div class="source-bar-wrap"><div class="source-bar-fill" style="width:58%;background:#4caf50;">28日</div></div></div>
+                    <div class="source-bar"><div class="source-label" style="width:80px;font-size:11px;">OfferBox</div><div class="source-bar-wrap"><div class="source-bar-fill" style="width:58%;background:#4C8C6B;">28日</div></div></div>
                     <div class="source-bar"><div class="source-label" style="width:80px;font-size:11px;">学校QR</div><div class="source-bar-wrap"><div class="source-bar-fill" style="width:62%;background:#66bb6a;">30日</div></div></div>
-                    <div class="source-bar"><div class="source-label" style="width:80px;font-size:11px;">マイナビ</div><div class="source-bar-wrap"><div class="source-bar-fill" style="width:79%;background:#ff9800;">38日</div></div></div>
+                    <div class="source-bar"><div class="source-label" style="width:80px;font-size:11px;">マイナビ</div><div class="source-bar-wrap"><div class="source-bar-fill" style="width:79%;background:#C9862A;">38日</div></div></div>
                     <div class="source-bar"><div class="source-label" style="width:80px;font-size:11px;">リクナビ</div><div class="source-bar-wrap"><div class="source-bar-fill" style="width:85%;background:#ff7043;">41日</div></div></div>
-                    <div class="source-bar"><div class="source-label" style="width:80px;font-size:11px;">Re就活</div><div class="source-bar-wrap"><div class="source-bar-fill" style="width:92%;background:#ff5722;">44日</div></div></div>
+                    <div class="source-bar"><div class="source-label" style="width:80px;font-size:11px;">Re就活</div><div class="source-bar-wrap"><div class="source-bar-fill" style="width:92%;background:#B3493C;">44日</div></div></div>
                   </div>
                 </div>
               </div>
@@ -1529,7 +1741,7 @@
           <div id="atab-cross" class="tab-content">
             <div style="display:flex;gap:12px;margin-bottom:16px;align-items:flex-end;flex-wrap:wrap;">
               <div>
-                <div style="font-size:11px;color:#888;margin-bottom:4px;">行（縦軸）</div>
+                <div style="font-size:11px;color:#7E8891;margin-bottom:4px;">行（縦軸）</div>
                 <select style="width:160px;">
                   <option>採用区分</option>
                   <option>流入媒体</option>
@@ -1540,7 +1752,7 @@
                 </select>
               </div>
               <div>
-                <div style="font-size:11px;color:#888;margin-bottom:4px;">列（横軸）</div>
+                <div style="font-size:11px;color:#7E8891;margin-bottom:4px;">列（横軸）</div>
                 <select style="width:160px;">
                   <option>選考ステータス</option>
                   <option>採用区分</option>
@@ -1550,7 +1762,7 @@
                 </select>
               </div>
               <div>
-                <div style="font-size:11px;color:#888;margin-bottom:4px;">集計値</div>
+                <div style="font-size:11px;color:#7E8891;margin-bottom:4px;">集計値</div>
                 <select style="width:130px;">
                   <option>人数</option>
                   <option>通過率</option>
@@ -1568,52 +1780,52 @@
             <div class="card" style="padding:0;overflow:auto;">
               <table style="font-size:12px;min-width:600px;">
                 <thead>
-                  <tr style="background:#f5f5f5;">
-                    <th style="padding:10px 12px;text-align:left;border-bottom:2px solid #e0e0e0;min-width:120px;">採用区分</th>
-                    <th style="padding:10px 12px;text-align:right;border-bottom:2px solid #e0e0e0;">エントリー</th>
-                    <th style="padding:10px 12px;text-align:right;border-bottom:2px solid #e0e0e0;">書類選考</th>
-                    <th style="padding:10px 12px;text-align:right;border-bottom:2px solid #e0e0e0;">1次面接</th>
-                    <th style="padding:10px 12px;text-align:right;border-bottom:2px solid #e0e0e0;">最終面接</th>
-                    <th style="padding:10px 12px;text-align:right;border-bottom:2px solid #e0e0e0;">内定</th>
-                    <th style="padding:10px 12px;text-align:right;border-bottom:2px solid #e0e0e0;">承諾</th>
-                    <th style="padding:10px 12px;text-align:right;border-bottom:2px solid #7c83fd;color:#7c83fd;font-weight:700;">承諾率</th>
+                  <tr style="background:#F2F5F6;">
+                    <th style="padding:10px 12px;text-align:left;border-bottom:2px solid #D3DADE;min-width:120px;">採用区分</th>
+                    <th style="padding:10px 12px;text-align:right;border-bottom:2px solid #D3DADE;">エントリー</th>
+                    <th style="padding:10px 12px;text-align:right;border-bottom:2px solid #D3DADE;">書類選考</th>
+                    <th style="padding:10px 12px;text-align:right;border-bottom:2px solid #D3DADE;">1次面接</th>
+                    <th style="padding:10px 12px;text-align:right;border-bottom:2px solid #D3DADE;">最終面接</th>
+                    <th style="padding:10px 12px;text-align:right;border-bottom:2px solid #D3DADE;">内定</th>
+                    <th style="padding:10px 12px;text-align:right;border-bottom:2px solid #D3DADE;">承諾</th>
+                    <th style="padding:10px 12px;text-align:right;border-bottom:2px solid #2E6480;color:#2E6480;font-weight:700;">承諾率</th>
                   </tr>
                 </thead>
                 <tbody>
-                  <tr style="cursor:pointer;" onmouseover="this.style.background='#f9f9ff'" onmouseout="this.style.background=''">
-                    <td style="padding:10px 12px;font-weight:600;border-bottom:1px solid #f0f0f0;"><span style="font-size:10px;background:#ad1457;color:#fff;border-radius:8px;padding:1px 6px;margin-right:6px;">新卒</span>新卒採用</td>
-                    <td style="padding:10px 12px;text-align:right;border-bottom:1px solid #f0f0f0;">302</td>
-                    <td style="padding:10px 12px;text-align:right;border-bottom:1px solid #f0f0f0;">—</td>
-                    <td style="padding:10px 12px;text-align:right;border-bottom:1px solid #f0f0f0;">182</td>
-                    <td style="padding:10px 12px;text-align:right;border-bottom:1px solid #f0f0f0;">98</td>
-                    <td style="padding:10px 12px;text-align:right;border-bottom:1px solid #f0f0f0;">38</td>
-                    <td style="padding:10px 12px;text-align:right;border-bottom:1px solid #f0f0f0;">31</td>
-                    <td style="padding:10px 12px;text-align:right;border-bottom:1px solid #f0f0f0;color:#4caf50;font-weight:700;">82%</td>
+                  <tr style="cursor:pointer;" onmouseover="this.style.background='#F4F7F8'" onmouseout="this.style.background=''">
+                    <td style="padding:10px 12px;font-weight:600;border-bottom:1px solid #D9E0E3;"><span style="font-size:10px;background:#A13D63;color:#fff;border-radius:8px;padding:1px 6px;margin-right:6px;">新卒</span>新卒採用</td>
+                    <td style="padding:10px 12px;text-align:right;border-bottom:1px solid #D9E0E3;">302</td>
+                    <td style="padding:10px 12px;text-align:right;border-bottom:1px solid #D9E0E3;">—</td>
+                    <td style="padding:10px 12px;text-align:right;border-bottom:1px solid #D9E0E3;">182</td>
+                    <td style="padding:10px 12px;text-align:right;border-bottom:1px solid #D9E0E3;">98</td>
+                    <td style="padding:10px 12px;text-align:right;border-bottom:1px solid #D9E0E3;">38</td>
+                    <td style="padding:10px 12px;text-align:right;border-bottom:1px solid #D9E0E3;">31</td>
+                    <td style="padding:10px 12px;text-align:right;border-bottom:1px solid #D9E0E3;color:#4C8C6B;font-weight:700;">82%</td>
                   </tr>
-                  <tr style="cursor:pointer;" onmouseover="this.style.background='#f9f9ff'" onmouseout="this.style.background=''">
-                    <td style="padding:10px 12px;font-weight:600;border-bottom:1px solid #f0f0f0;"><span style="font-size:10px;background:#00796b;color:#fff;border-radius:8px;padding:1px 6px;margin-right:6px;">中途</span>中途採用</td>
-                    <td style="padding:10px 12px;text-align:right;border-bottom:1px solid #f0f0f0;">46</td>
-                    <td style="padding:10px 12px;text-align:right;border-bottom:1px solid #f0f0f0;">38</td>
-                    <td style="padding:10px 12px;text-align:right;border-bottom:1px solid #f0f0f0;">22</td>
-                    <td style="padding:10px 12px;text-align:right;border-bottom:1px solid #f0f0f0;">14</td>
-                    <td style="padding:10px 12px;text-align:right;border-bottom:1px solid #f0f0f0;">4</td>
-                    <td style="padding:10px 12px;text-align:right;border-bottom:1px solid #f0f0f0;">3</td>
-                    <td style="padding:10px 12px;text-align:right;border-bottom:1px solid #f0f0f0;color:#ff9800;font-weight:700;">75%</td>
+                  <tr style="cursor:pointer;" onmouseover="this.style.background='#F4F7F8'" onmouseout="this.style.background=''">
+                    <td style="padding:10px 12px;font-weight:600;border-bottom:1px solid #D9E0E3;"><span style="font-size:10px;background:#1D6E63;color:#fff;border-radius:8px;padding:1px 6px;margin-right:6px;">中途</span>中途採用</td>
+                    <td style="padding:10px 12px;text-align:right;border-bottom:1px solid #D9E0E3;">46</td>
+                    <td style="padding:10px 12px;text-align:right;border-bottom:1px solid #D9E0E3;">38</td>
+                    <td style="padding:10px 12px;text-align:right;border-bottom:1px solid #D9E0E3;">22</td>
+                    <td style="padding:10px 12px;text-align:right;border-bottom:1px solid #D9E0E3;">14</td>
+                    <td style="padding:10px 12px;text-align:right;border-bottom:1px solid #D9E0E3;">4</td>
+                    <td style="padding:10px 12px;text-align:right;border-bottom:1px solid #D9E0E3;">3</td>
+                    <td style="padding:10px 12px;text-align:right;border-bottom:1px solid #D9E0E3;color:#C9862A;font-weight:700;">75%</td>
                   </tr>
                   <tr style="background:#fafafa;font-weight:700;">
-                    <td style="padding:10px 12px;border-top:2px solid #e0e0e0;">合計</td>
-                    <td style="padding:10px 12px;text-align:right;border-top:2px solid #e0e0e0;">348</td>
-                    <td style="padding:10px 12px;text-align:right;border-top:2px solid #e0e0e0;">38</td>
-                    <td style="padding:10px 12px;text-align:right;border-top:2px solid #e0e0e0;">204</td>
-                    <td style="padding:10px 12px;text-align:right;border-top:2px solid #e0e0e0;">112</td>
-                    <td style="padding:10px 12px;text-align:right;border-top:2px solid #e0e0e0;">42</td>
-                    <td style="padding:10px 12px;text-align:right;border-top:2px solid #e0e0e0;">34</td>
-                    <td style="padding:10px 12px;text-align:right;border-top:2px solid #e0e0e0;color:#7c83fd;">81%</td>
+                    <td style="padding:10px 12px;border-top:2px solid #D3DADE;">合計</td>
+                    <td style="padding:10px 12px;text-align:right;border-top:2px solid #D3DADE;">348</td>
+                    <td style="padding:10px 12px;text-align:right;border-top:2px solid #D3DADE;">38</td>
+                    <td style="padding:10px 12px;text-align:right;border-top:2px solid #D3DADE;">204</td>
+                    <td style="padding:10px 12px;text-align:right;border-top:2px solid #D3DADE;">112</td>
+                    <td style="padding:10px 12px;text-align:right;border-top:2px solid #D3DADE;">42</td>
+                    <td style="padding:10px 12px;text-align:right;border-top:2px solid #D3DADE;">34</td>
+                    <td style="padding:10px 12px;text-align:right;border-top:2px solid #D3DADE;color:#2E6480;">81%</td>
                   </tr>
                 </tbody>
               </table>
             </div>
-            <div style="margin-top:8px;font-size:11px;color:#888;">※ 行をクリックするとドリルダウン表示。フィルタ条件は上部グローバルフィルタと連動。</div>
+            <div style="margin-top:8px;font-size:11px;color:#7E8891;">※ 行をクリックするとドリルダウン表示。フィルタ条件は上部グローバルフィルタと連動。</div>
           </div>
 
         </div>
@@ -1632,10 +1844,10 @@
         <table>
           <thead><tr><th>媒体名</th><th>連携状況</th><th>取込数</th><th>最終同期</th><th>操作</th></tr></thead>
           <tbody>
-            <tr><td>マイナビ</td><td><span style="color:#4caf50;font-size:12px;">● 連携中</span></td><td>157名</td><td style="font-size:11px;">10/29 09:00</td><td><button class="btn btn-secondary btn-sm">設定</button></td></tr>
-            <tr><td>リクナビ</td><td><span style="color:#4caf50;font-size:12px;">● 連携中</span></td><td>97名</td><td style="font-size:11px;">10/29 09:00</td><td><button class="btn btn-secondary btn-sm">設定</button></td></tr>
-            <tr><td>OfferBox</td><td><span style="color:#4caf50;font-size:12px;">● 連携中</span></td><td>42名</td><td style="font-size:11px;">10/28 18:00</td><td><button class="btn btn-secondary btn-sm">設定</button></td></tr>
-            <tr><td>doda キャンパス</td><td><span style="color:#ccc;font-size:12px;">○ 未連携</span></td><td>—</td><td style="font-size:11px;">—</td><td><button class="btn btn-primary btn-sm">連携する</button></td></tr>
+            <tr><td>マイナビ</td><td><span style="color:#4C8C6B;font-size:12px;">● 連携中</span></td><td>157名</td><td style="font-size:11px;">10/29 09:00</td><td><button class="btn btn-secondary btn-sm">設定</button></td></tr>
+            <tr><td>リクナビ</td><td><span style="color:#4C8C6B;font-size:12px;">● 連携中</span></td><td>97名</td><td style="font-size:11px;">10/29 09:00</td><td><button class="btn btn-secondary btn-sm">設定</button></td></tr>
+            <tr><td>OfferBox</td><td><span style="color:#4C8C6B;font-size:12px;">● 連携中</span></td><td>42名</td><td style="font-size:11px;">10/28 18:00</td><td><button class="btn btn-secondary btn-sm">設定</button></td></tr>
+            <tr><td>doda キャンパス</td><td><span style="color:#C3CBD0;font-size:12px;">○ 未連携</span></td><td>—</td><td style="font-size:11px;">—</td><td><button class="btn btn-primary btn-sm">連携する</button></td></tr>
           </tbody>
         </table>
       </div>
@@ -1657,7 +1869,7 @@
             <div style="margin-top:4px;"><span class="tag tag-blue">イベント</span></div>
             <button class="btn btn-secondary btn-sm" style="margin-top:8px;">DL</button>
           </div>
-          <div class="qr-card" style="border:2px dashed #e0e0e0;display:flex;align-items:center;justify-content:center;flex-direction:column;color:#aaa;cursor:pointer;min-height:170px;">
+          <div class="qr-card" style="border:2px dashed #D3DADE;display:flex;align-items:center;justify-content:center;flex-direction:column;color:#A9B3BA;cursor:pointer;min-height:170px;">
             <div style="font-size:28px;">＋</div>
             <div style="font-size:12px;margin-top:6px;">QRコード追加</div>
           </div>
@@ -1672,7 +1884,7 @@
       <div id="rm-list-view">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
           <div>
-            <div style="font-size:13px;color:#666;">メニューはタグで自動割り当て。タグに一致しない応募者にはデフォルトが表示されます。</div>
+            <div style="font-size:13px;color:#5B6670;">メニューはタグで自動割り当て。タグに一致しない応募者にはデフォルトが表示されます。</div>
           </div>
           <button class="btn btn-primary btn-sm" onclick="showRmEditor(-1)">＋ 新規作成</button>
         </div>
@@ -1681,66 +1893,76 @@
         <div style="display:flex;flex-direction:column;gap:12px;" id="rm-cards">
 
           <!-- デフォルト -->
-          <div style="background:#fff;border-radius:10px;box-shadow:0 1px 4px rgba(0,0,0,.06);overflow:hidden;">
-            <div style="display:flex;align-items:center;gap:12px;padding:14px 16px;border-bottom:1px solid #f0f2f5;">
+          <div style="background:#fff;border-radius:3px;border:1px solid #D9E0E3;overflow:hidden;">
+            <div style="display:flex;align-items:center;gap:12px;padding:14px 16px;border-bottom:1px solid #E9EDEF;">
               <div style="flex:1;">
                 <div style="display:flex;align-items:center;gap:8px;">
                   <span style="font-size:13px;font-weight:700;">デフォルトメニュー</span>
-                  <span style="background:#7c83fd;color:#fff;font-size:10px;border-radius:10px;padding:1px 8px;font-weight:700;">デフォルト</span>
-                  <span style="background:#4caf50;color:#fff;font-size:10px;border-radius:10px;padding:1px 8px;">公開中</span>
+                  <span style="background:#2E6480;color:#fff;font-size:10px;border-radius:10px;padding:1px 8px;font-weight:700;">デフォルト</span>
+                  <span style="background:#4C8C6B;color:#fff;font-size:10px;border-radius:10px;padding:1px 8px;">公開中</span>
                 </div>
-                <div style="font-size:11px;color:#999;margin-top:3px;">割り当て条件：タグなし（全員共通の初期表示）</div>
+                <div style="font-size:11px;color:#94A0A8;margin-top:3px;">割り当て条件：タグなし（全員共通の初期表示）</div>
               </div>
-              <div style="font-size:12px;color:#888;">148名に適用中</div>
+              <div style="font-size:12px;color:#7E8891;">148名に適用中</div>
               <button class="btn btn-secondary btn-sm" onclick="showRmEditor(0)">編集</button>
             </div>
-            <div style="display:grid;grid-template-columns:repeat(6,1fr);background:#f8f9fc;">
-              <div style="padding:10px;text-align:center;font-size:11px;border-right:1px solid #e8eaf0;"><div style="font-size:16px;">🏠</div>企業HP</div>
-              <div style="padding:10px;text-align:center;font-size:11px;border-right:1px solid #e8eaf0;"><div style="font-size:16px;">📋</div>マイページ</div>
-              <div style="padding:10px;text-align:center;font-size:11px;border-right:1px solid #e8eaf0;"><div style="font-size:16px;">📅</div>説明会予約</div>
-              <div style="padding:10px;text-align:center;font-size:11px;border-right:1px solid #e8eaf0;"><div style="font-size:16px;">❓</div>よくある質問</div>
-              <div style="padding:10px;text-align:center;font-size:11px;border-right:1px solid #e8eaf0;"><div style="font-size:16px;">📞</div>お問い合わせ</div>
-              <div style="padding:10px;text-align:center;font-size:11px;"><div style="font-size:16px;">📝</div>アンケート</div>
+            <div class="rm-image" style="background:linear-gradient(135deg,#1C2126 0%,#2E6480 58%,#3E7490 100%);">
+              <div class="rm-image-deco" style="width:150px;height:150px;top:-55px;right:-35px;"></div>
+              <div class="rm-image-deco" style="width:210px;height:210px;bottom:-90px;left:18%;"></div>
+              <div class="rm-image-brand">フジアルテ 採用情報</div>
+              <div class="rm-tap-grid" style="grid-template-columns:repeat(3,1fr);grid-template-rows:repeat(2,1fr);">
+                <div class="rm-tap" style="border-right:none;border-top:none;border-left:none;"><span class="rm-tap-num">1</span><span class="rm-tap-icon">🏠</span><span class="rm-tap-label">企業HP</span></div>
+                <div class="rm-tap" style="border-top:none;"><span class="rm-tap-num">2</span><span class="rm-tap-icon">📋</span><span class="rm-tap-label">マイページ</span></div>
+                <div class="rm-tap" style="border-right:none;border-top:none;"><span class="rm-tap-num">3</span><span class="rm-tap-icon">📅</span><span class="rm-tap-label">説明会予約</span></div>
+                <div class="rm-tap" style="border-right:none;border-bottom:none;border-left:none;"><span class="rm-tap-num">4</span><span class="rm-tap-icon">❓</span><span class="rm-tap-label">よくある質問</span></div>
+                <div class="rm-tap" style="border-bottom:none;"><span class="rm-tap-num">5</span><span class="rm-tap-icon">📞</span><span class="rm-tap-label">お問い合わせ</span></div>
+                <div class="rm-tap" style="border-right:none;border-bottom:none;"><span class="rm-tap-num">6</span><span class="rm-tap-icon">📝</span><span class="rm-tap-label">アンケート</span></div>
+              </div>
             </div>
           </div>
 
           <!-- 総合職 -->
-          <div style="background:#fff;border-radius:10px;box-shadow:0 1px 4px rgba(0,0,0,.06);overflow:hidden;">
-            <div style="display:flex;align-items:center;gap:12px;padding:14px 16px;border-bottom:1px solid #f0f2f5;">
+          <div style="background:#fff;border-radius:3px;border:1px solid #D9E0E3;overflow:hidden;">
+            <div style="display:flex;align-items:center;gap:12px;padding:14px 16px;border-bottom:1px solid #E9EDEF;">
               <div style="flex:1;">
                 <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
                   <span style="font-size:13px;font-weight:700;">総合職メニュー</span>
-                  <span style="background:#4caf50;color:#fff;font-size:10px;border-radius:10px;padding:1px 8px;">公開中</span>
+                  <span style="background:#4C8C6B;color:#fff;font-size:10px;border-radius:10px;padding:1px 8px;">公開中</span>
                 </div>
-                <div style="font-size:11px;color:#999;margin-top:3px;">
+                <div style="font-size:11px;color:#94A0A8;margin-top:3px;">
                   割り当て条件：タグ
                   <span class="tag tag-blue" style="font-size:10px;padding:1px 6px;">総合職</span>
                   を持つ応募者
                 </div>
               </div>
-              <div style="font-size:12px;color:#888;">62名に適用中</div>
+              <div style="font-size:12px;color:#7E8891;">62名に適用中</div>
               <button class="btn btn-secondary btn-sm" onclick="showRmEditor(1)">編集</button>
-              <button class="btn btn-secondary btn-sm" style="color:#ff6b6b;">削除</button>
+              <button class="btn btn-secondary btn-sm" style="color:#B3493C;">削除</button>
             </div>
-            <div style="display:grid;grid-template-columns:repeat(6,1fr);background:#f8f9fc;">
-              <div style="padding:10px;text-align:center;font-size:11px;border-right:1px solid #e8eaf0;"><div style="font-size:16px;">🏠</div>企業HP</div>
-              <div style="padding:10px;text-align:center;font-size:11px;border-right:1px solid #e8eaf0;"><div style="font-size:16px;">📋</div>マイページ</div>
-              <div style="padding:10px;text-align:center;font-size:11px;border-right:1px solid #e8eaf0;background:#e8f0fe;"><div style="font-size:16px;">💼</div>総合職 説明会</div>
-              <div style="padding:10px;text-align:center;font-size:11px;border-right:1px solid #e8eaf0;background:#e8f0fe;"><div style="font-size:16px;">📄</div>職種詳細</div>
-              <div style="padding:10px;text-align:center;font-size:11px;border-right:1px solid #e8eaf0;"><div style="font-size:16px;">❓</div>よくある質問</div>
-              <div style="padding:10px;text-align:center;font-size:11px;"><div style="font-size:16px;">📝</div>アンケート</div>
+            <div class="rm-image" style="background:linear-gradient(135deg,#1C2126 0%,#2E6480 50%,#2B5F7A 100%);">
+              <div class="rm-image-deco" style="width:130px;height:130px;top:-45px;left:-30px;"></div>
+              <div class="rm-image-deco" style="width:180px;height:180px;bottom:-70px;right:10%;"></div>
+              <div class="rm-image-brand">総合職採用 2027</div>
+              <div class="rm-tap-grid" style="grid-template-columns:repeat(3,1fr);grid-template-rows:repeat(2,1fr);">
+                <div class="rm-tap" style="border-right:none;border-top:none;border-left:none;"><span class="rm-tap-num">1</span><span class="rm-tap-icon">🏠</span><span class="rm-tap-label">企業HP</span></div>
+                <div class="rm-tap" style="border-top:none;"><span class="rm-tap-num">2</span><span class="rm-tap-icon">📋</span><span class="rm-tap-label">マイページ</span></div>
+                <div class="rm-tap" style="border-right:none;border-top:none;background:rgba(255,255,255,0.08);"><span class="rm-tap-num">3</span><span class="rm-tap-icon">💼</span><span class="rm-tap-label">総合職説明会</span></div>
+                <div class="rm-tap" style="border-right:none;border-bottom:none;border-left:none;background:rgba(255,255,255,0.08);"><span class="rm-tap-num">4</span><span class="rm-tap-icon">📄</span><span class="rm-tap-label">職種詳細</span></div>
+                <div class="rm-tap" style="border-bottom:none;"><span class="rm-tap-num">5</span><span class="rm-tap-icon">❓</span><span class="rm-tap-label">よくある質問</span></div>
+                <div class="rm-tap" style="border-right:none;border-bottom:none;"><span class="rm-tap-num">6</span><span class="rm-tap-icon">📝</span><span class="rm-tap-label">アンケート</span></div>
+              </div>
             </div>
           </div>
 
           <!-- エンジニア -->
-          <div style="background:#fff;border-radius:10px;box-shadow:0 1px 4px rgba(0,0,0,.06);overflow:hidden;">
-            <div style="display:flex;align-items:center;gap:12px;padding:14px 16px;border-bottom:1px solid #f0f2f5;">
+          <div style="background:#fff;border-radius:3px;border:1px solid #D9E0E3;overflow:hidden;">
+            <div style="display:flex;align-items:center;gap:12px;padding:14px 16px;border-bottom:1px solid #E9EDEF;">
               <div style="flex:1;">
                 <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
                   <span style="font-size:13px;font-weight:700;">エンジニア職メニュー</span>
-                  <span style="background:#4caf50;color:#fff;font-size:10px;border-radius:10px;padding:1px 8px;">公開中</span>
+                  <span style="background:#4C8C6B;color:#fff;font-size:10px;border-radius:10px;padding:1px 8px;">公開中</span>
                 </div>
-                <div style="font-size:11px;color:#999;margin-top:3px;">
+                <div style="font-size:11px;color:#94A0A8;margin-top:3px;">
                   割り当て条件：タグ
                   <span class="tag tag-purple" style="font-size:10px;padding:1px 6px;">理系</span>
                   または
@@ -1748,52 +1970,60 @@
                   を持つ応募者
                 </div>
               </div>
-              <div style="font-size:12px;color:#888;">44名に適用中</div>
+              <div style="font-size:12px;color:#7E8891;">44名に適用中</div>
               <button class="btn btn-secondary btn-sm" onclick="showRmEditor(2)">編集</button>
-              <button class="btn btn-secondary btn-sm" style="color:#ff6b6b;">削除</button>
+              <button class="btn btn-secondary btn-sm" style="color:#B3493C;">削除</button>
             </div>
-            <div style="display:grid;grid-template-columns:repeat(6,1fr);background:#f8f9fc;">
-              <div style="padding:10px;text-align:center;font-size:11px;border-right:1px solid #e8eaf0;"><div style="font-size:16px;">🏠</div>企業HP</div>
-              <div style="padding:10px;text-align:center;font-size:11px;border-right:1px solid #e8eaf0;"><div style="font-size:16px;">📋</div>マイページ</div>
-              <div style="padding:10px;text-align:center;font-size:11px;border-right:1px solid #e8eaf0;background:#f3e5f5;"><div style="font-size:16px;">💻</div>技術説明会</div>
-              <div style="padding:10px;text-align:center;font-size:11px;border-right:1px solid #e8eaf0;background:#f3e5f5;"><div style="font-size:16px;">🛠️</div>技術ブログ</div>
-              <div style="padding:10px;text-align:center;font-size:11px;border-right:1px solid #e8eaf0;"><div style="font-size:16px;">❓</div>よくある質問</div>
-              <div style="padding:10px;text-align:center;font-size:11px;"><div style="font-size:16px;">📝</div>アンケート</div>
+            <div class="rm-image" style="background:linear-gradient(135deg,#1C2126 0%,#4A3A55 50%,#6B4C7A 100%);">
+              <div class="rm-image-deco" style="width:150px;height:150px;top:-50px;right:5%;"></div>
+              <div class="rm-image-deco" style="width:170px;height:170px;bottom:-70px;left:-40px;"></div>
+              <div class="rm-image-brand">ENGINEER RECRUITING</div>
+              <div class="rm-tap-grid" style="grid-template-columns:repeat(3,1fr);grid-template-rows:repeat(2,1fr);">
+                <div class="rm-tap" style="border-right:none;border-top:none;border-left:none;"><span class="rm-tap-num">1</span><span class="rm-tap-icon">🏠</span><span class="rm-tap-label">企業HP</span></div>
+                <div class="rm-tap" style="border-top:none;"><span class="rm-tap-num">2</span><span class="rm-tap-icon">📋</span><span class="rm-tap-label">マイページ</span></div>
+                <div class="rm-tap" style="border-right:none;border-top:none;background:rgba(255,255,255,0.08);"><span class="rm-tap-num">3</span><span class="rm-tap-icon">💻</span><span class="rm-tap-label">技術説明会</span></div>
+                <div class="rm-tap" style="border-right:none;border-bottom:none;border-left:none;background:rgba(255,255,255,0.08);"><span class="rm-tap-num">4</span><span class="rm-tap-icon">🛠️</span><span class="rm-tap-label">技術ブログ</span></div>
+                <div class="rm-tap" style="border-bottom:none;"><span class="rm-tap-num">5</span><span class="rm-tap-icon">❓</span><span class="rm-tap-label">よくある質問</span></div>
+                <div class="rm-tap" style="border-right:none;border-bottom:none;"><span class="rm-tap-num">6</span><span class="rm-tap-icon">📝</span><span class="rm-tap-label">アンケート</span></div>
+              </div>
             </div>
           </div>
 
           <!-- 内定者 -->
-          <div style="background:#fff;border-radius:10px;box-shadow:0 1px 4px rgba(0,0,0,.06);overflow:hidden;opacity:0.7;">
-            <div style="display:flex;align-items:center;gap:12px;padding:14px 16px;border-bottom:1px solid #f0f2f5;">
+          <div style="background:#fff;border-radius:3px;border:1px solid #D9E0E3;overflow:hidden;opacity:0.7;">
+            <div style="display:flex;align-items:center;gap:12px;padding:14px 16px;border-bottom:1px solid #E9EDEF;">
               <div style="flex:1;">
                 <div style="display:flex;align-items:center;gap:8px;">
                   <span style="font-size:13px;font-weight:700;">内定者メニュー</span>
-                  <span style="background:#9e9e9e;color:#fff;font-size:10px;border-radius:10px;padding:1px 8px;">下書き</span>
+                  <span style="background:#8A959C;color:#fff;font-size:10px;border-radius:10px;padding:1px 8px;">下書き</span>
+                  <span style="background:#E9EDEF;color:#5B6670;font-size:10px;border-radius:10px;padding:1px 8px;border:1px solid #D9E0E3;">コンパクトサイズ</span>
                 </div>
-                <div style="font-size:11px;color:#999;margin-top:3px;">
+                <div style="font-size:11px;color:#94A0A8;margin-top:3px;">
                   割り当て条件：タグ
                   <span class="tag tag-blue" style="font-size:10px;padding:1px 6px;">内定者</span>
                   を持つ応募者
                 </div>
               </div>
-              <div style="font-size:12px;color:#888;">未公開</div>
+              <div style="font-size:12px;color:#7E8891;">未公開</div>
               <button class="btn btn-secondary btn-sm" onclick="showRmEditor(3)">編集</button>
-              <button class="btn btn-secondary btn-sm" style="color:#ff6b6b;">削除</button>
+              <button class="btn btn-secondary btn-sm" style="color:#B3493C;">削除</button>
             </div>
-            <div style="display:grid;grid-template-columns:repeat(6,1fr);background:#f8f9fc;">
-              <div style="padding:10px;text-align:center;font-size:11px;border-right:1px solid #e8eaf0;background:#e8f5e9;"><div style="font-size:16px;">📄</div>承諾書提出</div>
-              <div style="padding:10px;text-align:center;font-size:11px;border-right:1px solid #e8eaf0;"><div style="font-size:16px;">📋</div>マイページ</div>
-              <div style="padding:10px;text-align:center;font-size:11px;border-right:1px solid #e8eaf0;background:#e8f5e9;"><div style="font-size:16px;">🎉</div>内定者イベント</div>
-              <div style="padding:10px;text-align:center;font-size:11px;border-right:1px solid #e8eaf0;background:#e8f5e9;"><div style="font-size:16px;">📅</div>入社前研修</div>
-              <div style="padding:10px;text-align:center;font-size:11px;border-right:1px solid #e8eaf0;"><div style="font-size:16px;">❓</div>よくある質問</div>
-              <div style="padding:10px;text-align:center;font-size:11px;"><div style="font-size:16px;">📞</div>担当に連絡</div>
+            <div class="rm-image compact" style="background:linear-gradient(135deg,#1C2126 0%,#2F5A42 55%,#4C8C6B 100%);">
+              <div class="rm-image-deco" style="width:120px;height:120px;top:-40px;right:10%;"></div>
+              <div class="rm-image-brand">内定者フォロー</div>
+              <div class="rm-tap-grid" style="grid-template-columns:repeat(3,1fr);grid-template-rows:1fr;">
+                <div class="rm-tap" style="border-top:none;border-left:none;border-bottom:none;background:rgba(255,255,255,0.08);"><span class="rm-tap-num">1</span><span class="rm-tap-icon">📄</span><span class="rm-tap-label">承諾書提出</span></div>
+                <div class="rm-tap" style="border-top:none;border-bottom:none;"><span class="rm-tap-num">2</span><span class="rm-tap-icon">🎉</span><span class="rm-tap-label">内定者イベント</span></div>
+                <div class="rm-tap" style="border-top:none;border-right:none;border-bottom:none;"><span class="rm-tap-num">3</span><span class="rm-tap-icon">💬</span><span class="rm-tap-label">担当に連絡</span></div>
+              </div>
             </div>
+            <div style="font-size:10.5px;color:#94A0A8;padding:6px 12px;background:#F2F5F6;border-top:1px solid #D9E0E3;">コンパクトサイズはタブを閉じている間、画面下部に帯として常時表示されます</div>
           </div>
 
         </div>
 
         <!-- 割り当て優先順位の説明 -->
-        <div style="background:#f8f9ff;border:1px solid #c5cae9;border-radius:8px;padding:14px 16px;margin-top:16px;font-size:12px;color:#3949ab;">
+        <div style="background:#E6EEF1;border:1px solid #C3CBD0;border-radius:8px;padding:14px 16px;margin-top:16px;font-size:12px;color:#1B3F52;">
           <strong>割り当て優先順位：</strong> 応募者が複数タグに一致する場合、リスト上位のメニューが優先されます。ドラッグ&ドロップで順序変更可能。タグに一致しない場合は「デフォルト」が表示されます。
         </div>
       </div>
@@ -1827,45 +2057,103 @@
               </div>
             </div>
 
+            <div class="card" style="margin-bottom:12px;">
+              <div class="card-title">メニュー画像</div>
+              <div class="form-row">
+                <label>サイズ</label>
+                <div class="rm-size-toggle">
+                  <button type="button" class="active">フルサイズ（2500×1686）</button>
+                  <button type="button">コンパクト（2500×843）</button>
+                </div>
+              </div>
+              <div class="rm-upload-zone">
+                <div style="font-size:22px;margin-bottom:6px;">🖼️</div>
+                画像をドラッグ＆ドロップ、またはクリックしてアップロード<br>
+                <span style="font-size:11px;color:#A9B3BA;">PNG/JPG・1MB以下・指定サイズに一致すること</span>
+              </div>
+              <div class="form-row" style="margin-top:12px;margin-bottom:0;">
+                <label>タップ領域の分割</label>
+                <select><option>6分割（3×2）</option><option>4分割（2×2）</option><option>3分割（横）</option><option>1分割（全面リンク）</option></select>
+              </div>
+            </div>
+
             <div class="card">
-              <div class="card-title">ボタン設定（6ボタン）</div>
+              <div class="card-title">タップ領域の設定（6ボタン）</div>
               <table>
-                <thead><tr><th>#</th><th>アイコン</th><th>ラベル</th><th>リンク先</th></tr></thead>
-                <tbody>
-                  <tr><td style="font-size:11px;color:#888;">1</td><td><input type="text" value="🏠" style="width:44px;text-align:center;"></td><td><input type="text" value="企業HP" style="width:80px;"></td><td><input type="text" value="https://example.com" style="font-size:11px;"></td></tr>
-                  <tr><td style="font-size:11px;color:#888;">2</td><td><input type="text" value="📋" style="width:44px;text-align:center;"></td><td><input type="text" value="マイページ" style="width:80px;"></td><td><input type="text" value="LIFF: マイページ" style="font-size:11px;"></td></tr>
-                  <tr><td style="font-size:11px;color:#888;">3</td><td><input type="text" value="💻" style="width:44px;text-align:center;"></td><td><input type="text" value="技術説明会" style="width:80px;"></td><td><input type="text" value="LIFF: 予約フォーム" style="font-size:11px;"></td></tr>
-                  <tr><td style="font-size:11px;color:#888;">4</td><td><input type="text" value="🛠️" style="width:44px;text-align:center;"></td><td><input type="text" value="技術ブログ" style="width:80px;"></td><td><input type="text" value="https://blog.example.com" style="font-size:11px;"></td></tr>
-                  <tr><td style="font-size:11px;color:#888;">5</td><td><input type="text" value="❓" style="width:44px;text-align:center;"></td><td><input type="text" value="よくある質問" style="width:80px;"></td><td><input type="text" value="https://tayori.com/..." style="font-size:11px;"></td></tr>
-                  <tr><td style="font-size:11px;color:#888;">6</td><td><input type="text" value="📝" style="width:44px;text-align:center;"></td><td><input type="text" value="アンケート" style="width:80px;"></td><td><input type="text" value="LIFF: アンケート" style="font-size:11px;"></td></tr>
+                <thead><tr><th>#</th><th>アイコン</th><th>ラベル</th><th>リンク先タイプ</th><th>リンク先</th><th></th></tr></thead>
+                <tbody id="rm-link-table">
                 </tbody>
               </table>
+              <div style="font-size:10.5px;color:#94A0A8;margin-top:8px;">LIFFを選択すると、登録済みのLIFFアプリから選べます。実際の画面もその場でプレビューできます</div>
             </div>
           </div>
 
           <div>
             <div class="card">
               <div class="card-title">プレビュー（スマートフォン）</div>
-              <div style="background:#e8f5e9;border-radius:12px;padding:16px;">
-                <div style="background:#fff;border-radius:10px;overflow:hidden;border:1px solid #e0e0e0;max-width:280px;margin:0 auto;">
-                  <div style="display:grid;grid-template-columns:1fr 1fr 1fr;border-bottom:1px solid #eee;">
-                    <div style="padding:12px 6px;text-align:center;font-size:11px;border-right:1px solid #eee;"><div style="font-size:18px;">🏠</div>企業HP</div>
-                    <div style="padding:12px 6px;text-align:center;font-size:11px;border-right:1px solid #eee;"><div style="font-size:18px;">📋</div>マイページ</div>
-                    <div style="padding:12px 6px;text-align:center;font-size:11px;background:#f3e5f5;"><div style="font-size:18px;">💻</div>技術説明会</div>
+              <div style="background:#E9EDEF;border-radius:12px;padding:16px;">
+                <div style="background:#fff;border-radius:16px;overflow:hidden;border:1px solid #D3DADE;max-width:280px;margin:0 auto;box-shadow:0 4px 16px rgba(28,33,38,.12);">
+                  <div style="background:#06C755;color:#fff;padding:8px 12px;font-size:11px;font-weight:700;display:flex;align-items:center;gap:6px;">
+                    <span>💬</span> フジアルテ採用担当
                   </div>
-                  <div style="display:grid;grid-template-columns:1fr 1fr 1fr;">
-                    <div style="padding:12px 6px;text-align:center;font-size:11px;border-right:1px solid #eee;background:#f3e5f5;"><div style="font-size:18px;">🛠️</div>技術ブログ</div>
-                    <div style="padding:12px 6px;text-align:center;font-size:11px;border-right:1px solid #eee;"><div style="font-size:18px;">❓</div>よくある質問</div>
-                    <div style="padding:12px 6px;text-align:center;font-size:11px;"><div style="font-size:18px;">📝</div>アンケート</div>
+                  <div style="padding:14px 12px;background:#9DC8AE;min-height:120px;display:flex;align-items:flex-end;">
+                    <div style="background:#fff;border-radius:12px;border-bottom-left-radius:2px;padding:8px 12px;font-size:11px;box-shadow:0 1px 3px rgba(28,33,38,.1);">面接の日程候補をお送りします📅</div>
+                  </div>
+                  <div class="rm-image" style="border-radius:0;">
+                    <div class="rm-image-deco" style="width:150px;height:150px;top:-50px;right:5%;"></div>
+                    <div class="rm-image-deco" style="width:170px;height:170px;bottom:-70px;left:-40px;"></div>
+                    <div class="rm-image" style="position:absolute;inset:0;background:linear-gradient(135deg,#1C2126 0%,#4A3A55 50%,#6B4C7A 100%);"></div>
+                    <div class="rm-image-brand">ENGINEER RECRUITING</div>
+                    <div class="rm-tap-grid" style="grid-template-columns:repeat(3,1fr);grid-template-rows:repeat(2,1fr);">
+                      <div class="rm-tap" style="border-right:none;border-top:none;border-left:none;"><span class="rm-tap-icon">🏠</span><span class="rm-tap-label">企業HP</span></div>
+                      <div class="rm-tap" style="border-top:none;"><span class="rm-tap-icon">📋</span><span class="rm-tap-label">マイページ</span></div>
+                      <div class="rm-tap" style="border-right:none;border-top:none;background:rgba(255,255,255,0.08);"><span class="rm-tap-icon">💻</span><span class="rm-tap-label">技術説明会</span></div>
+                      <div class="rm-tap" style="border-right:none;border-bottom:none;border-left:none;background:rgba(255,255,255,0.08);"><span class="rm-tap-icon">🛠️</span><span class="rm-tap-label">技術ブログ</span></div>
+                      <div class="rm-tap" style="border-bottom:none;"><span class="rm-tap-icon">❓</span><span class="rm-tap-label">よくある質問</span></div>
+                      <div class="rm-tap" style="border-right:none;border-bottom:none;"><span class="rm-tap-icon">📝</span><span class="rm-tap-label">アンケート</span></div>
+                    </div>
                   </div>
                 </div>
-                <div style="font-size:11px;color:#666;text-align:center;margin-top:8px;">対象：理系・エンジニアタグ保有者（44名）</div>
+                <div style="font-size:11px;color:#5B6670;text-align:center;margin-top:8px;">対象：理系・エンジニアタグ保有者（44名）・トーク画面下部に常時表示</div>
               </div>
             </div>
           </div>
         </div>
       </div>
 
+    </div>
+
+    <!-- ⑪.5 LINE自動化シナリオ -->
+    <div id="page-automation" class="page">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+
+        <div class="card">
+          <div class="card-title">あいさつメッセージ（友だち追加時）</div>
+          <div style="font-size:11.5px;color:#7E8891;margin-bottom:10px;">学生がLINE友だちに追加した直後、自動で1回だけ送信されます</div>
+          <textarea id="greeting-text" rows="4" style="margin-bottom:12px;">友だち追加ありがとうございます！🎉
+フジアルテ採用担当です。
+このあとすぐ、簡単な登録フォームへご案内します。</textarea>
+          <button class="btn btn-primary btn-sm" onclick="document.getElementById('greeting-preview-text').textContent = document.getElementById('greeting-text').value;">保存してプレビュー更新</button>
+
+          <div style="margin-top:16px;background:#9DC8AE;border-radius:10px;padding:14px;">
+            <div style="background:#fff;border-radius:12px;border-bottom-left-radius:2px;padding:10px 14px;font-size:12px;max-width:220px;box-shadow:0 1px 3px rgba(28,33,38,.1);white-space:pre-wrap;line-height:1.6;" id="greeting-preview-text">友だち追加ありがとうございます！🎉
+フジアルテ採用担当です。
+このあとすぐ、簡単な登録フォームへご案内します。</div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-title">登録完了後の自動アクション（シナリオ）</div>
+          <div style="font-size:11.5px;color:#7E8891;margin-bottom:4px;">トリガー</div>
+          <div style="display:inline-block;background:#E6EEF1;color:#2E6480;font-size:12px;font-weight:700;border-radius:6px;padding:6px 12px;margin-bottom:14px;">📋 簡易登録フォーム 送信完了</div>
+
+          <div id="scenario-steps"></div>
+
+          <button class="btn btn-secondary btn-sm" onclick="addScenarioStep()">＋ ステップ追加</button>
+          <div style="font-size:10.5px;color:#94A0A8;margin-top:10px;">遅延実行にはバックエンドのジョブキュー／スケジューラが必要です（FR125）</div>
+        </div>
+
+      </div>
     </div>
 
     <!-- ⑫ Settings -->
@@ -1896,12 +2184,12 @@
         <div class="card">
           <div class="card-title">選考ステップ設定</div>
           <div style="font-size:13px;line-height:2.5;">
-            <div style="display:flex;align-items:center;gap:8px;">1. エントリー <span style="color:#ccc;font-size:11px;">— 変更不可</span></div>
+            <div style="display:flex;align-items:center;gap:8px;">1. エントリー <span style="color:#C3CBD0;font-size:11px;">— 変更不可</span></div>
             <div style="display:flex;align-items:center;gap:8px;">2. 説明会予約 <button class="btn btn-secondary btn-sm">編集</button></div>
             <div style="display:flex;align-items:center;gap:8px;">3. 1次面接 <button class="btn btn-secondary btn-sm">編集</button></div>
             <div style="display:flex;align-items:center;gap:8px;">4. 最終面接 <button class="btn btn-secondary btn-sm">編集</button></div>
-            <div style="display:flex;align-items:center;gap:8px;">5. 内定 <span style="color:#ccc;font-size:11px;">— 変更不可</span></div>
-            <div style="display:flex;align-items:center;gap:8px;">6. 承諾 <span style="color:#ccc;font-size:11px;">— 変更不可</span></div>
+            <div style="display:flex;align-items:center;gap:8px;">5. 内定 <span style="color:#C3CBD0;font-size:11px;">— 変更不可</span></div>
+            <div style="display:flex;align-items:center;gap:8px;">6. 承諾 <span style="color:#C3CBD0;font-size:11px;">— 変更不可</span></div>
           </div>
           <button class="btn btn-secondary btn-sm" style="margin-top:8px;">＋ ステップ追加</button>
         </div>
@@ -1911,6 +2199,16 @@
           <div class="form-row"><label>Channel Secret</label><input type="text" value="•••••••••••••••••"></div>
           <div class="form-row"><label>LIFF ID（マイページ）</label><input type="text" value="1234567890-AbCdEfGh"></div>
           <button class="btn btn-primary btn-sm">保存</button>
+        </div>
+        <div class="card">
+          <div class="card-title">LIFFアプリ プレビュー</div>
+          <div style="font-size:11.5px;color:#7E8891;margin-bottom:10px;">学生側に実際に表示される画面を確認できます</div>
+          <div style="display:flex;flex-direction:column;gap:6px;">
+            <a href="liff-wireframe.html#onboard" target="_blank" style="display:flex;align-items:center;gap:8px;padding:8px 10px;border:1px solid #D9E0E3;border-radius:5px;text-decoration:none;color:#1C2126;font-size:12px;">📱 友だち追加〜初回登録 <span style="margin-left:auto;color:#A9B3BA;">↗</span></a>
+            <a href="liff-wireframe.html#mypage" target="_blank" style="display:flex;align-items:center;gap:8px;padding:8px 10px;border:1px solid #D9E0E3;border-radius:5px;text-decoration:none;color:#1C2126;font-size:12px;">📋 マイページ <span style="margin-left:auto;color:#A9B3BA;">↗</span></a>
+            <a href="liff-wireframe.html#seminar" target="_blank" style="display:flex;align-items:center;gap:8px;padding:8px 10px;border:1px solid #D9E0E3;border-radius:5px;text-decoration:none;color:#1C2126;font-size:12px;">📅 説明会予約 <span style="margin-left:auto;color:#A9B3BA;">↗</span></a>
+            <a href="liff-wireframe.html#survey" target="_blank" style="display:flex;align-items:center;gap:8px;padding:8px 10px;border:1px solid #D9E0E3;border-radius:5px;text-decoration:none;color:#1C2126;font-size:12px;">📝 アンケート <span style="margin-left:auto;color:#A9B3BA;">↗</span></a>
+          </div>
         </div>
       </div>
     </div>
@@ -1930,6 +2228,7 @@ const pageTitles = {
   'line-send': 'LINEメッセージ送信',
   'survey': 'アンケート管理',
   'richmenu': 'LINEリッチメニュー',
+  'automation': '自動化シナリオ',
   'documents': '書類管理',
   'analytics': '分析・レポート',
   'media': '媒体・QR管理',
@@ -1950,11 +2249,11 @@ function showPage(name) {
 }
 
 const mediaData = {
-  mynavi:  { label:'マイナビ', color:'#e53935', entries:157, stages:[157,122,84,44,22,18], rates:['—','78%','69%','52%','50%','82%'], applicants:[['田中 一郎','早稲田大','内定','11/10'],['佐藤 花子','東京大','1次面接済','—'],['中村 翔太','大阪大','説明会予約','—']] },
-  rikunabi:{ label:'リクナビ', color:'#1565c0', entries:97,  stages:[97,71,46,24,11,8],   rates:['—','73%','65%','52%','46%','73%'], applicants:[['林 奈々','名古屋大','内定','11/5'],['小林 直人','明治大','エントリー','—']] },
-  offerbox:{ label:'OfferBox', color:'#e65100', entries:42,  stages:[42,38,31,18,6,6],    rates:['—','90%','82%','58%','33%','100%'],applicants:[['伊藤 美咲','大阪大','承諾','済']] },
-  rekatsu: { label:'Re就活',  color:'#6a1b9a', entries:21,  stages:[21,14,9,6,2,1],      rates:['—','67%','64%','67%','33%','50%'], applicants:[['渡辺 拓也','北海道大','辞退','—']] },
-  qr:      { label:'学校QR',  color:'#e91e63', entries:31,  stages:[31,26,20,10,1,1],    rates:['—','84%','77%','50%','10%','100%'],applicants:[['山口 沙織','東京工大','エントリー','—']] },
+  mynavi:  { label:'マイナビ', color:'#9C3F2E', entries:157, stages:[157,122,84,44,22,18], rates:['—','78%','69%','52%','50%','82%'], applicants:[['田中 一郎','早稲田大','内定','11/10'],['佐藤 花子','東京大','1次面接済','—'],['中村 翔太','大阪大','説明会予約','—']] },
+  rikunabi:{ label:'リクナビ', color:'#3E7490', entries:97,  stages:[97,71,46,24,11,8],   rates:['—','73%','65%','52%','46%','73%'], applicants:[['林 奈々','名古屋大','内定','11/5'],['小林 直人','明治大','エントリー','—']] },
+  offerbox:{ label:'OfferBox', color:'#9C5A1D', entries:42,  stages:[42,38,31,18,6,6],    rates:['—','90%','82%','58%','33%','100%'],applicants:[['伊藤 美咲','大阪大','承諾','済']] },
+  rekatsu: { label:'Re就活',  color:'#6B4C7A', entries:21,  stages:[21,14,9,6,2,1],      rates:['—','67%','64%','67%','33%','50%'], applicants:[['渡辺 拓也','北海道大','辞退','—']] },
+  qr:      { label:'学校QR',  color:'#3E7D7A', entries:31,  stages:[31,26,20,10,1,1],    rates:['—','84%','77%','50%','10%','100%'],applicants:[['山口 沙織','東京工大','エントリー','—']] },
 };
 const stageNames = ['エントリー','説明会','1次面接','最終面接','内定','承諾'];
 const statusClass = s => s==='内定'?'status-offer':s==='承諾'?'status-accept':s==='辞退'?'status-ng':s.includes('面接')?'status-done':'status-entry';
@@ -1964,6 +2263,404 @@ function showRmEditor(idx) {
   document.getElementById('rm-list-view').style.display = 'none';
   document.getElementById('rm-edit-view').style.display = '';
   document.getElementById('rm-edit-title').textContent = (idx === -1 ? '新規メニュー作成' : titles[idx] + ' を編集');
+  renderRmLinkTable();
+}
+
+// 登録済みLIFFアプリ一覧（liff-wireframe.htmlの各画面に対応）
+const liffApps = [
+  { key: 'onboard', label: '友だち追加〜初回登録' },
+  { key: 'mypage',  label: 'マイページ' },
+  { key: 'seminar', label: '説明会予約' },
+  { key: 'survey',  label: 'アンケート' },
+];
+
+// 登録済みリッチメニュー一覧（「リッチメニュー切り替え」アクションの切替先候補）
+const richMenuList = ['デフォルトメニュー', '総合職メニュー', 'エンジニア職メニュー', '内定者メニュー'];
+
+// LINEのリッチメニューで設定できるアクション種別
+const rmActionTypes = [
+  { key: 'url',         label: '外部URL' },
+  { key: 'liff',        label: 'LIFF' },
+  { key: 'message',     label: 'メッセージ送信' },
+  { key: 'postback',    label: 'ポストバック' },
+  { key: 'datetime',    label: '日時選択' },
+  { key: 'richmenu',    label: 'リッチメニュー切り替え' },
+];
+
+// タップ領域の初期データ（エンジニア職メニューの例）
+const rmLinkRows = [
+  { icon: '🏠',   label: '企業HP',       type: 'url',      url: 'https://example.com' },
+  { icon: '📋',   label: 'マイページ',   type: 'liff',     liff: 'mypage' },
+  { icon: '💻',   label: '技術説明会',   type: 'liff',     liff: 'seminar' },
+  { icon: '🛠️', label: '技術ブログ',   type: 'url',      url: 'https://blog.example.com' },
+  { icon: '❓',   label: 'よくある質問', type: 'message',  message: 'よくある質問について教えて' },
+  { icon: '📝',   label: 'アンケート',   type: 'liff',     liff: 'survey' },
+];
+
+function renderRmLinkTable() {
+  const tbody = document.getElementById('rm-link-table');
+  if (!tbody || tbody.dataset.rendered) return; // 編集のたびに再構築して入力値を失わないようにする
+  tbody.dataset.rendered = '1';
+  const typeOptions = rmActionTypes.map(t => `<option value="${t.key}">${t.label}</option>`).join('');
+  tbody.innerHTML = rmLinkRows.map((row, i) => {
+    const n = i + 1;
+    return `<tr>
+      <td style="font-size:11px;color:#7E8891;">${n}</td>
+      <td><input type="text" value="${row.icon}" style="width:44px;text-align:center;"></td>
+      <td><input type="text" value="${row.label}" style="width:80px;"></td>
+      <td class="link-field">
+        <select id="type-select-${n}" onchange="setLinkType(${n}, this.value)">${typeOptions}</select>
+      </td>
+      <td class="link-field" id="value-cell-${n}"></td>
+      <td id="preview-cell-${n}"></td>
+    </tr>`;
+  }).join('');
+  rmLinkRows.forEach((row, i) => {
+    const n = i + 1;
+    document.getElementById('type-select-' + n).value = row.type;
+    renderRmValueCell(n, row.type, row);
+  });
+}
+
+// タイプごとに「リンク先」欄の中身を作る（タイプ変更時は入力中のデータを引き継がない簡易モックのため、
+// そのタイプの代表的な初期値を都度セットする）
+function rmValueCellHtml(n, type, row) {
+  row = row || {};
+  switch (type) {
+    case 'url':
+      return `<input type="text" id="val-${n}" value="${row.url || 'https://'}" placeholder="https://...">`;
+    case 'liff': {
+      const opts = liffApps.map(a => `<option value="${a.key}">${a.label}</option>`).join('');
+      return `<select id="val-${n}" onchange="updatePreviewCell(${n})">${opts}</select>`;
+    }
+    case 'message':
+      return `<input type="text" id="val-${n}" value="${row.message || ''}" placeholder="送信するメッセージ">`;
+    case 'postback':
+      return `<input type="text" id="val-${n}" value="${row.postback || 'action=contact_request'}" placeholder="data=...">`;
+    case 'datetime':
+      return `<input type="text" id="val-${n}" value="${row.postback || 'action=select_interview_date'}" placeholder="data=...">`;
+    case 'richmenu': {
+      const opts = richMenuList.map(m => `<option>${m}</option>`).join('');
+      return `<select id="val-${n}" onchange="updatePreviewCell(${n})">${opts}</select>`;
+    }
+    default:
+      return '';
+  }
+}
+
+function renderRmValueCell(n, type, row) {
+  document.getElementById('value-cell-' + n).innerHTML = rmValueCellHtml(n, type, row);
+  if (type === 'liff' && row && row.liff) document.getElementById('val-' + n).value = row.liff;
+  if (type === 'richmenu' && row && row.richmenu) document.getElementById('val-' + n).value = row.richmenu;
+  updatePreviewCell(n);
+}
+
+function setLinkType(n, type) {
+  renderRmValueCell(n, type);
+}
+
+function updatePreviewCell(n) {
+  const type = document.getElementById('type-select-' + n).value;
+  const cell = document.getElementById('preview-cell-' + n);
+  const val = document.getElementById('val-' + n);
+  if (type === 'liff') {
+    cell.innerHTML = `<a href="liff-wireframe.html#${val.value}" target="_blank" class="btn btn-secondary btn-sm" style="text-decoration:none;white-space:nowrap;">👁 プレビュー</a>`;
+  } else if (type === 'richmenu') {
+    cell.innerHTML = `<span style="font-size:10.5px;color:#94A0A8;white-space:nowrap;">↳ 切替先</span>`;
+  } else if (type === 'message') {
+    cell.innerHTML = `<span style="font-size:10.5px;color:#94A0A8;white-space:nowrap;">💬 自動応答と連動</span>`;
+  } else if (type === 'postback' || type === 'datetime') {
+    cell.innerHTML = `<span style="font-size:10.5px;color:#94A0A8;white-space:nowrap;">⚙️ サーバー処理</span>`;
+  } else {
+    cell.innerHTML = '';
+  }
+}
+
+// ===== 自動化シナリオ（登録完了後のステップ） =====
+const scenarioDelays = ['即時', '1時間後', '1日後', '3日後', '7日後'];
+const scenarioStepTypes = [
+  { key: 'message',  label: 'メッセージ送信' },
+  { key: 'survey',   label: 'アンケート送信' },
+  { key: 'tag',      label: 'タグ付与' },
+  { key: 'richmenu', label: 'リッチメニュー切り替え' },
+];
+const scenarioTagOptions = ['マイナビ', 'リクナビ', '関東', '理系', '内定者'];
+
+let scenarioSteps = [
+  { delay: '即時',   type: 'message',  value: 'ご登録ありがとうございます！ご不明点があればこちらからどうぞ😊' },
+  { delay: '1日後',  type: 'survey',   value: 'survey' },
+  { delay: '3日後',  type: 'richmenu', value: '総合職メニュー' },
+];
+
+function scenarioContentHtml(i, type, value) {
+  switch (type) {
+    case 'message':
+      return `<input type="text" class="content-field" id="scenario-val-${i}" value="${value || ''}" placeholder="送信するメッセージ">`;
+    case 'survey': {
+      const opts = liffApps.filter(a => a.key === 'survey' || a.key === 'seminar').map(a => `<option value="${a.key}">${a.label}</option>`).join('');
+      return `<select class="content-field" id="scenario-val-${i}">${opts}</select>
+              <a href="liff-wireframe.html#${value || 'survey'}" target="_blank" class="btn btn-secondary btn-sm" style="text-decoration:none;white-space:nowrap;margin-left:6px;">👁</a>`;
+    }
+    case 'tag': {
+      const opts = scenarioTagOptions.map(t => `<option ${t===value?'selected':''}>${t}</option>`).join('');
+      return `<select class="content-field" id="scenario-val-${i}">${opts}</select>`;
+    }
+    case 'richmenu': {
+      const opts = richMenuList.map(m => `<option ${m===value?'selected':''}>${m}</option>`).join('');
+      return `<select class="content-field" id="scenario-val-${i}">${opts}</select>`;
+    }
+    default:
+      return '';
+  }
+}
+
+function renderScenarioStepsOnce() {
+  const wrap = document.getElementById('scenario-steps');
+  if (!wrap || wrap.dataset.rendered) return;
+  wrap.dataset.rendered = '1';
+  renderScenarioSteps();
+}
+
+function renderScenarioSteps() {
+  const wrap = document.getElementById('scenario-steps');
+  if (!wrap) return;
+  const typeOptions = scenarioStepTypes.map(t => `<option value="${t.key}">${t.label}</option>`).join('');
+  wrap.innerHTML = scenarioSteps.map((step, i) => {
+    const delayOptions = scenarioDelays.map(d => `<option ${d===step.delay?'selected':''}>${d}</option>`).join('');
+    const connector = i > 0 ? '<div class="scenario-connector"></div>' : '';
+    return `${connector}<div class="scenario-step">
+      <div class="scenario-step-row">
+        <select class="delay-select" onchange="scenarioSteps[${i}].delay=this.value">${delayOptions}</select>
+        <span style="color:#A9B3BA;font-size:11px;">→</span>
+        <select class="type-select" onchange="changeScenarioStepType(${i}, this.value)">${typeOptions}</select>
+        <span id="scenario-content-${i}" style="display:flex;align-items:center;flex:1;">${scenarioContentHtml(i, step.type, step.value)}</span>
+        <button type="button" class="scenario-step-remove" onclick="removeScenarioStep(${i})">✕ 削除</button>
+      </div>
+    </div>`;
+  }).join('');
+  scenarioSteps.forEach((step, i) => {
+    document.querySelectorAll('.scenario-step .type-select')[i].value = step.type;
+  });
+}
+
+function changeScenarioStepType(i, type) {
+  scenarioSteps[i].type = type;
+  scenarioSteps[i].value = '';
+  document.getElementById('scenario-content-' + i).innerHTML = scenarioContentHtml(i, type, '');
+}
+
+function addScenarioStep() {
+  scenarioSteps.push({ delay: '1日後', type: 'message', value: '' });
+  renderScenarioSteps();
+}
+
+function removeScenarioStep(i) {
+  scenarioSteps.splice(i, 1);
+  renderScenarioSteps();
+}
+
+// ===== LINE送信：アンケート回答状況での絞り込み =====
+function updateLsAudience() {
+  const select = document.getElementById('ls-survey-select');
+  const opt = select.options[select.selectedIndex];
+  const unansweredRow = document.getElementById('ls-unanswered-row');
+  const unansweredOnly = document.getElementById('ls-unanswered-only').checked;
+  const summary = document.getElementById('ls-audience-summary');
+  const sendBtn = document.getElementById('ls-send-btn');
+
+  if (!opt.value) {
+    unansweredRow.style.opacity = '0.4';
+    document.getElementById('ls-unanswered-only').disabled = true;
+    summary.innerHTML = '対象：<strong style="color:#2E6480;">47名</strong>（LINE連携済み）';
+    sendBtn.textContent = '47名に送信する';
+    return;
+  }
+  unansweredRow.style.opacity = '1';
+  document.getElementById('ls-unanswered-only').disabled = false;
+
+  const sent = Number(opt.dataset.sent);
+  const answered = Number(opt.dataset.answered);
+  const count = unansweredOnly ? (sent - answered) : sent;
+  const label = unansweredOnly ? `「${opt.value}」未回答者` : `「${opt.value}」送信対象者`;
+  summary.innerHTML = `対象：<strong style="color:#2E6480;">${count}名</strong>（${label}）`;
+  sendBtn.textContent = `${count}名に送信する`;
+}
+
+// アンケート画面の「未回答者にリマインド」から遷移してきた場合、
+// そのアンケート・未回答条件を自動で選択した状態でLINE送信画面を開く
+function remindNonRespondents(surveyName) {
+  showPage('line-send');
+  const select = document.getElementById('ls-survey-select');
+  select.value = surveyName;
+  document.getElementById('ls-unanswered-only').checked = true;
+  document.getElementById('ls-message-type').value = 'アンケート添付';
+  const opt = select.options[select.selectedIndex];
+  const remaining = Number(opt.dataset.sent) - Number(opt.dataset.answered);
+  document.getElementById('ls-message-body').value =
+    `{氏名}さん、お世話になっております。\n\n「${surveyName}」にまだご回答いただいていないようでしたので、ご連絡いたしました。\nお手すきの際にご回答いただけますと幸いです。`;
+  updateLsAudience();
+}
+
+// ===== アンケート作成・編集 =====
+// 選択肢は question_type = radio / checkbox / text / rating（SurveyQuestionテーブルのENUMに合わせる）
+const surveyQuestionTypeLabels = { radio: '単一選択', checkbox: '複数選択', text: '自由記述', rating: '評価（点数）' };
+const surveyTitles = ['内定者アンケート', '説明会満足度アンケート', '志望動機確認アンケート', '新規アンケート'];
+const defaultSurveyQuestions = () => [
+  { type: 'radio',    text: '説明会の満足度を教えてください', choices: ['とても満足', '満足', 'どちらとも言えない', '不満'] },
+  { type: 'checkbox', text: '興味のある職種（複数選択可）', choices: ['機械設計', '回路設計', '生産技術', '品質管理'] },
+  { type: 'rating',   text: '入社意欲を10点満点でお聞かせください', scale: 10 },
+  { type: 'text',     text: 'ご意見・ご感想（任意）' },
+];
+let surveyQuestions = defaultSurveyQuestions();
+
+function showSurveyEditor(idx) {
+  document.getElementById('survey-list-view').style.display = 'none';
+  document.getElementById('survey-edit-view').style.display = '';
+  document.getElementById('survey-edit-title').textContent = (idx === -1 ? '新規アンケート作成' : surveyTitles[idx] + ' を編集');
+  document.getElementById('survey-name-input').value = (idx === -1 ? '' : surveyTitles[idx]);
+  surveyQuestions = idx === -1 ? [{ type: 'radio', text: '', choices: ['選択肢1', '選択肢2'] }] : defaultSurveyQuestions();
+  renderSurveyQuestions();
+}
+
+function surveyQuestionHtml(i, q) {
+  let bodyHtml = '';
+  if (q.type === 'radio' || q.type === 'checkbox') {
+    bodyHtml = `
+    <div style="margin-top:8px;display:flex;flex-direction:column;gap:6px;">
+      ${q.choices.map((c, ci) => `
+        <div style="display:flex;gap:6px;align-items:center;">
+          <span style="font-size:11px;color:#94A0A8;width:14px;">${q.type === 'radio' ? '○' : '☐'}</span>
+          <input type="text" value="${c}" style="flex:1;font-size:12px;" onchange="surveyQuestions[${i}].choices[${ci}]=this.value">
+          <button type="button" onclick="removeSurveyChoice(${i},${ci})" style="border:none;background:none;color:#B3493C;cursor:pointer;font-size:11px;">✕</button>
+        </div>`).join('')}
+      <button type="button" class="btn btn-secondary btn-sm" style="align-self:flex-start;" onclick="addSurveyChoice(${i})">＋ 選択肢追加</button>
+    </div>`;
+  } else if (q.type === 'rating') {
+    bodyHtml = `
+    <div style="margin-top:8px;display:flex;align-items:center;gap:8px;font-size:12px;color:#4A535C;">
+      評価の範囲：1 〜
+      <select style="width:70px;" onchange="surveyQuestions[${i}].scale=Number(this.value)">
+        <option value="5" ${q.scale===5?'selected':''}>5</option>
+        <option value="10" ${q.scale===10?'selected':''}>10</option>
+      </select>
+      点（平均値を集計結果に表示）
+    </div>`;
+  }
+  return `<div class="card" style="padding:14px;margin-bottom:0;">
+    <div style="display:flex;gap:8px;align-items:center;">
+      <select style="width:110px;" onchange="changeSurveyQuestionType(${i}, this.value)">
+        ${Object.entries(surveyQuestionTypeLabels).map(([k, label]) => `<option value="${k}" ${q.type===k?'selected':''}>${label}</option>`).join('')}
+      </select>
+      <input type="text" value="${q.text}" style="flex:1;font-size:13px;font-weight:600;" placeholder="質問文を入力" onchange="surveyQuestions[${i}].text=this.value">
+      <button type="button" onclick="removeSurveyQuestion(${i})" style="border:none;background:none;color:#B3493C;cursor:pointer;font-size:11px;white-space:nowrap;">✕ 削除</button>
+    </div>
+    ${bodyHtml}
+  </div>`;
+}
+
+function renderSurveyQuestions() {
+  document.getElementById('survey-questions').innerHTML = surveyQuestions.map((q, i) => surveyQuestionHtml(i, q)).join('');
+}
+
+function changeSurveyQuestionType(i, type) {
+  const q = surveyQuestions[i];
+  q.type = type;
+  if ((type === 'radio' || type === 'checkbox') && !q.choices) q.choices = ['選択肢1', '選択肢2'];
+  if (type === 'rating' && !q.scale) q.scale = 10;
+  renderSurveyQuestions();
+}
+
+function addSurveyQuestion() {
+  surveyQuestions.push({ type: 'radio', text: '', choices: ['選択肢1', '選択肢2'] });
+  renderSurveyQuestions();
+}
+
+function removeSurveyQuestion(i) {
+  surveyQuestions.splice(i, 1);
+  renderSurveyQuestions();
+}
+
+function addSurveyChoice(i) {
+  surveyQuestions[i].choices.push(`選択肢${surveyQuestions[i].choices.length + 1}`);
+  renderSurveyQuestions();
+}
+
+function removeSurveyChoice(i, ci) {
+  surveyQuestions[i].choices.splice(ci, 1);
+  renderSurveyQuestions();
+}
+
+// ===== カレンダー：枠の一括登録（FR098） =====
+const slotTypeMeta = {
+  interview: { label: '面接', eventClass: '', defaultText: '面接枠' },
+  seminar:   { label: '説明会', eventClass: 'line-event', defaultText: '説明会' },
+  agent:     { label: 'エージェント枠', eventClass: 'agent-event', defaultText: 'エージェント面談' },
+};
+const slotDayLabels = { '28': '10/28(月)', '29': '10/29(火)', '30': '10/30(水)', '31': '10/31(木)', '1': '11/1(金)' };
+
+function openSlotModal() {
+  document.getElementById('slot-modal-overlay').style.display = 'flex';
+  document.querySelectorAll('.slot-day, .slot-time').forEach(cb => cb.checked = false);
+  updateSlotPreview();
+}
+
+function closeSlotModal() {
+  document.getElementById('slot-modal-overlay').style.display = 'none';
+}
+
+function getSelectedSlotDays() { return Array.from(document.querySelectorAll('.slot-day:checked')).map(cb => cb.value); }
+function getSelectedSlotTimes() { return Array.from(document.querySelectorAll('.slot-time:checked')).map(cb => cb.value); }
+
+function updateSlotPreview() {
+  const type = document.getElementById('slot-type').value;
+  document.getElementById('slot-capacity-row').style.display = type === 'interview' ? 'none' : '';
+  const days = getSelectedSlotDays();
+  const times = getSelectedSlotTimes();
+  const preview = document.getElementById('slot-preview');
+  if (days.length === 0 || times.length === 0) {
+    preview.textContent = '日付・時間帯を選択してください';
+    return;
+  }
+  const count = days.length * times.length;
+  preview.innerHTML = `${slotTypeMeta[type].label}を、<strong>${days.length}日 × ${times.length}時間帯 = ${count}枠</strong>作成します`;
+}
+
+function submitSlotCreation() {
+  const type = document.getElementById('slot-type').value;
+  const days = getSelectedSlotDays();
+  const times = getSelectedSlotTimes();
+  if (days.length === 0 || times.length === 0) { alert('日付と時間帯を1つ以上選択してください'); return; }
+
+  const meta = slotTypeMeta[type];
+  const capacity = document.getElementById('slot-capacity').value;
+  let created = 0;
+  days.forEach(day => {
+    times.forEach(time => {
+      const cell = document.querySelector(`.cal-cell[data-day="${day}"][data-time="${time}"]`);
+      if (!cell || cell.querySelector('.cal-event')) return; // 既存枠がある場合はスキップ（ダブルブッキング防止）
+      const ev = document.createElement('div');
+      ev.className = 'cal-event' + (meta.eventClass ? ' ' + meta.eventClass : '');
+      ev.innerHTML = type === 'interview' ? `${meta.defaultText}<br>空き` : `${meta.defaultText}<br>定員${capacity}名`;
+      cell.appendChild(ev);
+      created++;
+    });
+  });
+
+  closeSlotModal();
+  const banner = document.getElementById('cal-confirm-banner');
+  banner.style.display = 'block';
+  banner.textContent = `✅ ${meta.label}を${created}件作成しました（ガルーンへ同期中…）` + (created < days.length * times.length ? '　※既に枠がある日時はスキップしました' : '');
+}
+
+function sendSurveyFromEditor() {
+  const name = document.getElementById('survey-name-input').value || '新規アンケート';
+  showPage('line-send');
+  document.getElementById('ls-survey-select').value = '';
+  document.getElementById('ls-unanswered-only').checked = false;
+  document.getElementById('ls-message-type').value = 'アンケート添付';
+  document.getElementById('ls-message-body').value =
+    `{氏名}さん、お世話になっております。\n\n「${name}」にご協力いただけますと幸いです。\nお手すきの際にご回答をお願いいたします。`;
+  updateLsAudience();
 }
 
 function selectMedia(el, key) {
@@ -1981,7 +2678,7 @@ function selectMedia(el, key) {
   });
   document.getElementById('media-detail-funnel').innerHTML = funnel;
   let rows = d.applicants.map(([name,school,status,deadline]) =>
-    `<tr><td>${name}</td><td style="font-size:11px;">${school}</td><td><span class="status ${statusClass(status)}">${status}</span></td><td style="font-size:11px;color:#888;">${deadline}</td></tr>`
+    `<tr><td>${name}</td><td style="font-size:11px;">${school}</td><td><span class="status ${statusClass(status)}">${status}</span></td><td style="font-size:11px;color:#7E8891;">${deadline}</td></tr>`
   ).join('');
   document.getElementById('media-detail-table').innerHTML = rows;
   all.style.display='none'; detail.style.display='';
@@ -2005,9 +2702,9 @@ function switchStudentTab(el, tabId) {
 function switchHireType(el, type) {
   el.closest('div').querySelectorAll('button').forEach(b => {
     b.style.background = 'transparent';
-    b.style.color = '#888';
+    b.style.color = '#7E8891';
   });
-  el.style.background = '#7c83fd';
+  el.style.background = '#2E6480';
   el.style.color = '#fff';
   const labels = { all: '※ 全採用区分を表示中', new_grad: '※ 新卒採用のみ表示中', mid_career: '※ 中途採用のみ表示中' };
   document.getElementById('hire-type-label').textContent = labels[type] || '';
