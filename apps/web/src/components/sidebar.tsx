@@ -16,14 +16,14 @@ type NavSection = {
   items: NavItem[];
 };
 
-// index.html のサイドバー構成に対応。STEP 0/1(認証・マスターデータ)で
-// 実装済みのものだけ href を持ち、それ以外は準備中として非活性表示にする。
+// index.html のサイドバー構成に対応。実装済みのものだけ href を持ち、
+// それ以外は準備中として非活性表示にする。
 const SECTIONS: NavSection[] = [
   {
     label: "メイン",
     items: [
       { href: "/", icon: "📊", label: "ダッシュボード" },
-      { icon: "👥", label: "応募者一覧" },
+      { href: "/applicants", icon: "👥", label: "応募者一覧" },
       { icon: "🔄", label: "選考管理" },
       { icon: "📅", label: "カレンダー" },
     ],
