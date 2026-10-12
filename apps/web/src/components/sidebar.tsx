@@ -24,7 +24,8 @@ const SECTIONS: NavSection[] = [
     items: [
       { href: "/", icon: "📊", label: "ダッシュボード" },
       { href: "/applicants", icon: "👥", label: "応募者一覧" },
-      { icon: "🔄", label: "選考管理" },
+      { href: "/selections", icon: "🔄", label: "選考管理" },
+      { href: "/interviews", icon: "📋", label: "面接" },
       { icon: "📅", label: "カレンダー" },
     ],
   },
