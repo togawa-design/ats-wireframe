@@ -62,10 +62,15 @@ model Staff {
   created_at           DateTime            @default(now())
   updated_at           DateTime            @updatedAt
 
-  sessions              StaffSession[]
-  audit_logs            AuditLog[]
-  tags                  Tag[]
-  tagged_applicant_tags ApplicantTag[]
+  sessions                       StaffSession[]
+  audit_logs                     AuditLog[]
+  tags                           Tag[]
+  tagged_applicant_tags          ApplicantTag[]
+  assigned_selections            Selection[]          @relation("SelectionAssignee")
+  selection_history_changes      SelectionHistory[]   @relation("SelectionHistoryChangedBy")
+  interviews_conducted           Interview[]          @relation("InterviewInterviewer")
+  evaluation_templates_created   EvaluationTemplate[] @relation("EvaluationTemplateCreator")
+  evaluation_responses_submitted EvaluationResponse[] @relation("EvaluationResponseSubmitter")
 
   @@index([email], map: "staff_email_idx")
   @@index([google_id], map: "staff_google_id_idx")
@@ -185,7 +190,8 @@ model SelectionFlow {
   is_default Boolean
   is_active  Boolean
 
-  stages SelectionStage[]
+  stages     SelectionStage[]
+  selections Selection[]
 }
 
 /// 選考ステージ定義。
@@ -196,7 +202,12 @@ model SelectionStage {
   order      Int       @db.SmallInt
   stage_type StageType
 
-  flow SelectionFlow @relation(fields: [flow_id], references: [id])
+  flow                 SelectionFlow        @relation(fields: [flow_id], references: [id])
+  current_for          Selection[]          @relation("SelectionCurrentStage")
+  history_from         SelectionHistory[]   @relation("SelectionHistoryFromStage")
+  history_to           SelectionHistory[]   @relation("SelectionHistoryToStage")
+  interviews           Interview[]          @relation("InterviewStage")
+  evaluation_templates EvaluationTemplate[] @relation("EvaluationTemplateStage")
 }
 
 // ===== STEP 2: 応募者コア =====
@@ -267,6 +278,7 @@ model Applicant {
   primary_source ApplicantSource?        @relation("ApplicantPrimarySource", fields: [primary_source_id], references: [id])
   tags           ApplicantTag[]
   line_tokens    LineRegistrationToken[]
+  selection      Selection?
 
   @@index([email], map: "applicant_email_idx")
   @@index([sf_contact_id], map: "applicant_sf_idx")
@@ -311,4 +323,127 @@ model LineRegistrationToken {
   created_at   DateTime  @default(now())
 
   applicant Applicant @relation(fields: [applicant_id], references: [id])
+}
+
+// ===== STEP 3: 選考管理 =====
+
+enum SelectionResult {
+  pending
+  passed
+  failed
+  withdrawn
+  offer_declined
+
+  @@map("selection_result")
+}
+
+enum EvaluationItemType {
+  score5
+  score10
+  text
+  checkbox
+
+  @@map("evaluation_item_type")
+}
+
+/// 個人選考記録テーブル。
+model Selection {
+  id               String          @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  applicant_id     String          @unique @db.Uuid
+  flow_id          String          @db.Uuid
+  current_stage_id String          @db.Uuid
+  result           SelectionResult @default(pending)
+  assigned_to      String?         @db.Uuid
+
+  applicant     Applicant          @relation(fields: [applicant_id], references: [id], onDelete: Cascade)
+  flow          SelectionFlow      @relation(fields: [flow_id], references: [id])
+  current_stage SelectionStage     @relation("SelectionCurrentStage", fields: [current_stage_id], references: [id])
+  assignee      Staff?             @relation("SelectionAssignee", fields: [assigned_to], references: [id])
+  history       SelectionHistory[]
+  interviews    Interview[]
+
+  @@index([current_stage_id], map: "selection_stage_idx")
+  @@index([result], map: "selection_result_idx")
+}
+
+/// 選考履歴ログ(追記のみ)。
+model SelectionHistory {
+  id             String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  selection_id   String   @db.Uuid
+  from_stage_id  String?  @db.Uuid
+  to_stage_id    String   @db.Uuid
+  changed_at     DateTime @default(now())
+  changed_by     String   @db.Uuid
+  note           String?
+  decline_reason String?
+
+  selection  Selection       @relation(fields: [selection_id], references: [id], onDelete: Cascade)
+  from_stage SelectionStage? @relation("SelectionHistoryFromStage", fields: [from_stage_id], references: [id])
+  to_stage   SelectionStage  @relation("SelectionHistoryToStage", fields: [to_stage_id], references: [id])
+  staff      Staff           @relation("SelectionHistoryChangedBy", fields: [changed_by], references: [id])
+}
+
+/// 面接記録テーブル。
+model Interview {
+  id                     String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  selection_id           String   @db.Uuid
+  stage_id               String   @db.Uuid
+  interviewer_id         String   @db.Uuid
+  // CalendarSlotテーブルは未実装(roadmap.html STEP5以降で追加予定)のため、
+  // 今はFK制約を張らずスカラーとして保持する。
+  calendar_slot_id       String?  @db.Uuid
+  scheduled_at           DateTime
+  score                  Int?     @db.SmallInt
+  notes                  String?
+  garoon_event_id        String?  @db.VarChar(100)
+  is_evaluation_complete Boolean  @default(false)
+
+  selection            Selection            @relation(fields: [selection_id], references: [id], onDelete: Cascade)
+  stage                SelectionStage       @relation("InterviewStage", fields: [stage_id], references: [id])
+  interviewer          Staff                @relation("InterviewInterviewer", fields: [interviewer_id], references: [id])
+  evaluation_responses EvaluationResponse[]
+}
+
+/// 評価シートテンプレート。
+model EvaluationTemplate {
+  id         String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name       String   @db.VarChar(100)
+  stage_id   String?  @db.Uuid
+  is_active  Boolean  @default(true)
+  created_by String   @db.Uuid
+  created_at DateTime @default(now())
+
+  stage   SelectionStage?  @relation("EvaluationTemplateStage", fields: [stage_id], references: [id])
+  creator Staff            @relation("EvaluationTemplateCreator", fields: [created_by], references: [id])
+  items   EvaluationItem[]
+}
+
+/// 評価項目テーブル。
+model EvaluationItem {
+  id          String             @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  template_id String             @db.Uuid
+  question    String             @db.VarChar(200)
+  item_type   EvaluationItemType
+  sort_order  Int                @db.SmallInt
+  created_at  DateTime           @default(now())
+
+  template  EvaluationTemplate   @relation(fields: [template_id], references: [id], onDelete: Cascade)
+  responses EvaluationResponse[]
+}
+
+/// 評価回答テーブル(面接担当者の評価入力結果)。
+model EvaluationResponse {
+  id           String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  interview_id String   @db.Uuid
+  item_id      String   @db.Uuid
+  score        Int?     @db.SmallInt
+  answer_text  String?
+  submitted_by String   @db.Uuid
+  submitted_at DateTime @default(now())
+
+  interview Interview      @relation(fields: [interview_id], references: [id], onDelete: Cascade)
+  item      EvaluationItem @relation(fields: [item_id], references: [id])
+  submitter Staff          @relation("EvaluationResponseSubmitter", fields: [submitted_by], references: [id])
+
+  @@unique([interview_id, item_id], map: "eval_resp_interview_idx")
 }

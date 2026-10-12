@@ -45,7 +45,23 @@ export async function createApplicant(formData: FormData) {
     });
   }
 
+  // 応募登録と同時に、デフォルト選考フローの最初のステージでSelectionを作成する。
+  const defaultFlow = await prisma.selectionFlow.findFirst({
+    where: { is_default: true, is_active: true },
+    include: { stages: { orderBy: { order: "asc" }, take: 1 } },
+  });
+  if (defaultFlow && defaultFlow.stages[0]) {
+    await prisma.selection.create({
+      data: {
+        applicant_id: applicant.id,
+        flow_id: defaultFlow.id,
+        current_stage_id: defaultFlow.stages[0].id,
+      },
+    });
+  }
+
   revalidatePath("/applicants");
+  revalidatePath("/selections");
 }
 
 export async function deleteApplicant(id: string) {

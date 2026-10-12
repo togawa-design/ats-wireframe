@@ -89,6 +89,35 @@ describe("createApplicant", () => {
   });
 });
 
+describe("createApplicant (Selection自動作成)", () => {
+  it("デフォルト選考フローがあれば、その最初のステージでSelectionを作成する", async () => {
+    vi.mocked(getCurrentStaff).mockResolvedValue(mockStaff);
+    prismaMock.applicant.create.mockResolvedValue({ id: "applicant-1" } as never);
+    prismaMock.selectionFlow.findFirst.mockResolvedValue({
+      id: "flow-1",
+      stages: [{ id: "stage-1" }],
+    } as never);
+    const form = buildForm({ last_name: "山田", first_name: "太郎", email: "a@example.com" });
+
+    await createApplicant(form);
+
+    expect(prismaMock.selection.create).toHaveBeenCalledWith({
+      data: { applicant_id: "applicant-1", flow_id: "flow-1", current_stage_id: "stage-1" },
+    });
+  });
+
+  it("デフォルト選考フローがなければSelectionを作成しない", async () => {
+    vi.mocked(getCurrentStaff).mockResolvedValue(mockStaff);
+    prismaMock.applicant.create.mockResolvedValue({ id: "applicant-1" } as never);
+    prismaMock.selectionFlow.findFirst.mockResolvedValue(null);
+    const form = buildForm({ last_name: "山田", first_name: "太郎", email: "a@example.com" });
+
+    await createApplicant(form);
+
+    expect(prismaMock.selection.create).not.toHaveBeenCalled();
+  });
+});
+
 describe("deleteApplicant", () => {
   it("未ログインなら例外を投げる", async () => {
     vi.mocked(getCurrentStaff).mockResolvedValue(null);
