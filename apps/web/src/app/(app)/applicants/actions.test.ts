@@ -1,0 +1,104 @@
+import { describe, expect, it, vi } from "vitest";
+import { mockDeep, type DeepMockProxy } from "vitest-mock-extended";
+import type { PrismaClient } from "@/generated/prisma/client";
+import { prisma } from "@/lib/prisma";
+import { getCurrentStaff } from "@/lib/auth";
+import { createApplicant, deleteApplicant } from "./actions";
+
+vi.mock("@/lib/prisma", () => ({
+  prisma: mockDeep<PrismaClient>(),
+}));
+vi.mock("@/lib/auth", () => ({
+  getCurrentStaff: vi.fn(),
+}));
+vi.mock("next/cache", () => ({ revalidatePath: vi.fn() }));
+
+const prismaMock = prisma as unknown as DeepMockProxy<PrismaClient>;
+const mockStaff = { id: "staff-1", name: "テスト太郎" } as never;
+
+function buildForm(fields: Record<string, string | string[]>) {
+  const form = new FormData();
+  for (const [key, value] of Object.entries(fields)) {
+    if (Array.isArray(value)) {
+      value.forEach((v) => form.append(key, v));
+    } else {
+      form.set(key, value);
+    }
+  }
+  return form;
+}
+
+describe("createApplicant", () => {
+  it("未ログインなら例外を投げる", async () => {
+    vi.mocked(getCurrentStaff).mockResolvedValue(null);
+    const form = buildForm({ last_name: "山田", first_name: "太郎", email: "a@example.com" });
+
+    await expect(createApplicant(form)).rejects.toThrow("ログインが必要です");
+    expect(prismaMock.applicant.create).not.toHaveBeenCalled();
+  });
+
+  it("氏名が空なら例外を投げる", async () => {
+    vi.mocked(getCurrentStaff).mockResolvedValue(mockStaff);
+    const form = buildForm({ last_name: "", first_name: "", email: "a@example.com" });
+
+    await expect(createApplicant(form)).rejects.toThrow("氏名を入力してください");
+  });
+
+  it("メールアドレスが空なら例外を投げる", async () => {
+    vi.mocked(getCurrentStaff).mockResolvedValue(mockStaff);
+    const form = buildForm({ last_name: "山田", first_name: "太郎", email: "" });
+
+    await expect(createApplicant(form)).rejects.toThrow("メールアドレスを入力してください");
+  });
+
+  it("有効な入力で応募者を作成し、タグも紐付ける", async () => {
+    vi.mocked(getCurrentStaff).mockResolvedValue(mockStaff);
+    prismaMock.applicant.create.mockResolvedValue({ id: "applicant-1" } as never);
+    const form = buildForm({
+      last_name: "山田",
+      first_name: "太郎",
+      email: "a@example.com",
+      school_id: "school-1",
+      graduation_year: "2027",
+      applicant_type: "new_grad",
+      hire_type: "new_grad",
+      position_type: "sogo",
+      tag_ids: ["tag-1", "tag-2"],
+    });
+
+    await createApplicant(form);
+
+    expect(prismaMock.applicant.create).toHaveBeenCalledWith({
+      data: {
+        last_name: "山田",
+        first_name: "太郎",
+        email: "a@example.com",
+        school_id: "school-1",
+        graduation_year: 2027,
+        applicant_type: "new_grad",
+        hire_type: "new_grad",
+        position_type: "sogo",
+      },
+    });
+    expect(prismaMock.applicantTag.createMany).toHaveBeenCalledWith({
+      data: [
+        { applicant_id: "applicant-1", tag_id: "tag-1", tagged_by: "staff-1" },
+        { applicant_id: "applicant-1", tag_id: "tag-2", tagged_by: "staff-1" },
+      ],
+    });
+  });
+});
+
+describe("deleteApplicant", () => {
+  it("未ログインなら例外を投げる", async () => {
+    vi.mocked(getCurrentStaff).mockResolvedValue(null);
+    await expect(deleteApplicant("applicant-1")).rejects.toThrow("ログインが必要です");
+    expect(prismaMock.applicant.delete).not.toHaveBeenCalled();
+  });
+
+  it("ログイン済みなら指定IDの応募者を削除する", async () => {
+    vi.mocked(getCurrentStaff).mockResolvedValue(mockStaff);
+    await deleteApplicant("applicant-1");
+    expect(prismaMock.applicant.delete).toHaveBeenCalledWith({ where: { id: "applicant-1" } });
+  });
+});
