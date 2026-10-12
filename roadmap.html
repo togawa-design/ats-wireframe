@@ -4,25 +4,28 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>ATS 開発ロードマップ</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@400;500;700;900&family=IBM+Plex+Mono:wght@500;600;700&display=swap" rel="stylesheet">
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
-  body { font-family: -apple-system, BlinkMacSystemFont, 'Hiragino Sans', sans-serif; background: #f0f2f5; color: #1a1a2e; display:flex; flex-direction:column; min-height:100vh; }
+  body { font-family: 'Zen Kaku Gothic New', 'Hiragino Sans', -apple-system, BlinkMacSystemFont, sans-serif; background: #E9EDEF; color: #1C2126; display:flex; flex-direction:column; min-height:100vh; }
   .page { max-width: 1100px; margin: 0 auto; padding: 32px 24px; width:100%; }
   h1 { font-size: 22px; font-weight: 700; margin-bottom: 4px; }
-  h2 { font-size: 15px; font-weight: 700; color: #1a1a2e; margin-bottom: 14px; padding-left: 12px; border-left: 4px solid #7c83fd; }
-  h3 { font-size: 13px; font-weight: 700; color: #444; margin-bottom: 8px; }
-  .meta { font-size: 12px; color: #999; margin-bottom: 28px; display:flex; gap:16px; }
-  .section { background: #fff; border-radius: 12px; padding: 22px 24px; margin-bottom: 20px; box-shadow: 0 1px 4px rgba(0,0,0,.06); }
+  h2 { font-size: 15px; font-weight: 700; color: #1C2126; margin-bottom: 14px; padding-left: 12px; border-left: 4px solid #2E6480; }
+  h3 { font-size: 13px; font-weight: 700; color: #3C444C; margin-bottom: 8px; }
+  .meta { font-size: 12px; color: #94A0A8; margin-bottom: 28px; display:flex; gap:16px; }
+  .section { background: #fff; border-radius: 12px; padding: 22px 24px; margin-bottom: 20px; border:1px solid #D9E0E3; }
 
   /* Tabs */
-  .tabs { display:flex; gap:0; border-bottom:2px solid #e8eaf0; margin-bottom:22px; flex-wrap:wrap; }
-  .tab { padding:10px 18px; font-size:13px; cursor:pointer; color:#888; border-bottom:2px solid transparent; margin-bottom:-2px; transition:all .15s; white-space:nowrap; }
-  .tab.active { color:#7c83fd; border-bottom-color:#7c83fd; font-weight:600; }
+  .tabs { display:flex; gap:0; border-bottom:2px solid #D9E0E3; margin-bottom:22px; flex-wrap:wrap; }
+  .tab { padding:10px 18px; font-size:13px; cursor:pointer; color:#7E8891; border-bottom:2px solid transparent; margin-bottom:-2px; transition:all .15s; white-space:nowrap; }
+  .tab.active { color:#2E6480; border-bottom-color:#2E6480; font-weight:600; }
   .tab-content { display:none; }
   .tab-content.active { display:block; }
 
   /* Phase cards */
-  .phase-card { border-radius: 12px; overflow: hidden; margin-bottom: 16px; box-shadow: 0 1px 4px rgba(0,0,0,.06); }
+  .phase-card { border-radius: 12px; overflow: hidden; margin-bottom: 16px; border:1px solid #D9E0E3; }
   .phase-header { padding: 14px 20px; display: flex; align-items: center; gap: 12px; }
   .phase-badge { font-size: 11px; font-weight: 700; border-radius: 12px; padding: 3px 12px; white-space: nowrap; }
   .phase-title { font-size: 16px; font-weight: 700; color: #fff; }
@@ -32,17 +35,17 @@
 
   /* Feature grid */
   .feat-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 14px; }
-  .feat-item { background: #f8f9fc; border-radius: 8px; padding: 10px 12px; font-size: 12px; border-left: 3px solid #ddd; }
-  .feat-item.core { border-left-color: #ff6b6b; }
-  .feat-item.important { border-left-color: #ff9800; }
-  .feat-item.nice { border-left-color: #9e9e9e; }
+  .feat-item { background: #F2F5F6; border-radius: 8px; padding: 10px 12px; font-size: 12px; border-left: 3px solid #ddd; }
+  .feat-item.core { border-left-color: #B3493C; }
+  .feat-item.important { border-left-color: #C9862A; }
+  .feat-item.nice { border-left-color: #8A959C; }
   .feat-name { font-weight: 600; margin-bottom: 3px; }
-  .feat-note { font-size: 11px; color: #888; line-height: 1.4; }
+  .feat-note { font-size: 11px; color: #7E8891; line-height: 1.4; }
 
   /* Table */
   table { width:100%; border-collapse:collapse; font-size:13px; }
-  th { background:#f8f9fc; padding:9px 12px; text-align:left; font-weight:600; color:#555; font-size:12px; border-bottom:1px solid #e8eaf0; }
-  td { padding:10px 12px; border-bottom:1px solid #f0f2f5; vertical-align:top; line-height:1.6; }
+  th { background:#F2F5F6; padding:9px 12px; text-align:left; font-weight:600; color:#4A535C; font-size:12px; border-bottom:1px solid #D9E0E3; }
+  td { padding:10px 12px; border-bottom:1px solid #E9EDEF; vertical-align:top; line-height:1.6; }
   tr:last-child td { border-bottom:none; }
 
   /* Data build order */
@@ -50,29 +53,29 @@
   .db-phase-title { font-size: 13px; font-weight: 700; padding: 6px 14px; border-radius: 6px; margin-bottom: 10px; display: inline-block; }
   .table-grid { display: flex; flex-wrap: wrap; gap: 8px; }
   .table-card { border-radius: 8px; padding: 8px 14px; font-size: 12px; font-weight: 600; display: flex; align-items: center; gap: 6px; }
-  .dep-arrow { font-size: 11px; color: #aaa; padding: 0 4px; align-self: center; }
+  .dep-arrow { font-size: 11px; color: #A9B3BA; padding: 0 4px; align-self: center; }
 
   /* Dependency lines */
   .dep-section { margin-top: 16px; }
   .dep-row { display: flex; align-items: center; gap: 6px; margin-bottom: 6px; font-size: 12px; flex-wrap: wrap; }
-  .dep-from { background: #e8eaf0; border-radius: 4px; padding: 2px 8px; font-weight: 600; color: #555; }
-  .dep-to { background: #7c83fd; color: #fff; border-radius: 4px; padding: 2px 8px; font-weight: 600; }
-  .dep-reason { color: #888; font-size: 11px; }
+  .dep-from { background: #D9E0E3; border-radius: 4px; padding: 2px 8px; font-weight: 600; color: #4A535C; }
+  .dep-to { background: #2E6480; color: #fff; border-radius: 4px; padding: 2px 8px; font-weight: 600; }
+  .dep-reason { color: #7E8891; font-size: 11px; }
 
   /* Badge */
   .badge { display:inline-block; padding:2px 8px; border-radius:10px; font-size:10px; font-weight:700; white-space:nowrap; }
-  .badge-must { background:#ff6b6b; color:#fff; }
-  .badge-should { background:#ff9800; color:#fff; }
-  .badge-could { background:#9e9e9e; color:#fff; }
-  .badge-new { background:#7c83fd; color:#fff; }
+  .badge-must { background:#B3493C; color:#fff; }
+  .badge-should { background:#C9862A; color:#fff; }
+  .badge-could { background:#8A959C; color:#fff; }
+  .badge-new { background:#2E6480; color:#fff; }
 
   /* Info box */
-  .info-box { background:#f0f0ff; border:1px solid #c5cae9; border-radius:8px; padding:10px 14px; font-size:12px; color:#3949ab; }
-  .warn-box { background:#fff8e1; border:1px solid #ffcc80; border-radius:8px; padding:10px 14px; font-size:12px; color:#e65100; }
+  .info-box { background:#E6EEF1; border:1px solid #C3CBD0; border-radius:8px; padding:10px 14px; font-size:12px; color:#1B3F52; }
+  .warn-box { background:#F3E8D6; border:1px solid #C9862A; border-radius:8px; padding:10px 14px; font-size:12px; color:#9C5A1D; }
 
   /* Gantt-like timeline */
   .timeline-row { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
-  .timeline-label { width: 160px; font-size: 12px; color: #555; flex-shrink: 0; text-align: right; }
+  .timeline-label { width: 160px; font-size: 12px; color: #4A535C; flex-shrink: 0; text-align: right; }
   .timeline-bar-wrap { flex: 1; display: flex; gap: 2px; }
   .timeline-bar { height: 24px; border-radius: 4px; display: flex; align-items: center; padding: 0 8px; font-size: 10px; color: #fff; font-weight: 600; }
 
@@ -83,17 +86,18 @@
 <body>
 
 <!-- Global Nav -->
-<div style="background:#1a1a2e;height:40px;display:flex;align-items:center;padding:0 20px;gap:24px;font-size:12px;flex-shrink:0;">
-  <span style="color:#7c83fd;font-weight:700;letter-spacing:0.5px;">ATS設計ドキュメント</span>
-  <a href="index.html"        style="color:#aaa;text-decoration:none;opacity:.7;">🖥 ワイヤーフレーム</a>
-  <a href="requirements.html" style="color:#aaa;text-decoration:none;opacity:.7;">📋 要件定義書</a>
-  <a href="dataflow.html"     style="color:#aaa;text-decoration:none;opacity:.7;">🔀 データフロー設計</a>
-  <a href="roadmap.html"      style="color:#fff;text-decoration:none;border-bottom:2px solid #7c83fd;padding-bottom:2px;">🗺️ ロードマップ</a>
-  <a href="screen-spec.html"  style="color:#aaa;text-decoration:none;opacity:.7;">📐 画面仕様書</a>
-  <a href="table-spec.html"   style="color:#aaa;text-decoration:none;opacity:.7;">🗃️ テーブル定義書</a>
-  <a href="integration-spec.html" style="color:#aaa;text-decoration:none;opacity:.7;">🔌 外部連携仕様書</a>
-  <a href="architecture.html"    style="color:#aaa;text-decoration:none;opacity:.7;">🏗️ アーキテクチャ</a>
-  <a href="agency-wireframe.html" style="color:#aaa;text-decoration:none;opacity:.7;">🤝 エージェントWF</a>
+<div style="background:#1C2126;height:40px;display:flex;align-items:center;padding:0 20px;gap:24px;font-size:12px;flex-shrink:0;">
+  <span style="color:#2E6480;font-weight:700;letter-spacing:0.5px;">ATS設計ドキュメント</span>
+  <a href="index.html"        style="color:#A9B3BA;text-decoration:none;opacity:.7;">🖥 ワイヤーフレーム</a>
+  <a href="requirements.html" style="color:#A9B3BA;text-decoration:none;opacity:.7;">📋 要件定義書</a>
+  <a href="dataflow.html"     style="color:#A9B3BA;text-decoration:none;opacity:.7;">🔀 データフロー設計</a>
+  <a href="roadmap.html"      style="color:#fff;text-decoration:none;border-bottom:2px solid #2E6480;padding-bottom:2px;">🗺️ ロードマップ</a>
+  <a href="screen-spec.html"  style="color:#A9B3BA;text-decoration:none;opacity:.7;">📐 画面仕様書</a>
+  <a href="table-spec.html"   style="color:#A9B3BA;text-decoration:none;opacity:.7;">🗃️ テーブル定義書</a>
+  <a href="integration-spec.html" style="color:#A9B3BA;text-decoration:none;opacity:.7;">🔌 外部連携仕様書</a>
+  <a href="architecture.html"    style="color:#A9B3BA;text-decoration:none;opacity:.7;">🏗️ アーキテクチャ</a>
+  <a href="agency-wireframe.html" style="color:#A9B3BA;text-decoration:none;opacity:.7;">🤝 エージェントWF</a>
+  <a href="liff-wireframe.html" style="color:#A9B3BA;text-decoration:none;opacity:.7;white-space:nowrap;">📱 LIFF画面WF</a>
 </div>
 
 <div class="page">
@@ -102,29 +106,29 @@
     <span>v0.2</span>
     <span>2026-06-04</span>
     <span>要件定義フェーズ</span>
-    <span style="background:#7c83fd;color:#fff;border-radius:10px;padding:2px 10px;font-weight:700;">総開発期間：3ヶ月</span>
-    <span style="background:#1a1a2e;color:#7c83fd;border-radius:10px;padding:2px 10px;font-weight:700;">🤖 AI駆動開発</span>
+    <span style="background:#2E6480;color:#fff;border-radius:10px;padding:2px 10px;font-weight:700;">総開発期間：3ヶ月</span>
+    <span style="background:#1C2126;color:#2E6480;border-radius:10px;padding:2px 10px;font-weight:700;">🤖 AI駆動開発</span>
   </div>
 
   <!-- AI駆動開発の前提 -->
-  <div style="background:#1a1a2e;border-radius:12px;padding:20px 24px;margin-bottom:20px;display:grid;grid-template-columns:1fr 1fr 1fr;gap:20px;">
+  <div style="background:#1C2126;border-radius:12px;padding:20px 24px;margin-bottom:20px;display:grid;grid-template-columns:1fr 1fr 1fr;gap:20px;">
     <div>
-      <div style="font-size:11px;color:#7c83fd;font-weight:700;margin-bottom:6px;">🤖 AI駆動開発とは</div>
-      <div style="font-size:12px;color:#ccc;line-height:1.8;">
+      <div style="font-size:11px;color:#2E6480;font-weight:700;margin-bottom:6px;">🤖 AI駆動開発とは</div>
+      <div style="font-size:12px;color:#C3CBD0;line-height:1.8;">
         Claude Code / GitHub Copilot 等のAIツールを積極活用し、コード生成・設計・レビューをAI補助で進める。通常開発比 <strong style="color:#fff;">1.5〜2倍</strong>のスピードを想定。
       </div>
     </div>
     <div>
-      <div style="font-size:11px;color:#7c83fd;font-weight:700;margin-bottom:6px;">⚡ 3ヶ月でできること</div>
-      <div style="font-size:12px;color:#ccc;line-height:1.8;">
+      <div style="font-size:11px;color:#2E6480;font-weight:700;margin-bottom:6px;">⚡ 3ヶ月でできること</div>
+      <div style="font-size:12px;color:#C3CBD0;line-height:1.8;">
         <div>Month 1：基盤 + MVP中核機能</div>
         <div>Month 2：MVP完成 + テスト + リリース</div>
         <div>Month 3：Phase2 主要機能</div>
       </div>
     </div>
     <div>
-      <div style="font-size:11px;color:#7c83fd;font-weight:700;margin-bottom:6px;">⚠️ AI駆動開発の留意点</div>
-      <div style="font-size:12px;color:#ccc;line-height:1.8;">
+      <div style="font-size:11px;color:#2E6480;font-weight:700;margin-bottom:6px;">⚠️ AI駆動開発の留意点</div>
+      <div style="font-size:12px;color:#C3CBD0;line-height:1.8;">
         外部API連携（LINE / SF / Google）は仕様確認が必要なため、AIだけでは進められない。確認事項（U-xx）の早期解決が全体スピードに直結する。
       </div>
     </div>
@@ -144,7 +148,7 @@
 
     <!-- MVP -->
     <div class="phase-card">
-      <div class="phase-header" style="background:linear-gradient(135deg,#e53935,#c62828);">
+      <div class="phase-header" style="background:linear-gradient(135deg,#9C3F2E,#8C352A);">
         <div>
           <div style="display:flex;align-items:center;gap:8px;">
             <div class="phase-title">MVP（最小構成）</div>
@@ -172,7 +176,7 @@
 
     <!-- Phase 2 -->
     <div class="phase-card">
-      <div class="phase-header" style="background:linear-gradient(135deg,#1976d2,#1565c0);">
+      <div class="phase-header" style="background:linear-gradient(135deg,#1976d2,#3E7490);">
         <div>
           <div style="display:flex;align-items:center;gap:8px;">
             <div class="phase-title">Phase 2（機能強化）</div>
@@ -208,7 +212,7 @@
 
     <!-- Phase 3 -->
     <div class="phase-card">
-      <div class="phase-header" style="background:linear-gradient(135deg,#388e3c,#2e7d32);">
+      <div class="phase-header" style="background:linear-gradient(135deg,#3C6E52,#2F5A42);">
         <div>
           <div style="display:flex;align-items:center;gap:8px;">
             <div class="phase-title">Phase 3（高度化・自動化）</div>
@@ -243,14 +247,14 @@
           <table>
             <thead><tr><th>機能ID</th><th>機能</th><th>理由</th></tr></thead>
             <tbody>
-              <tr><td class="fr-id" style="font-family:monospace;font-size:11px;color:#7c83fd;">FR085</td><td style="font-size:12px;">Google OAuth認証</td><td style="font-size:11px;color:#888;">ログイン基盤。最初に必要</td></tr>
-              <tr><td class="fr-id" style="font-family:monospace;font-size:11px;color:#7c83fd;">FR086</td><td style="font-size:12px;">RBAC（4権限）</td><td style="font-size:11px;color:#888;">複数人利用のため必須</td></tr>
-              <tr><td class="fr-id" style="font-family:monospace;font-size:11px;color:#7c83fd;">FR001-005</td><td style="font-size:12px;">学生管理</td><td style="font-size:11px;color:#888;">中核機能</td></tr>
-              <tr><td class="fr-id" style="font-family:monospace;font-size:11px;color:#7c83fd;">FR030-033</td><td style="font-size:12px;">LINE基本連携</td><td style="font-size:11px;color:#888;">コミュニケーション基盤</td></tr>
-              <tr><td class="fr-id" style="font-family:monospace;font-size:11px;color:#7c83fd;">FR010-012</td><td style="font-size:12px;">選考管理（1フロー）</td><td style="font-size:11px;color:#888;">複数フローはPhase2</td></tr>
-              <tr><td class="fr-id" style="font-family:monospace;font-size:11px;color:#7c83fd;">FR040-041</td><td style="font-size:12px;">媒体CSV取込+QR</td><td style="font-size:11px;color:#888;">APIはPhase2〜3</td></tr>
-              <tr><td class="fr-id" style="font-family:monospace;font-size:11px;color:#7c83fd;">FR050-053</td><td style="font-size:12px;">基本分析・エクスポート</td><td style="font-size:11px;color:#888;">最低限の可視化</td></tr>
-              <tr><td class="fr-id" style="font-family:monospace;font-size:11px;color:#7c83fd;">FR087</td><td style="font-size:12px;">ユーザー管理</td><td style="font-size:11px;color:#888;">複数人運用のため必要</td></tr>
+              <tr><td class="fr-id" style="font-family:'IBM Plex Mono','SF Mono',monospace;font-size:11px;color:#2E6480;">FR085</td><td style="font-size:12px;">Google OAuth認証</td><td style="font-size:11px;color:#7E8891;">ログイン基盤。最初に必要</td></tr>
+              <tr><td class="fr-id" style="font-family:'IBM Plex Mono','SF Mono',monospace;font-size:11px;color:#2E6480;">FR086</td><td style="font-size:12px;">RBAC（4権限）</td><td style="font-size:11px;color:#7E8891;">複数人利用のため必須</td></tr>
+              <tr><td class="fr-id" style="font-family:'IBM Plex Mono','SF Mono',monospace;font-size:11px;color:#2E6480;">FR001-005</td><td style="font-size:12px;">学生管理</td><td style="font-size:11px;color:#7E8891;">中核機能</td></tr>
+              <tr><td class="fr-id" style="font-family:'IBM Plex Mono','SF Mono',monospace;font-size:11px;color:#2E6480;">FR030-033</td><td style="font-size:12px;">LINE基本連携</td><td style="font-size:11px;color:#7E8891;">コミュニケーション基盤</td></tr>
+              <tr><td class="fr-id" style="font-family:'IBM Plex Mono','SF Mono',monospace;font-size:11px;color:#2E6480;">FR010-012</td><td style="font-size:12px;">選考管理（1フロー）</td><td style="font-size:11px;color:#7E8891;">複数フローはPhase2</td></tr>
+              <tr><td class="fr-id" style="font-family:'IBM Plex Mono','SF Mono',monospace;font-size:11px;color:#2E6480;">FR040-041</td><td style="font-size:12px;">媒体CSV取込+QR</td><td style="font-size:11px;color:#7E8891;">APIはPhase2〜3</td></tr>
+              <tr><td class="fr-id" style="font-family:'IBM Plex Mono','SF Mono',monospace;font-size:11px;color:#2E6480;">FR050-053</td><td style="font-size:12px;">基本分析・エクスポート</td><td style="font-size:11px;color:#7E8891;">最低限の可視化</td></tr>
+              <tr><td class="fr-id" style="font-family:'IBM Plex Mono','SF Mono',monospace;font-size:11px;color:#2E6480;">FR087</td><td style="font-size:12px;">ユーザー管理</td><td style="font-size:11px;color:#7E8891;">複数人運用のため必要</td></tr>
             </tbody>
           </table>
         </div>
@@ -259,12 +263,12 @@
           <table>
             <thead><tr><th>機能</th><th>除外理由</th><th>Phase</th></tr></thead>
             <tbody>
-              <tr><td style="font-size:12px;">複数選考フロー</td><td style="font-size:11px;color:#888;">1フローで動くのを確認してから</td><td style="font-size:11px;color:#7c83fd;">Phase2</td></tr>
-              <tr><td style="font-size:12px;">Salesforce連携</td><td style="font-size:11px;color:#888;">SF側の設計調整が必要</td><td style="font-size:11px;color:#7c83fd;">Phase2</td></tr>
-              <tr><td style="font-size:12px;">ガルーン双方向同期</td><td style="font-size:11px;color:#888;">一方向はPhase2で実装。双方向は仕様調整が必要</td><td style="font-size:11px;color:#4caf50;">Phase3</td></tr>
-              <tr><td style="font-size:12px;">書類出力（PDF）</td><td style="font-size:11px;color:#888;">テンプレート設計が必要</td><td style="font-size:11px;color:#7c83fd;">Phase2</td></tr>
-              <tr><td style="font-size:12px;">監査ログ</td><td style="font-size:11px;color:#888;">StaffSession基盤があれば後追い可</td><td style="font-size:11px;color:#7c83fd;">Phase2</td></tr>
-              <tr><td style="font-size:12px;">辞退リスクスコア</td><td style="font-size:11px;color:#888;">データが溜まってから</td><td style="font-size:11px;color:#4caf50;">Phase3</td></tr>
+              <tr><td style="font-size:12px;">複数選考フロー</td><td style="font-size:11px;color:#7E8891;">1フローで動くのを確認してから</td><td style="font-size:11px;color:#2E6480;">Phase2</td></tr>
+              <tr><td style="font-size:12px;">Salesforce連携</td><td style="font-size:11px;color:#7E8891;">SF側の設計調整が必要</td><td style="font-size:11px;color:#2E6480;">Phase2</td></tr>
+              <tr><td style="font-size:12px;">ガルーン双方向同期</td><td style="font-size:11px;color:#7E8891;">一方向はPhase2で実装。双方向は仕様調整が必要</td><td style="font-size:11px;color:#4C8C6B;">Phase3</td></tr>
+              <tr><td style="font-size:12px;">書類出力（PDF）</td><td style="font-size:11px;color:#7E8891;">テンプレート設計が必要</td><td style="font-size:11px;color:#2E6480;">Phase2</td></tr>
+              <tr><td style="font-size:12px;">監査ログ</td><td style="font-size:11px;color:#7E8891;">StaffSession基盤があれば後追い可</td><td style="font-size:11px;color:#2E6480;">Phase2</td></tr>
+              <tr><td style="font-size:12px;">辞退リスクスコア</td><td style="font-size:11px;color:#7E8891;">データが溜まってから</td><td style="font-size:11px;color:#4C8C6B;">Phase3</td></tr>
             </tbody>
           </table>
         </div>
@@ -284,49 +288,49 @@
         <thead><tr><th>機能</th><th>前提条件</th><th>工数感</th><th>優先度</th></tr></thead>
         <tbody>
           <tr>
-            <td><strong>複数選考フロー</strong><br><span style="font-size:11px;color:#888;">職種別・区分別フロー自由設計</span></td>
+            <td><strong>複数選考フロー</strong><br><span style="font-size:11px;color:#7E8891;">職種別・区分別フロー自由設計</span></td>
             <td style="font-size:12px;">MVP の選考管理が安定していること</td>
             <td style="font-size:12px;">中</td>
             <td><span class="badge badge-must">必須</span></td>
           </tr>
           <tr>
-            <td><strong>Salesforce連携</strong><br><span style="font-size:11px;color:#888;">承諾時自動登録・在籍同期</span></td>
+            <td><strong>Salesforce連携</strong><br><span style="font-size:11px;color:#7E8891;">承諾時自動登録・在籍同期</span></td>
             <td style="font-size:12px;">SF側のオブジェクト設計確定（U-SF）</td>
             <td style="font-size:12px;">大</td>
             <td><span class="badge badge-must">必須</span></td>
           </tr>
           <tr>
-            <td><strong>複数リッチメニュー</strong><br><span style="font-size:11px;color:#888;">タグ別自動割り当て</span></td>
+            <td><strong>複数リッチメニュー</strong><br><span style="font-size:11px;color:#7E8891;">タグ別自動割り当て</span></td>
             <td style="font-size:12px;">タグ体系が安定していること</td>
             <td style="font-size:12px;">小〜中</td>
             <td><span class="badge badge-must">必須</span></td>
           </tr>
           <tr>
-            <td><strong>LINEアンケート</strong><br><span style="font-size:11px;color:#888;">作成・送信・集計</span></td>
+            <td><strong>LINEアンケート</strong><br><span style="font-size:11px;color:#7E8891;">作成・送信・集計</span></td>
             <td style="font-size:12px;">LIFF基盤（MVP済み）</td>
             <td style="font-size:12px;">中</td>
             <td><span class="badge badge-should">推奨</span></td>
           </tr>
           <tr>
-            <td><strong>書類出力（PDF）</strong><br><span style="font-size:11px;color:#888;">テンプレートから一括生成</span></td>
+            <td><strong>書類出力（PDF）</strong><br><span style="font-size:11px;color:#7E8891;">テンプレートから一括生成</span></td>
             <td style="font-size:12px;">書類テンプレートの確定（U-10）</td>
             <td style="font-size:12px;">中</td>
             <td><span class="badge badge-should">推奨</span></td>
           </tr>
           <tr>
-            <td><strong>監査ログ</strong><br><span style="font-size:11px;color:#888;">操作証跡の記録・管理者閲覧</span></td>
+            <td><strong>監査ログ</strong><br><span style="font-size:11px;color:#7E8891;">操作証跡の記録・管理者閲覧</span></td>
             <td style="font-size:12px;">StaffSession（MVP済み）</td>
             <td style="font-size:12px;">小</td>
             <td><span class="badge badge-should">推奨</span></td>
           </tr>
           <tr>
-            <td><strong>面接カレンダー（ATS内）</strong><br><span style="font-size:11px;color:#888;">Google連携なし版。枠管理・予約</span></td>
+            <td><strong>面接カレンダー（ATS内）</strong><br><span style="font-size:11px;color:#7E8891;">Google連携なし版。枠管理・予約</span></td>
             <td style="font-size:12px;">なし</td>
             <td style="font-size:12px;">大</td>
             <td><span class="badge badge-should">推奨</span></td>
           </tr>
           <tr>
-            <td><strong>OfferBox / Re就活 CSV</strong><br><span style="font-size:11px;color:#888;">残り2媒体のCSV対応</span></td>
+            <td><strong>OfferBox / Re就活 CSV</strong><br><span style="font-size:11px;color:#7E8891;">残り2媒体のCSV対応</span></td>
             <td style="font-size:12px;">媒体のCSV仕様確認</td>
             <td style="font-size:12px;">小</td>
             <td><span class="badge badge-could">任意</span></td>
@@ -345,31 +349,31 @@
         <thead><tr><th>機能</th><th>前提条件</th><th>工数感</th><th>優先度</th></tr></thead>
         <tbody>
           <tr>
-            <td><strong>ガルーン連携拡張</strong><br><span style="font-size:11px;color:#888;">双方向同期・空き時間自動検出・面接確定→ガルーン自動登録</span></td>
+            <td><strong>ガルーン連携拡張</strong><br><span style="font-size:11px;color:#7E8891;">双方向同期・空き時間自動検出・面接確定→ガルーン自動登録</span></td>
             <td style="font-size:12px;">ガルーン REST API の書き込みスコープ確認が前提。Phase 2 の一方向同期が安定後</td>
             <td style="font-size:12px;">大</td>
             <td><span class="badge badge-should">推奨</span></td>
           </tr>
           <tr>
-            <td><strong>辞退リスクスコア</strong><br><span style="font-size:11px;color:#888;">入社意欲×LINE開封×アクセス頻度</span></td>
+            <td><strong>辞退リスクスコア</strong><br><span style="font-size:11px;color:#7E8891;">入社意欲×LINE開封×アクセス頻度</span></td>
             <td style="font-size:12px;">1シーズン分のデータが必要</td>
             <td style="font-size:12px;">中</td>
             <td><span class="badge badge-should">推奨</span></td>
           </tr>
           <tr>
-            <td><strong>採用目標達成予測</strong><br><span style="font-size:11px;color:#888;">現ファネルから最終承諾数予測</span></td>
+            <td><strong>採用目標達成予測</strong><br><span style="font-size:11px;color:#7E8891;">現ファネルから最終承諾数予測</span></td>
             <td style="font-size:12px;">複数シーズンのデータがあるほど精度向上</td>
             <td style="font-size:12px;">中</td>
             <td><span class="badge badge-should">推奨</span></td>
           </tr>
           <tr>
-            <td><strong>前年比較分析</strong><br><span style="font-size:11px;color:#888;">主要KPIの年度比較</span></td>
+            <td><strong>前年比較分析</strong><br><span style="font-size:11px;color:#7E8891;">主要KPIの年度比較</span></td>
             <td style="font-size:12px;">2シーズン目以降</td>
             <td style="font-size:12px;">小</td>
             <td><span class="badge badge-should">推奨</span></td>
           </tr>
           <tr>
-            <td><strong>媒体API連携</strong><br><span style="font-size:11px;color:#888;">CSV→APIへ移行</span></td>
+            <td><strong>媒体API連携</strong><br><span style="font-size:11px;color:#7E8891;">CSV→APIへ移行</span></td>
             <td style="font-size:12px;">各媒体とのパートナー契約</td>
             <td style="font-size:12px;">媒体ごとに異なる</td>
             <td><span class="badge badge-could">任意</span></td>
@@ -394,57 +398,57 @@
           <div class="table-card" style="background:#37474f;color:#fff;">👔 Staff</div>
           <div class="dep-arrow">他の全テーブルの created_by / assigned_to / changed_by が参照</div>
         </div>
-        <div style="font-size:11px;color:#888;margin-top:6px;padding-left:4px;">Staffがないとログイン不可。最初にスキーマと初期レコードを作成する。</div>
+        <div style="font-size:11px;color:#7E8891;margin-top:6px;padding-left:4px;">Staffがないとログイン不可。最初にスキーマと初期レコードを作成する。</div>
       </div>
 
       <!-- Step 1: マスターデータ -->
       <div class="db-phase">
-        <div class="db-phase-title" style="background:#e53935;color:#fff;">STEP 1 — マスターデータ（依存関係なし、何より先に作れる）</div>
+        <div class="db-phase-title" style="background:#9C3F2E;color:#fff;">STEP 1 — マスターデータ（依存関係なし、何より先に作れる）</div>
         <div class="table-grid">
-          <div class="table-card" style="background:#4caf50;color:#fff;">🏷️ Tag</div>
-          <div class="table-card" style="background:#4caf50;color:#fff;">🏫 School</div>
-          <div class="table-card" style="background:#4caf50;color:#fff;">📱 Media</div>
-          <div class="table-card" style="background:#4caf50;color:#fff;">📲 QRCode</div>
-          <div class="table-card" style="background:#4caf50;color:#fff;">🗂️ SelectionFlow</div>
-          <div class="table-card" style="background:#4caf50;color:#fff;">📌 SelectionStage</div>
+          <div class="table-card" style="background:#4C8C6B;color:#fff;">🏷️ Tag</div>
+          <div class="table-card" style="background:#4C8C6B;color:#fff;">🏫 School</div>
+          <div class="table-card" style="background:#4C8C6B;color:#fff;">📱 Media</div>
+          <div class="table-card" style="background:#4C8C6B;color:#fff;">📲 QRCode</div>
+          <div class="table-card" style="background:#4C8C6B;color:#fff;">🗂️ SelectionFlow</div>
+          <div class="table-card" style="background:#4C8C6B;color:#fff;">📌 SelectionStage</div>
         </div>
-        <div style="font-size:11px;color:#888;margin-top:6px;padding-left:4px;">これらはFKで他テーブルから参照される。Applicantより先に存在が必要。</div>
+        <div style="font-size:11px;color:#7E8891;margin-top:6px;padding-left:4px;">これらはFKで他テーブルから参照される。Applicantより先に存在が必要。</div>
       </div>
 
       <!-- Step 2: 応募者コア -->
       <div class="db-phase">
-        <div class="db-phase-title" style="background:#1565c0;color:#fff;">STEP 2 — 応募者コア（STEP 1 完了後）</div>
+        <div class="db-phase-title" style="background:#3E7490;color:#fff;">STEP 2 — 応募者コア（STEP 1 完了後）</div>
         <div class="table-grid">
-          <div class="table-card" style="background:#7c83fd;color:#fff;">👤 Applicant</div>
+          <div class="table-card" style="background:#2E6480;color:#fff;">👤 Applicant</div>
           <div class="dep-arrow">→ School, Staff を参照</div>
         </div>
         <div class="table-grid" style="margin-top:6px;">
-          <div class="table-card" style="background:#9c88fd;color:#fff;">📡 ApplicantSource</div>
+          <div class="table-card" style="background:#6FA0B5;color:#fff;">📡 ApplicantSource</div>
           <div class="dep-arrow">→ Applicant, Media, QRCode を参照</div>
         </div>
         <div class="table-grid" style="margin-top:6px;">
-          <div class="table-card" style="background:#9c88fd;color:#fff;">🔖 ApplicantTag</div>
+          <div class="table-card" style="background:#6FA0B5;color:#fff;">🔖 ApplicantTag</div>
           <div class="dep-arrow">→ Applicant, Tag を参照</div>
         </div>
         <div class="table-grid" style="margin-top:6px;">
-          <div class="table-card" style="background:#9c88fd;color:#fff;">🔗 LineRegistrationToken</div>
+          <div class="table-card" style="background:#6FA0B5;color:#fff;">🔗 LineRegistrationToken</div>
           <div class="dep-arrow">→ Applicant を参照</div>
         </div>
       </div>
 
       <!-- Step 3: 選考 -->
       <div class="db-phase">
-        <div class="db-phase-title" style="background:#e91e63;color:#fff;">STEP 3 — 選考管理（STEP 1・2 完了後）</div>
+        <div class="db-phase-title" style="background:#3E7D7A;color:#fff;">STEP 3 — 選考管理（STEP 1・2 完了後）</div>
         <div class="table-grid">
-          <div class="table-card" style="background:#e91e63;color:#fff;">🎯 Selection</div>
+          <div class="table-card" style="background:#3E7D7A;color:#fff;">🎯 Selection</div>
           <div class="dep-arrow">→ Applicant, SelectionFlow, SelectionStage, Staff を参照</div>
         </div>
         <div class="table-grid" style="margin-top:6px;">
-          <div class="table-card" style="background:#ad1457;color:#fff;">📜 SelectionHistory</div>
+          <div class="table-card" style="background:#A13D63;color:#fff;">📜 SelectionHistory</div>
           <div class="dep-arrow">→ Selection, SelectionStage, Staff を参照</div>
         </div>
         <div class="table-grid" style="margin-top:6px;">
-          <div class="table-card" style="background:#5c6bc0;color:#fff;">📋 Interview</div>
+          <div class="table-card" style="background:#3E7490;color:#fff;">📋 Interview</div>
           <div class="dep-arrow">→ Selection, SelectionStage, Staff を参照</div>
         </div>
       </div>
@@ -476,15 +480,15 @@
       </div>
 
       <!-- 依存関係サマリー -->
-      <div style="margin-top:20px;background:#f8f9fc;border-radius:10px;padding:16px;">
+      <div style="margin-top:20px;background:#F2F5F6;border-radius:10px;padding:16px;">
         <h3 style="margin-bottom:12px;">重要な依存関係まとめ</h3>
         <div style="display:flex;flex-direction:column;gap:6px;">
-          <div class="dep-row"><span class="dep-from">Staff</span><span style="color:#aaa;">←── 全テーブルが参照</span><span class="dep-reason">created_by, assigned_to, changed_by, interviewer_id</span></div>
-          <div class="dep-row"><span class="dep-from">SelectionFlow/Stage</span><span style="color:#aaa;">←──</span><span class="dep-to">Selection</span><span class="dep-reason">フロー定義が先に必要</span></div>
-          <div class="dep-row"><span class="dep-from">Applicant</span><span style="color:#aaa;">←──</span><span class="dep-to">Selection / ApplicantTag / ApplicantSource / LineToken</span></div>
-          <div class="dep-row"><span class="dep-from">Selection</span><span style="color:#aaa;">←──</span><span class="dep-to">SelectionHistory / Interview</span></div>
-          <div class="dep-row"><span class="dep-from">Tag</span><span style="color:#aaa;">←──</span><span class="dep-to">ApplicantTag / RichMenuRule</span></div>
-          <div class="dep-row"><span class="dep-from">RichMenu</span><span style="color:#aaa;">←──</span><span class="dep-to">RichMenuRule</span></div>
+          <div class="dep-row"><span class="dep-from">Staff</span><span style="color:#A9B3BA;">←── 全テーブルが参照</span><span class="dep-reason">created_by, assigned_to, changed_by, interviewer_id</span></div>
+          <div class="dep-row"><span class="dep-from">SelectionFlow/Stage</span><span style="color:#A9B3BA;">←──</span><span class="dep-to">Selection</span><span class="dep-reason">フロー定義が先に必要</span></div>
+          <div class="dep-row"><span class="dep-from">Applicant</span><span style="color:#A9B3BA;">←──</span><span class="dep-to">Selection / ApplicantTag / ApplicantSource / LineToken</span></div>
+          <div class="dep-row"><span class="dep-from">Selection</span><span style="color:#A9B3BA;">←──</span><span class="dep-to">SelectionHistory / Interview</span></div>
+          <div class="dep-row"><span class="dep-from">Tag</span><span style="color:#A9B3BA;">←──</span><span class="dep-to">ApplicantTag / RichMenuRule</span></div>
+          <div class="dep-row"><span class="dep-from">RichMenu</span><span style="color:#A9B3BA;">←──</span><span class="dep-to">RichMenuRule</span></div>
         </div>
       </div>
     </div>
@@ -502,18 +506,18 @@
       <div style="margin-bottom:24px;">
         <div style="display:grid;grid-template-columns:150px repeat(12,1fr);gap:1px;margin-bottom:6px;align-items:center;">
           <div></div>
-          <div style="font-size:10px;color:#999;text-align:center;grid-column:2/6;background:#fafafa;border-radius:4px;padding:2px 0;">Month 1（Week 1〜4）</div>
-          <div style="font-size:10px;color:#999;text-align:center;grid-column:6/10;background:#fafafa;border-radius:4px;padding:2px 0;">Month 2（Week 5〜8）</div>
-          <div style="font-size:10px;color:#999;text-align:center;grid-column:10/14;background:#fafafa;border-radius:4px;padding:2px 0;">Month 3（Week 9〜12）</div>
+          <div style="font-size:10px;color:#94A0A8;text-align:center;grid-column:2/6;background:#fafafa;border-radius:4px;padding:2px 0;">Month 1（Week 1〜4）</div>
+          <div style="font-size:10px;color:#94A0A8;text-align:center;grid-column:6/10;background:#fafafa;border-radius:4px;padding:2px 0;">Month 2（Week 5〜8）</div>
+          <div style="font-size:10px;color:#94A0A8;text-align:center;grid-column:10/14;background:#fafafa;border-radius:4px;padding:2px 0;">Month 3（Week 9〜12）</div>
         </div>
         <div style="display:grid;grid-template-columns:150px repeat(12,1fr);gap:1px;margin-bottom:8px;">
           <div></div>
-          <div style="font-size:9px;color:#ccc;text-align:center;">W1</div><div style="font-size:9px;color:#ccc;text-align:center;">W2</div>
-          <div style="font-size:9px;color:#ccc;text-align:center;">W3</div><div style="font-size:9px;color:#ccc;text-align:center;">W4</div>
-          <div style="font-size:9px;color:#ccc;text-align:center;">W5</div><div style="font-size:9px;color:#ccc;text-align:center;">W6</div>
-          <div style="font-size:9px;color:#ccc;text-align:center;">W7</div><div style="font-size:9px;color:#ccc;text-align:center;">W8</div>
-          <div style="font-size:9px;color:#ccc;text-align:center;">W9</div><div style="font-size:9px;color:#ccc;text-align:center;">W10</div>
-          <div style="font-size:9px;color:#ccc;text-align:center;">W11</div><div style="font-size:9px;color:#ccc;text-align:center;">W12</div>
+          <div style="font-size:9px;color:#C3CBD0;text-align:center;">W1</div><div style="font-size:9px;color:#C3CBD0;text-align:center;">W2</div>
+          <div style="font-size:9px;color:#C3CBD0;text-align:center;">W3</div><div style="font-size:9px;color:#C3CBD0;text-align:center;">W4</div>
+          <div style="font-size:9px;color:#C3CBD0;text-align:center;">W5</div><div style="font-size:9px;color:#C3CBD0;text-align:center;">W6</div>
+          <div style="font-size:9px;color:#C3CBD0;text-align:center;">W7</div><div style="font-size:9px;color:#C3CBD0;text-align:center;">W8</div>
+          <div style="font-size:9px;color:#C3CBD0;text-align:center;">W9</div><div style="font-size:9px;color:#C3CBD0;text-align:center;">W10</div>
+          <div style="font-size:9px;color:#C3CBD0;text-align:center;">W11</div><div style="font-size:9px;color:#C3CBD0;text-align:center;">W12</div>
         </div>
 
         <div style="display:flex;flex-direction:column;gap:5px;">
@@ -521,7 +525,7 @@
           <div class="timeline-row">
             <div class="timeline-label" style="font-size:11px;">🔧 設計・環境構築</div>
             <div class="timeline-bar-wrap">
-              <div class="timeline-bar" style="width:calc(100%*2/12);background:#9e9e9e;font-size:10px;">設計確定</div>
+              <div class="timeline-bar" style="width:calc(100%*2/12);background:#8A959C;font-size:10px;">設計確定</div>
             </div>
           </div>
 
@@ -544,7 +548,7 @@
             <div class="timeline-label" style="font-size:11px;">👤 学生管理</div>
             <div class="timeline-bar-wrap">
               <div style="width:calc(100%*2/12);"></div>
-              <div class="timeline-bar" style="width:calc(100%*3/12);background:#7c83fd;font-size:10px;">CRUD・タグ・一覧</div>
+              <div class="timeline-bar" style="width:calc(100%*3/12);background:#2E6480;font-size:10px;">CRUD・タグ・一覧</div>
             </div>
           </div>
 
@@ -560,7 +564,7 @@
             <div class="timeline-label" style="font-size:11px;">🎯 選考管理</div>
             <div class="timeline-bar-wrap">
               <div style="width:calc(100%*3/12);"></div>
-              <div class="timeline-bar" style="width:calc(100%*3/12);background:#e91e63;font-size:10px;">パイプライン・面接記録</div>
+              <div class="timeline-bar" style="width:calc(100%*3/12);background:#3E7D7A;font-size:10px;">パイプライン・面接記録</div>
             </div>
           </div>
 
@@ -568,7 +572,7 @@
             <div class="timeline-label" style="font-size:11px;">📡 媒体CSV取込</div>
             <div class="timeline-bar-wrap">
               <div style="width:calc(100%*5/12);"></div>
-              <div class="timeline-bar" style="width:calc(100%*2/12);background:#ff9800;font-size:10px;">マイナビ・リクナビ CSV</div>
+              <div class="timeline-bar" style="width:calc(100%*2/12);background:#C9862A;font-size:10px;">マイナビ・リクナビ CSV</div>
             </div>
           </div>
 
@@ -576,19 +580,19 @@
             <div class="timeline-label" style="font-size:11px;">📊 基本分析</div>
             <div class="timeline-bar-wrap">
               <div style="width:calc(100%*6/12);"></div>
-              <div class="timeline-bar" style="width:calc(100%*2/12);background:#5c6bc0;font-size:10px;">ファネル・一覧</div>
+              <div class="timeline-bar" style="width:calc(100%*2/12);background:#3E7490;font-size:10px;">ファネル・一覧</div>
             </div>
           </div>
 
           <div class="timeline-row">
-            <div class="timeline-label" style="color:#e53935;font-weight:700;font-size:11px;">🚀 MVP リリース</div>
+            <div class="timeline-label" style="color:#9C3F2E;font-weight:700;font-size:11px;">🚀 MVP リリース</div>
             <div class="timeline-bar-wrap">
-              <div style="width:calc(100%*7.5/12);border-right:2px dashed #e53935;"></div>
-              <div style="font-size:11px;color:#e53935;padding-left:8px;font-weight:700;">Week 8 目標</div>
+              <div style="width:calc(100%*7.5/12);border-right:2px dashed #9C3F2E;"></div>
+              <div style="font-size:11px;color:#9C3F2E;padding-left:8px;font-weight:700;">Week 8 目標</div>
             </div>
           </div>
 
-          <div style="height:1px;background:#e8eaf0;margin:4px 0;"></div>
+          <div style="height:1px;background:#D9E0E3;margin:4px 0;"></div>
 
           <div class="timeline-row">
             <div class="timeline-label" style="font-size:11px;">🔄 複数フロー</div>
@@ -602,7 +606,7 @@
             <div class="timeline-label" style="font-size:11px;">☁️ Salesforce連携</div>
             <div class="timeline-bar-wrap">
               <div style="width:calc(100%*8/12);"></div>
-              <div class="timeline-bar" style="width:calc(100%*3/12);background:#1565c0;font-size:10px;">承諾登録・在籍同期</div>
+              <div class="timeline-bar" style="width:calc(100%*3/12);background:#3E7490;font-size:10px;">承諾登録・在籍同期</div>
             </div>
           </div>
 
@@ -615,14 +619,14 @@
           </div>
 
         </div>
-        <div style="font-size:11px;color:#999;margin-top:8px;">※ AI駆動開発前提。並行作業により実際の壁打ちは短縮される場合あり</div>
+        <div style="font-size:11px;color:#94A0A8;margin-top:8px;">※ AI駆動開発前提。並行作業により実際の壁打ちは短縮される場合あり</div>
       </div>
 
       <!-- Month別サマリー -->
       <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:20px;">
         <div style="background:#fff5f5;border:1.5px solid #ffcdd2;border-radius:10px;padding:14px;">
-          <div style="font-size:12px;font-weight:700;color:#c62828;margin-bottom:8px;">Month 1（Week 1〜4）</div>
-          <div style="font-size:12px;line-height:2;color:#555;">
+          <div style="font-size:12px;font-weight:700;color:#8C352A;margin-bottom:8px;">Month 1（Week 1〜4）</div>
+          <div style="font-size:12px;line-height:2;color:#4A535C;">
             <div>✅ ヒアリング最終確定</div>
             <div>✅ 技術スタック決定</div>
             <div>✅ DB基盤構築（STEP 0〜2）</div>
@@ -630,9 +634,9 @@
             <div>✅ 学生管理基本機能</div>
           </div>
         </div>
-        <div style="background:#fff8e1;border:1.5px solid #ffe082;border-radius:10px;padding:14px;">
+        <div style="background:#F3E8D6;border:1.5px solid #ffe082;border-radius:10px;padding:14px;">
           <div style="font-size:12px;font-weight:700;color:#f57f17;margin-bottom:8px;">Month 2（Week 5〜8）</div>
-          <div style="font-size:12px;line-height:2;color:#555;">
+          <div style="font-size:12px;line-height:2;color:#4A535C;">
             <div>✅ LINE連携（友達追加・送信）</div>
             <div>✅ 選考管理・パイプライン</div>
             <div>✅ 媒体CSV取込</div>
@@ -641,8 +645,8 @@
           </div>
         </div>
         <div style="background:#e3f2fd;border:1.5px solid #90caf9;border-radius:10px;padding:14px;">
-          <div style="font-size:12px;font-weight:700;color:#1565c0;margin-bottom:8px;">Month 3（Week 9〜12）</div>
-          <div style="font-size:12px;line-height:2;color:#555;">
+          <div style="font-size:12px;font-weight:700;color:#3E7490;margin-bottom:8px;">Month 3（Week 9〜12）</div>
+          <div style="font-size:12px;line-height:2;color:#4A535C;">
             <div>✅ 複数選考フロー</div>
             <div>✅ Salesforce連携</div>
             <div>✅ 複数リッチメニュー</div>

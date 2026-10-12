@@ -4,31 +4,34 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>ATS テーブル定義書</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@400;500;700;900&family=IBM+Plex+Mono:wght@500;600;700&display=swap" rel="stylesheet">
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
-  body { font-family: -apple-system, BlinkMacSystemFont, 'Hiragino Sans', sans-serif; background: #f0f2f5; color: #1a1a2e; display:flex; flex-direction:column; min-height:100vh; }
+  body { font-family: 'Zen Kaku Gothic New', 'Hiragino Sans', -apple-system, BlinkMacSystemFont, sans-serif; background: #E9EDEF; color: #1C2126; display:flex; flex-direction:column; min-height:100vh; }
   .page { max-width: 1200px; margin: 0 auto; padding: 32px 24px; width:100%; }
   h1 { font-size: 22px; font-weight: 700; margin-bottom: 4px; }
-  h2 { font-size: 15px; font-weight: 700; color: #1a1a2e; margin-bottom: 14px; padding-left: 12px; border-left: 4px solid #7c83fd; }
-  h3 { font-size: 13px; font-weight: 700; color: #444; margin-bottom: 8px; }
-  .meta { font-size: 12px; color: #999; margin-bottom: 28px; display:flex; gap:16px; align-items:center; }
+  h2 { font-size: 15px; font-weight: 700; color: #1C2126; margin-bottom: 14px; padding-left: 12px; border-left: 4px solid #2E6480; }
+  h3 { font-size: 13px; font-weight: 700; color: #3C444C; margin-bottom: 8px; }
+  .meta { font-size: 12px; color: #94A0A8; margin-bottom: 28px; display:flex; gap:16px; align-items:center; }
 
   /* Tabs */
-  .tabs { display:flex; gap:0; border-bottom:2px solid #e8eaf0; margin-bottom:22px; flex-wrap:wrap; }
-  .tab { padding:10px 18px; font-size:13px; cursor:pointer; color:#888; border-bottom:2px solid transparent; margin-bottom:-2px; transition:all .15s; white-space:nowrap; }
-  .tab.active { color:#7c83fd; border-bottom-color:#7c83fd; font-weight:600; }
+  .tabs { display:flex; gap:0; border-bottom:2px solid #D9E0E3; margin-bottom:22px; flex-wrap:wrap; }
+  .tab { padding:10px 18px; font-size:13px; cursor:pointer; color:#7E8891; border-bottom:2px solid transparent; margin-bottom:-2px; transition:all .15s; white-space:nowrap; }
+  .tab.active { color:#2E6480; border-bottom-color:#2E6480; font-weight:600; }
   .tab-content { display:none; }
   .tab-content.active { display:block; }
 
   /* Section card */
-  .section { background: #fff; border-radius: 12px; padding: 22px 24px; margin-bottom: 20px; box-shadow: 0 1px 4px rgba(0,0,0,.06); }
+  .section { background: #fff; border-radius: 12px; padding: 22px 24px; margin-bottom: 20px; border:1px solid #D9E0E3; }
 
   /* Table styles */
   table { width:100%; border-collapse:collapse; font-size:13px; }
-  th { background:#f8f9fc; padding:9px 12px; text-align:left; font-weight:600; color:#555; font-size:12px; border-bottom:1px solid #e8eaf0; white-space:nowrap; }
-  td { padding:9px 12px; border-bottom:1px solid #f0f2f5; vertical-align:top; line-height:1.6; }
+  th { background:#F2F5F6; padding:9px 12px; text-align:left; font-weight:600; color:#4A535C; font-size:12px; border-bottom:1px solid #D9E0E3; white-space:nowrap; }
+  td { padding:9px 12px; border-bottom:1px solid #E9EDEF; vertical-align:top; line-height:1.6; }
   tr:last-child td { border-bottom:none; }
-  tr:hover td { background:#fafbff; }
+  tr:hover td { background:#F4F7F8; }
 
   /* Column widths */
   .col-col { width:180px; }
@@ -39,29 +42,29 @@
   .col-desc { }
 
   /* Monospace refs */
-  code { font-family: 'SF Mono', 'Menlo', monospace; font-size:11px; color:#7c83fd; background:#f0f0ff; padding:1px 5px; border-radius:4px; white-space:nowrap; }
-  .fk-ref { font-family: 'SF Mono', 'Menlo', monospace; font-size:11px; color:#e65100; background:#fff3e0; padding:1px 5px; border-radius:4px; white-space:nowrap; }
+  code { font-family: 'IBM Plex Mono', 'SF Mono', 'Menlo', monospace; font-size:11px; color:#2E6480; background:#E6EEF1; padding:1px 5px; border-radius:4px; white-space:nowrap; }
+  .fk-ref { font-family: 'IBM Plex Mono', 'SF Mono', 'Menlo', monospace; font-size:11px; color:#9C5A1D; background:#F3E8D6; padding:1px 5px; border-radius:4px; white-space:nowrap; }
 
   /* Badges */
   .badge { display:inline-block; padding:2px 7px; border-radius:10px; font-size:10px; font-weight:700; white-space:nowrap; }
-  .badge-pk    { background:#7c83fd; color:#fff; }
-  .badge-fk    { background:#ff9800; color:#fff; }
+  .badge-pk    { background:#2E6480; color:#fff; }
+  .badge-fk    { background:#C9862A; color:#fff; }
   .badge-uk    { background:#29b6f6; color:#fff; }
-  .badge-new   { background:#4caf50; color:#fff; }
-  .badge-idx   { background:#9e9e9e; color:#fff; }
-  .badge-enum  { background:#e91e63; color:#fff; }
+  .badge-new   { background:#4C8C6B; color:#fff; }
+  .badge-idx   { background:#8A959C; color:#fff; }
+  .badge-enum  { background:#3E7D7A; color:#fff; }
 
   /* Table header card */
-  .tbl-header { display:flex; align-items:center; gap:10px; margin-bottom:14px; padding-bottom:10px; border-bottom:1px solid #f0f2f5; }
+  .tbl-header { display:flex; align-items:center; gap:10px; margin-bottom:14px; padding-bottom:10px; border-bottom:1px solid #E9EDEF; }
   .tbl-icon { font-size:20px; }
-  .tbl-name { font-size:15px; font-weight:700; font-family:'SF Mono','Menlo',monospace; }
-  .tbl-jp { font-size:13px; color:#888; }
-  .tbl-count { margin-left:auto; font-size:11px; color:#aaa; }
+  .tbl-name { font-size:15px; font-weight:700; font-family:'IBM Plex Mono','SF Mono','Menlo',monospace; }
+  .tbl-jp { font-size:13px; color:#7E8891; }
+  .tbl-count { margin-left:auto; font-size:11px; color:#A9B3BA; }
 
   /* Group color bands */
   .group-a { border-top:3px solid #37474f; }
-  .group-b { border-top:3px solid #7c83fd; }
-  .group-c { border-top:3px solid #e91e63; }
+  .group-b { border-top:3px solid #2E6480; }
+  .group-c { border-top:3px solid #3E7D7A; }
   .group-d { border-top:3px solid #00838f; }
   .group-e { border-top:3px solid #00897b; }
   .group-f { border-top:3px solid #f57f17; }
@@ -73,34 +76,34 @@
 
   /* Enum list */
   .enum-list { display:flex; flex-wrap:wrap; gap:5px; margin-top:6px; }
-  .enum-val { background:#f8f9fc; border:1px solid #e0e0e0; border-radius:4px; padding:2px 8px; font-family:monospace; font-size:11px; color:#555; }
+  .enum-val { background:#F2F5F6; border:1px solid #D3DADE; border-radius:4px; padding:2px 8px; font-family:'IBM Plex Mono','SF Mono',monospace; font-size:11px; color:#4A535C; }
 
   /* Info boxes */
-  .info-box  { background:#f0f0ff; border:1px solid #c5cae9; border-radius:8px; padding:10px 14px; font-size:12px; color:#3949ab; margin-top:10px; }
-  .warn-box  { background:#fff8e1; border:1px solid #ffcc80; border-radius:8px; padding:10px 14px; font-size:12px; color:#e65100; margin-top:10px; }
+  .info-box  { background:#E6EEF1; border:1px solid #C3CBD0; border-radius:8px; padding:10px 14px; font-size:12px; color:#1B3F52; margin-top:10px; }
+  .warn-box  { background:#F3E8D6; border:1px solid #C9862A; border-radius:8px; padding:10px 14px; font-size:12px; color:#9C5A1D; margin-top:10px; }
 
   /* Overview grid */
   .overview-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:10px; margin-bottom:22px; }
-  .overview-card { background:#fff; border-radius:10px; padding:14px 16px; box-shadow:0 1px 4px rgba(0,0,0,.06); text-align:center; }
-  .overview-card-val { font-size:24px; font-weight:700; color:#7c83fd; }
-  .overview-card-label { font-size:11px; color:#888; margin-top:4px; }
+  .overview-card { background:#fff; border-radius:10px; padding:14px 16px; border:1px solid #D9E0E3; text-align:center; }
+  .overview-card-val { font-size:24px; font-weight:700; color:#2E6480; }
+  .overview-card-label { font-size:11px; color:#7E8891; margin-top:4px; }
 
   /* Table index (TOC) */
   .toc { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; margin-bottom:22px; }
-  .toc-item { background:#fff; border-radius:8px; padding:10px 14px; box-shadow:0 1px 3px rgba(0,0,0,.05); cursor:pointer; font-size:12px; transition:all .15s; border-left:3px solid #ddd; }
-  .toc-item:hover { box-shadow:0 2px 8px rgba(0,0,0,.1); transform:translateY(-1px); }
-  .toc-item-name { font-family:monospace; font-weight:700; color:#1a1a2e; font-size:12px; }
-  .toc-item-jp { color:#888; font-size:11px; margin-top:2px; }
-  .toc-item-cols { color:#aaa; font-size:10px; margin-top:3px; }
+  .toc-item { background:#fff; border-radius:8px; padding:10px 14px; border:1px solid #D9E0E3; cursor:pointer; font-size:12px; transition:all .15s; border-left:3px solid #ddd; }
+  .toc-item:hover { border:1px solid #D9E0E3; transform:translateY(-1px); }
+  .toc-item-name { font-family:'IBM Plex Mono','SF Mono',monospace; font-weight:700; color:#1C2126; font-size:12px; }
+  .toc-item-jp { color:#7E8891; font-size:11px; margin-top:2px; }
+  .toc-item-cols { color:#A9B3BA; font-size:10px; margin-top:3px; }
   .toc-a { border-left-color:#37474f; }
-  .toc-b { border-left-color:#7c83fd; }
-  .toc-c { border-left-color:#e91e63; }
+  .toc-b { border-left-color:#2E6480; }
+  .toc-c { border-left-color:#3E7D7A; }
   .toc-d { border-left-color:#00838f; }
   .toc-e { border-left-color:#00897b; }
   .toc-f { border-left-color:#f57f17; }
 
   /* Legend */
-  .legend { display:flex; gap:14px; font-size:12px; align-items:center; padding:10px 14px; background:#fafbff; border-radius:8px; border:1px solid #e8eaf0; margin-bottom:14px; flex-wrap:wrap; }
+  .legend { display:flex; gap:14px; font-size:12px; align-items:center; padding:10px 14px; background:#F4F7F8; border-radius:8px; border:1px solid #D9E0E3; margin-bottom:14px; flex-wrap:wrap; }
   .legend-item { display:flex; align-items:center; gap:5px; }
 
   /* Two col */
@@ -109,33 +112,34 @@
   /* Scrollbar */
   ::-webkit-scrollbar { width: 4px; height: 4px; }
   ::-webkit-scrollbar-track { background: transparent; }
-  ::-webkit-scrollbar-thumb { background: #ccc; border-radius: 2px; }
+  ::-webkit-scrollbar-thumb { background: #C3CBD0; border-radius: 2px; }
 </style>
 </head>
 <body>
 
 <!-- Global Nav -->
-<div style="background:#1a1a2e;height:40px;display:flex;align-items:center;padding:0 20px;gap:24px;font-size:12px;flex-shrink:0;overflow-x:auto;">
-  <span style="color:#7c83fd;font-weight:700;letter-spacing:0.5px;white-space:nowrap;">ATS設計ドキュメント</span>
-  <a href="index.html"             style="color:#aaa;text-decoration:none;opacity:.7;white-space:nowrap;">🖥 ワイヤーフレーム</a>
-  <a href="requirements.html"      style="color:#aaa;text-decoration:none;opacity:.7;white-space:nowrap;">📋 要件定義書</a>
-  <a href="dataflow.html"          style="color:#aaa;text-decoration:none;opacity:.7;white-space:nowrap;">🔀 データフロー設計</a>
-  <a href="roadmap.html"           style="color:#aaa;text-decoration:none;opacity:.7;white-space:nowrap;">🗺️ ロードマップ</a>
-  <a href="screen-spec.html"       style="color:#aaa;text-decoration:none;opacity:.7;white-space:nowrap;">📐 画面仕様書</a>
-  <a href="table-spec.html"        style="color:#fff;text-decoration:none;border-bottom:2px solid #7c83fd;padding-bottom:2px;white-space:nowrap;">🗃️ テーブル定義書</a>
-  <a href="integration-spec.html"  style="color:#aaa;text-decoration:none;opacity:.7;white-space:nowrap;">🔌 外部連携仕様書</a>
-  <a href="architecture.html"      style="color:#aaa;text-decoration:none;opacity:.7;white-space:nowrap;">🏗️ アーキテクチャ</a>
-  <a href="agency-wireframe.html"  style="color:#aaa;text-decoration:none;opacity:.7;white-space:nowrap;">🤝 エージェントWF</a>
-  <a href="security.html"         style="color:#aaa;text-decoration:none;opacity:.7;white-space:nowrap;">🔒 セキュリティ設計書</a>
+<div style="background:#1C2126;height:40px;display:flex;align-items:center;padding:0 20px;gap:24px;font-size:12px;flex-shrink:0;overflow-x:auto;">
+  <span style="color:#2E6480;font-weight:700;letter-spacing:0.5px;white-space:nowrap;">ATS設計ドキュメント</span>
+  <a href="index.html"             style="color:#A9B3BA;text-decoration:none;opacity:.7;white-space:nowrap;">🖥 ワイヤーフレーム</a>
+  <a href="requirements.html"      style="color:#A9B3BA;text-decoration:none;opacity:.7;white-space:nowrap;">📋 要件定義書</a>
+  <a href="dataflow.html"          style="color:#A9B3BA;text-decoration:none;opacity:.7;white-space:nowrap;">🔀 データフロー設計</a>
+  <a href="roadmap.html"           style="color:#A9B3BA;text-decoration:none;opacity:.7;white-space:nowrap;">🗺️ ロードマップ</a>
+  <a href="screen-spec.html"       style="color:#A9B3BA;text-decoration:none;opacity:.7;white-space:nowrap;">📐 画面仕様書</a>
+  <a href="table-spec.html"        style="color:#fff;text-decoration:none;border-bottom:2px solid #2E6480;padding-bottom:2px;white-space:nowrap;">🗃️ テーブル定義書</a>
+  <a href="integration-spec.html"  style="color:#A9B3BA;text-decoration:none;opacity:.7;white-space:nowrap;">🔌 外部連携仕様書</a>
+  <a href="architecture.html"      style="color:#A9B3BA;text-decoration:none;opacity:.7;white-space:nowrap;">🏗️ アーキテクチャ</a>
+  <a href="agency-wireframe.html"  style="color:#A9B3BA;text-decoration:none;opacity:.7;white-space:nowrap;">🤝 エージェントWF</a>
+  <a href="security.html"         style="color:#A9B3BA;text-decoration:none;opacity:.7;white-space:nowrap;">🔒 セキュリティ設計書</a>
+  <a href="liff-wireframe.html" style="color:#A9B3BA;text-decoration:none;opacity:.7;white-space:nowrap;">📱 LIFF画面WF</a>
 </div>
 
 <div class="page">
   <h1>新卒採用管理システム（ATS）テーブル定義書</h1>
   <div class="meta">
-    <span>v0.4</span>
-    <span>2026-07-21</span>
+    <span>v0.5</span>
+    <span>2026-10-11</span>
     <span>ステータス：設計中</span>
-    <span style="background:#7c83fd;color:#fff;border-radius:10px;padding:2px 10px;font-weight:700;">DB: PostgreSQL 16</span>
+    <span style="background:#2E6480;color:#fff;border-radius:10px;padding:2px 10px;font-weight:700;">DB: PostgreSQL 16</span>
   </div>
 
   <!-- Overview -->
@@ -160,14 +164,14 @@
 
   <!-- Legend -->
   <div class="legend">
-    <span style="font-weight:700;color:#555;font-size:12px;">凡例：</span>
-    <span class="legend-item"><span class="badge badge-pk">PK</span><span style="color:#888;">主キー</span></span>
-    <span class="legend-item"><span class="badge badge-fk">FK</span><span style="color:#888;">外部キー</span></span>
-    <span class="legend-item"><span class="badge badge-uk">UQ</span><span style="color:#888;">ユニーク制約</span></span>
-    <span class="legend-item"><span class="badge badge-enum">ENUM</span><span style="color:#888;">列挙型</span></span>
-    <span class="legend-item"><span class="badge badge-new">NEW</span><span style="color:#888;">今回追加</span></span>
-    <span class="legend-item"><span class="badge badge-idx">IDX</span><span style="color:#888;">インデックスあり</span></span>
-    <span style="margin-left:auto;font-size:11px;color:#aaa;">NULL列のデフォルトはNOT NULLとする</span>
+    <span style="font-weight:700;color:#4A535C;font-size:12px;">凡例：</span>
+    <span class="legend-item"><span class="badge badge-pk">PK</span><span style="color:#7E8891;">主キー</span></span>
+    <span class="legend-item"><span class="badge badge-fk">FK</span><span style="color:#7E8891;">外部キー</span></span>
+    <span class="legend-item"><span class="badge badge-uk">UQ</span><span style="color:#7E8891;">ユニーク制約</span></span>
+    <span class="legend-item"><span class="badge badge-enum">ENUM</span><span style="color:#7E8891;">列挙型</span></span>
+    <span class="legend-item"><span class="badge badge-new">NEW</span><span style="color:#7E8891;">今回追加</span></span>
+    <span class="legend-item"><span class="badge badge-idx">IDX</span><span style="color:#7E8891;">インデックスあり</span></span>
+    <span style="margin-left:auto;font-size:11px;color:#A9B3BA;">NULL列のデフォルトはNOT NULLとする</span>
   </div>
 
   <!-- Tabs -->
@@ -305,7 +309,7 @@
         <div class="toc-item toc-e" onclick="goTab('tab-e')">
           <div class="toc-item-name">RichMenu</div>
           <div class="toc-item-jp">LINEリッチメニュー</div>
-          <div class="toc-item-cols">7 columns</div>
+          <div class="toc-item-cols">8 columns</div>
         </div>
         <div class="toc-item toc-e" onclick="goTab('tab-e')">
           <div class="toc-item-name">RichMenuRule</div>
@@ -337,18 +341,28 @@
           <div class="toc-item-jp">LINEチャット履歴</div>
           <div class="toc-item-cols">7 columns</div>
         </div>
+        <div class="toc-item toc-e" onclick="goTab('tab-e')">
+          <div class="toc-item-name">RichMenuAutoReply <span class="badge badge-new">NEW</span></div>
+          <div class="toc-item-jp">メッセージ送信アクションの自動応答</div>
+          <div class="toc-item-cols">5 columns</div>
+        </div>
+        <div class="toc-item toc-e" onclick="goTab('tab-e')">
+          <div class="toc-item-name">ScenarioStep <span class="badge badge-new">NEW</span></div>
+          <div class="toc-item-jp">登録後の自動アクション</div>
+          <div class="toc-item-cols">7 columns</div>
+        </div>
         <!-- Group G -->
-        <div class="toc-item" style="border-left-color:#e91e63;" onclick="goTab('tab-g')">
+        <div class="toc-item" style="border-left-color:#3E7D7A;" onclick="goTab('tab-g')">
           <div class="toc-item-name">MessageTemplate <span class="badge badge-new">NEW</span></div>
           <div class="toc-item-jp">メッセージテンプレート</div>
           <div class="toc-item-cols">9 columns</div>
         </div>
-        <div class="toc-item" style="border-left-color:#e91e63;" onclick="goTab('tab-g')">
+        <div class="toc-item" style="border-left-color:#3E7D7A;" onclick="goTab('tab-g')">
           <div class="toc-item-name">NotificationRule <span class="badge badge-new">NEW</span></div>
           <div class="toc-item-jp">自動通知ルール</div>
           <div class="toc-item-cols">9 columns</div>
         </div>
-        <div class="toc-item" style="border-left-color:#e91e63;" onclick="goTab('tab-g')">
+        <div class="toc-item" style="border-left-color:#3E7D7A;" onclick="goTab('tab-g')">
           <div class="toc-item-name">NotificationLog <span class="badge badge-new">NEW</span></div>
           <div class="toc-item-jp">通知送信ログ</div>
           <div class="toc-item-cols">7 columns</div>
@@ -401,13 +415,13 @@
             <td>StaffColumnPreferenceを新規追加（応募者一覧の表示列カスタマイズ）</td>
           </tr>
           <tr>
-            <td><strong style="color:#7c83fd;">B. 応募者</strong></td>
+            <td><strong style="color:#2E6480;">B. 応募者</strong></td>
             <td>Applicant / ApplicantSource / ApplicantCustomField / ApplicantTag / Tag / School / LineRegistrationToken / CallLog（8）</td>
             <td>応募者情報・流入元・カスタム項目・タグ付け・LINE連携トークン・架電履歴</td>
             <td>Applicantにresume_url / call_status / hire_typeを追加。CallLogを新規追加（FR109/110/115）</td>
           </tr>
           <tr>
-            <td><strong style="color:#e91e63;">C. 選考フロー</strong></td>
+            <td><strong style="color:#3E7D7A;">C. 選考フロー</strong></td>
             <td>SelectionFlow / SelectionStage / Selection / SelectionHistory / Interview / EvaluationTemplate / EvaluationItem / EvaluationResponse / EventRegistration（9）</td>
             <td>選考フロー設定・ステージ管理・面接記録・ステージ別評価シート・選考会予約履歴</td>
             <td>EventRegistrationを新規追加（選考会キャンセル履歴・種別変更対応、FR108/113）。event_typeを4種類に拡張（FR119）</td>
@@ -420,9 +434,9 @@
           </tr>
           <tr>
             <td><strong style="color:#00897b;">E. LINE</strong></td>
-            <td>RichMenu / RichMenuRule / Survey / SurveyQuestion / SurveyResponse / SurveyResponseItem / LineMessage（7）</td>
-            <td>LINEリッチメニュー管理・アンケート機能・個別チャット履歴</td>
-            <td>LineMessageにfile_url / file_nameを追加（PDFファイル送受信対応）</td>
+            <td>RichMenu / RichMenuRule / Survey / SurveyQuestion / SurveyResponse / SurveyResponseItem / LineMessage / RichMenuAutoReply / ScenarioStep（9）</td>
+            <td>LINEリッチメニュー管理・アンケート機能・個別チャット履歴・自動応答・登録後シナリオ</td>
+            <td>RichMenuAutoReply・ScenarioStepを新規追加（FR120・FR124・FR125）。RichMenuにline_menu_aliasを追加（FR123）</td>
           </tr>
           <tr>
             <td><strong style="color:#f57f17;">F. 媒体・マスター</strong></td>
@@ -431,7 +445,7 @@
             <td>Mediaのinfo-boxを6媒体（キミスカ・ABABA・キャリアチケット追加）に更新</td>
           </tr>
           <tr>
-            <td><strong style="color:#e91e63;">G. 通知・テンプレート</strong></td>
+            <td><strong style="color:#3E7D7A;">G. 通知・テンプレート</strong></td>
             <td>MessageTemplate / NotificationRule / NotificationLog（3）</td>
             <td>LINE/メール送信テンプレート・自動通知ルール・送信ログ</td>
             <td>今回新規追加。サンクス・リマインド自動送信インフラ</td>
@@ -773,7 +787,7 @@
           <tbody>
             <tr><td><code>id</code></td><td>UUID</td><td>NO</td><td><span class="badge badge-pk">PK</span></td></tr>
             <tr><td><code>name</code></td><td>VARCHAR(50)</td><td>NO</td><td><span class="badge badge-uk">UQ</span> タグ名（例: "マイナビ", "理系"）</td></tr>
-            <tr><td><code>color</code></td><td>VARCHAR(7)</td><td>NO</td><td>16進数カラーコード（例: #7c83fd）</td></tr>
+            <tr><td><code>color</code></td><td>VARCHAR(7)</td><td>NO</td><td>16進数カラーコード（例: #2E6480）</td></tr>
             <tr><td><code>created_by</code></td><td>UUID</td><td>NO</td><td><span class="badge badge-fk">FK</span> → <span class="fk-ref">Staff.id</span></td></tr>
           </tbody>
         </table>
@@ -1163,7 +1177,7 @@
             <div class="tbl-name">RichMenu</div>
             <div class="tbl-jp">LINEリッチメニュー定義</div>
           </div>
-          <div class="tbl-count">7 columns</div>
+          <div class="tbl-count">8 columns</div>
         </div>
         <table>
           <thead><tr><th class="col-col">カラム名</th><th class="col-type">型</th><th class="col-null">NULL</th><th>制約・説明</th></tr></thead>
@@ -1173,8 +1187,9 @@
             <tr><td><code>is_default</code></td><td>BOOLEAN</td><td>NO</td><td>デフォルトメニューフラグ</td></tr>
             <tr><td><code>status</code></td><td>ENUM</td><td>NO</td><td>draft / active / archived</td></tr>
             <tr><td><code>priority</code></td><td>SMALLINT</td><td>NO</td><td>ルール適用優先度（数値が小さいほど優先）</td></tr>
-            <tr><td><code>buttons</code></td><td>JSONB</td><td>NO</td><td>ボタン定義（LINE API形式のJSONをそのまま格納）</td></tr>
+            <tr><td><code>buttons</code></td><td>JSONB</td><td>NO</td><td>ボタン定義（LINE API形式のJSONをそのまま格納。uri/message/postback/datetimepicker/richmenuswitch等のaction typeを含む、FR120〜123）</td></tr>
             <tr><td><code>line_menu_id</code></td><td>VARCHAR(100)</td><td>YES</td><td>LINE側に登録後に払い出されるID</td></tr>
+            <tr><td><code>line_menu_alias</code></td><td>VARCHAR(100)</td><td>YES</td><td><span class="badge badge-new">NEW</span> Rich Menu Alias ID。「リッチメニュー切り替え」アクション（richmenuswitch）の切替先として他メニューから参照される（FR123）</td></tr>
           </tbody>
         </table>
       </div>
@@ -1325,6 +1340,54 @@
           <tr><td><code>linemsg_unread_idx</code></td><td>is_read, direction, sent_at</td><td>BTREE（PARTIAL）</td><td>未読inboundメッセージ一覧（ダッシュボード表示用）</td></tr>
         </tbody>
       </table>
+    </div>
+
+    <!-- RichMenuAutoReply / ScenarioStep -->
+    <div class="two-col">
+      <div class="section group-e">
+        <div class="tbl-header">
+          <div class="tbl-icon">💬</div>
+          <div>
+            <div class="tbl-name">RichMenuAutoReply <span class="badge badge-new">NEW</span></div>
+            <div class="tbl-jp">メッセージ送信アクションの自動応答</div>
+          </div>
+          <div class="tbl-count">5 columns</div>
+        </div>
+        <table>
+          <thead><tr><th class="col-col">カラム名</th><th class="col-type">型</th><th class="col-null">NULL</th><th>制約・説明</th></tr></thead>
+          <tbody>
+            <tr><td><code>id</code></td><td>UUID</td><td>NO</td><td><span class="badge badge-pk">PK</span></td></tr>
+            <tr><td><code>trigger_text</code></td><td>VARCHAR(200)</td><td>NO</td><td>完全一致で判定するキーワード（リッチメニューのmessageアクションで送信される固定テキスト、または学生の手入力）</td></tr>
+            <tr><td><code>reply_type</code></td><td>ENUM</td><td>NO</td><td>text / flex</td></tr>
+            <tr><td><code>reply_content</code></td><td>TEXT</td><td>NO</td><td>text時は本文。flex時はFlex MessageのJSON</td></tr>
+            <tr><td><code>created_at</code></td><td>TIMESTAMP</td><td>NO</td><td>DEFAULT CURRENT_TIMESTAMP</td></tr>
+          </tbody>
+        </table>
+        <div class="info-box" style="margin-top:12px;">FR120に対応。Webhookで受信したテキストメッセージを<code>trigger_text</code>と照合し、一致すれば<code>reply_content</code>を自動返信する。</div>
+      </div>
+      <div class="section group-e">
+        <div class="tbl-header">
+          <div class="tbl-icon">🔄</div>
+          <div>
+            <div class="tbl-name">ScenarioStep <span class="badge badge-new">NEW</span></div>
+            <div class="tbl-jp">登録完了後の自動アクション</div>
+          </div>
+          <div class="tbl-count">7 columns</div>
+        </div>
+        <table>
+          <thead><tr><th class="col-col">カラム名</th><th class="col-type">型</th><th class="col-null">NULL</th><th>制約・説明</th></tr></thead>
+          <tbody>
+            <tr><td><code>id</code></td><td>UUID</td><td>NO</td><td><span class="badge badge-pk">PK</span></td></tr>
+            <tr><td><code>trigger</code></td><td>ENUM</td><td>NO</td><td>follow（友だち追加）/ registration_complete（簡易登録フォーム送信完了）</td></tr>
+            <tr><td><code>step_order</code></td><td>SMALLINT</td><td>NO</td><td>実行順（1始まり）</td></tr>
+            <tr><td><code>delay_minutes</code></td><td>INT</td><td>NO</td><td>トリガーからの遅延時間（分）。即時は0</td></tr>
+            <tr><td><code>action_type</code></td><td>ENUM</td><td>NO</td><td>message / survey / tag / richmenu</td></tr>
+            <tr><td><code>action_value</code></td><td>VARCHAR(200)</td><td>NO</td><td>action_typeに応じた値（メッセージ本文 / Survey.id / Tag.id / RichMenu.id）</td></tr>
+            <tr><td><code>created_at</code></td><td>TIMESTAMP</td><td>NO</td><td>DEFAULT CURRENT_TIMESTAMP</td></tr>
+          </tbody>
+        </table>
+        <div class="info-box" style="margin-top:12px;">FR124・FR125に対応。<code>trigger</code>発生時刻 + <code>delay_minutes</code>後に、ジョブキュー／スケジューラが<code>step_order</code>順に各アクションを実行する。</div>
+      </div>
     </div>
 
   </div>
@@ -1481,7 +1544,7 @@
   <div id="tab-g" class="tab-content">
 
     <!-- MessageTemplate -->
-    <div class="section" style="border-top:3px solid #e91e63;">
+    <div class="section" style="border-top:3px solid #3E7D7A;">
       <div class="tbl-header">
         <div class="tbl-icon">📨</div>
         <div>
@@ -1511,7 +1574,7 @@
 
     <!-- NotificationRule / NotificationLog -->
     <div class="two-col">
-      <div class="section" style="border-top:3px solid #e91e63;">
+      <div class="section" style="border-top:3px solid #3E7D7A;">
         <div class="tbl-header">
           <div class="tbl-icon">⚙️</div>
           <div>
@@ -1537,7 +1600,7 @@
         </table>
         <div class="info-box" style="margin-top:10px;">Cloud Scheduler（GCP）でポーリングし、対象応募者にNotificationLogを生成して送信キューに投入。FR101（自動送信）対応。</div>
       </div>
-      <div class="section" style="border-top:3px solid #e91e63;">
+      <div class="section" style="border-top:3px solid #3E7D7A;">
         <div class="tbl-header">
           <div class="tbl-icon">📋</div>
           <div>

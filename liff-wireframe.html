@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ATS LIFFアプリ ワイヤーフレーム（学生側）</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@400;500;700;900&family=IBM+Plex+Mono:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Zen Kaku Gothic New', 'Hiragino Sans', -apple-system, BlinkMacSystemFont, sans-serif; background: #E9EDEF; color: #1C2126; display:flex; flex-direction:column; min-height:100vh; }
+
+  /* Tabs（既存ワイヤーフレーム群と共通のパターン） */
+  .page-tabs { display:flex; gap:0; border-bottom:2px solid #D9E0E3; background:#fff; padding:0 24px; flex-wrap:wrap; }
+  .page-tab { padding:14px 20px; font-size:13px; cursor:pointer; color:#7E8891; border-bottom:2px solid transparent; margin-bottom:-2px; transition:all .15s; white-space:nowrap; }
+  .page-tab.active { color:#2E6480; border-bottom-color:#2E6480; font-weight:700; }
+  .page-content { display:none; }
+  .page-content.active { display:block; }
+
+  .wf-wrap { max-width:1100px; margin:24px auto; padding:0 24px; display:grid; grid-template-columns:340px 1fr; gap:32px; align-items:start; }
+  .wf-note-col { font-size:12px; color:#4A535C; line-height:1.9; }
+  .wf-note-col h3 { font-size:13px; color:#1C2126; margin-bottom:8px; }
+  .wf-note-col .fr-ref { display:inline-block; font-family:'IBM Plex Mono',monospace; font-size:10px; color:#2E6480; background:#E6EEF1; border-radius:3px; padding:1px 6px; margin-right:4px; }
+  .wf-step { display:flex; gap:10px; margin-bottom:14px; }
+  .wf-step-num { width:20px; height:20px; border-radius:50%; background:#2E6480; color:#fff; font-size:10px; font-weight:700; display:flex; align-items:center; justify-content:center; flex-shrink:0; margin-top:1px; font-family:'IBM Plex Mono',monospace; }
+
+  /* Phone frame */
+  .phone-wrap { display:flex; justify-content:center; }
+  .phone-frame {
+    width:320px; background:#F2F5F6; border-radius:30px; border:8px solid #1C2126;
+    overflow:hidden; box-shadow:0 10px 30px rgba(28,33,38,.18); position:relative;
+  }
+  .phone-notch {
+    position:absolute; top:0; left:50%; transform:translateX(-50%);
+    width:120px; height:20px; background:#1C2126; border-radius:0 0 14px 14px; z-index:2;
+  }
+  .phone-statusbar {
+    height:30px; background:#fff; display:flex; align-items:center; justify-content:space-between;
+    padding:0 18px; font-size:10px; font-family:'IBM Plex Mono',monospace; color:#1C2126;
+  }
+  .liff-header {
+    background:#fff; border-bottom:1px solid #D9E0E3; padding:11px 14px;
+    display:flex; align-items:center; gap:8px; font-size:13px; font-weight:700;
+  }
+  .liff-header-back { color:#7E8891; font-size:16px; }
+  .liff-header-close { margin-left:auto; color:#A9B3BA; font-size:15px; }
+  .liff-body { min-height:500px; max-height:500px; overflow-y:auto; padding:14px; }
+  .liff-card { background:#fff; border-radius:10px; padding:14px; margin-bottom:12px; border:1px solid #D9E0E3; }
+  .liff-label { font-size:10.5px; color:#7E8891; margin-bottom:4px; display:block; }
+  .liff-input { width:100%; padding:9px 10px; border:1px solid #D3DADE; border-radius:6px; font-size:12.5px; font-family:inherit; color:#1C2126; margin-bottom:10px; }
+  .liff-btn { width:100%; padding:11px; border:none; border-radius:8px; background:#06C755; color:#fff; font-size:13px; font-weight:700; cursor:pointer; font-family:inherit; }
+  .liff-btn.secondary { background:#fff; color:#2E6480; border:1px solid #2E6480; }
+  .liff-chip { display:inline-block; background:#E6EEF1; color:#2E6480; font-size:10.5px; padding:2px 8px; border-radius:9px; margin:2px 3px 2px 0; }
+  .liff-chip.selected { background:#2E6480; color:#fff; }
+
+  /* マイページ：選考ステップ */
+  .liff-steps { display:flex; align-items:center; margin:4px 0 2px; }
+  .liff-step-dot { width:22px; height:22px; border-radius:50%; background:#D9E0E3; color:#7E8891; font-size:10px; font-weight:700; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+  .liff-step-dot.done { background:#4C8C6B; color:#fff; }
+  .liff-step-dot.current { background:#2E6480; color:#fff; box-shadow:0 0 0 4px #E6EEF1; }
+  .liff-step-line { flex:1; height:2px; background:#D9E0E3; }
+  .liff-step-line.done { background:#4C8C6B; }
+  .liff-step-labels { display:flex; font-size:9px; color:#7E8891; margin-top:4px; text-align:center; }
+  .liff-step-labels span { flex:1; }
+
+  .liff-upload-row { display:flex; align-items:center; gap:10px; padding:10px 0; border-bottom:1px solid #E9EDEF; }
+  .liff-upload-row:last-child { border-bottom:none; }
+  .liff-upload-icon { width:34px; height:34px; border-radius:7px; background:#F2F5F6; display:flex; align-items:center; justify-content:center; font-size:16px; flex-shrink:0; }
+  .liff-upload-status { margin-left:auto; font-size:10.5px; font-weight:700; }
+  .liff-upload-status.done { color:#2F5A42; }
+  .liff-upload-status.todo { color:#9C5A1D; }
+
+  .liff-seminar-card { border:1px solid #D9E0E3; border-radius:8px; padding:11px 12px; margin-bottom:10px; }
+  .liff-seminar-date { font-size:12px; font-weight:700; }
+  .liff-seminar-meta { font-size:10.5px; color:#7E8891; margin:3px 0 8px; }
+
+  code { font-family:'IBM Plex Mono','SF Mono',monospace; font-size:11px; color:#2E6480; background:#E6EEF1; padding:1px 5px; border-radius:4px; }
+</style>
+</head>
+<body>
+
+<!-- Global Nav -->
+<div style="background:#1C2126;height:40px;display:flex;align-items:center;padding:0 20px;gap:20px;font-size:12px;flex-shrink:0;overflow-x:auto;">
+  <span style="color:#6FA0B5;font-weight:700;letter-spacing:0.5px;white-space:nowrap;">ATS設計ドキュメント</span>
+  <a href="index.html"             style="color:#A9B3BA;text-decoration:none;opacity:.7;white-space:nowrap;">🖥 ワイヤーフレーム</a>
+  <a href="requirements.html"      style="color:#A9B3BA;text-decoration:none;opacity:.7;white-space:nowrap;">📋 要件定義書</a>
+  <a href="dataflow.html"          style="color:#A9B3BA;text-decoration:none;opacity:.7;white-space:nowrap;">🔀 データフロー設計</a>
+  <a href="roadmap.html"           style="color:#A9B3BA;text-decoration:none;opacity:.7;white-space:nowrap;">🗺️ ロードマップ</a>
+  <a href="screen-spec.html"       style="color:#A9B3BA;text-decoration:none;opacity:.7;white-space:nowrap;">📐 画面仕様書</a>
+  <a href="table-spec.html"        style="color:#A9B3BA;text-decoration:none;opacity:.7;white-space:nowrap;">🗃️ テーブル定義書</a>
+  <a href="integration-spec.html"  style="color:#A9B3BA;text-decoration:none;opacity:.7;white-space:nowrap;">🔌 外部連携仕様書</a>
+  <a href="architecture.html"      style="color:#A9B3BA;text-decoration:none;opacity:.7;white-space:nowrap;">🏗️ アーキテクチャ</a>
+  <a href="agency-wireframe.html"  style="color:#A9B3BA;text-decoration:none;opacity:.7;white-space:nowrap;">🤝 エージェントWF</a>
+  <a href="security.html"          style="color:#A9B3BA;text-decoration:none;opacity:.7;white-space:nowrap;">🔒 セキュリティ設計書</a>
+  <a href="media-rpa-poc.html"     style="color:#A9B3BA;text-decoration:none;opacity:.7;white-space:nowrap;">🧪 媒体取込 技術検証</a>
+  <a href="liff-wireframe.html"    style="color:#fff;text-decoration:none;border-bottom:2px solid #6FA0B5;padding-bottom:2px;white-space:nowrap;">📱 LIFF画面WF</a>
+</div>
+
+<!-- Page tabs -->
+<div class="page-tabs">
+  <div class="page-tab active" onclick="swPage(this,'pg-onboard')">① 友だち追加〜初回登録</div>
+  <div class="page-tab" onclick="swPage(this,'pg-mypage')">② マイページ</div>
+  <div class="page-tab" onclick="swPage(this,'pg-seminar')">③ 説明会予約</div>
+  <div class="page-tab" onclick="swPage(this,'pg-survey')">④ アンケート</div>
+</div>
+
+<!-- ============ PAGE 1: 友だち追加〜初回登録 ============ -->
+<div id="pg-onboard" class="page-content active">
+  <div class="wf-wrap">
+    <div class="phone-wrap">
+      <div class="phone-frame">
+        <div class="phone-notch"></div>
+        <div class="phone-statusbar"><span>9:41</span><span>LINE</span></div>
+        <div class="liff-header"><span class="liff-header-back">‹</span> 新規登録 <span class="liff-header-close">✕</span></div>
+        <div class="liff-body">
+          <div class="liff-card" style="background:#E3EFE8;border-color:#C7D8CC;">
+            <div style="font-size:11.5px;color:#2F5A42;">✅ LINEログイン済み（小川 拓也として認証）</div>
+          </div>
+          <div class="liff-card">
+            <span class="liff-label">流入元（自動検出）</span>
+            <span class="liff-chip selected">🏫 東京工業大学 説明会QR</span>
+          </div>
+          <div class="liff-card">
+            <span class="liff-label">氏名</span>
+            <input class="liff-input" value="小川 拓也">
+            <span class="liff-label">大学</span>
+            <input class="liff-input" value="東京工業大学">
+            <span class="liff-label">学部・学科</span>
+            <input class="liff-input" value="工学部 機械系">
+            <span class="liff-label">電話番号</span>
+            <input class="liff-input" value="090-1234-5678">
+            <span class="liff-label">卒業予定年度</span>
+            <input class="liff-input" value="2027年3月">
+          </div>
+          <div class="liff-card">
+            <label style="font-size:11px;color:#4A535C;display:flex;gap:8px;align-items:flex-start;">
+              <input type="checkbox" checked style="margin-top:2px;">
+              <span><a href="#" style="color:#2E6480;">個人情報の取り扱い</a>に同意の上、登録します</span>
+            </label>
+          </div>
+          <button class="liff-btn">登録してマイページへ</button>
+        </div>
+      </div>
+    </div>
+    <div class="wf-note-col">
+      <h3>この画面について</h3>
+      <div class="wf-step"><div class="wf-step-num">1</div><div>学校訪問・説明会等でQRコードを提示。<code>liff.me/xxxxx?qr_id=UUID</code>形式のURLをスキャン</div></div>
+      <div class="wf-step"><div class="wf-step-num">2</div><div>LINE内ブラウザでLIFFアプリが起動。<strong>LINEの自動ログイン</strong>によりユーザーIDが取得される（学生は何も入力不要）</div></div>
+      <div class="wf-step"><div class="wf-step-num">3</div><div>QRに紐づいた流入元タグ（例：「東京工業大学 説明会QR」）が自動付与され、画面にも表示される</div></div>
+      <div class="wf-step"><div class="wf-step-num">4</div><div>簡易登録フォームに入力・同意して送信すると、応募者レコードが作成されマイページに遷移する</div></div>
+      <div style="margin-top:16px;padding-top:12px;border-top:1px solid #D9E0E3;">
+        <span class="fr-ref">FR030</span><span class="fr-ref">FR104</span>
+        対応する要件：LINE友達登録フロー、採用サイトからのLIFF導線
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ PAGE 2: マイページ ============ -->
+<div id="pg-mypage" class="page-content">
+  <div class="wf-wrap">
+    <div class="phone-wrap">
+      <div class="phone-frame">
+        <div class="phone-notch"></div>
+        <div class="phone-statusbar"><span>9:41</span><span>LINE</span></div>
+        <div class="liff-header"><span class="liff-header-back">‹</span> マイページ <span class="liff-header-close">✕</span></div>
+        <div class="liff-body">
+          <div class="liff-card">
+            <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
+              <div style="width:40px;height:40px;border-radius:50%;background:#2E6480;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;">小</div>
+              <div>
+                <div style="font-size:13px;font-weight:700;">小川 拓也 さん</div>
+                <div style="font-size:10.5px;color:#7E8891;">東京工業大学 / 機械系</div>
+              </div>
+            </div>
+            <div class="liff-steps">
+              <div class="liff-step-dot done">✓</div><div class="liff-step-line done"></div>
+              <div class="liff-step-dot done">✓</div><div class="liff-step-line done"></div>
+              <div class="liff-step-dot current">3</div><div class="liff-step-line"></div>
+              <div class="liff-step-dot">4</div><div class="liff-step-line"></div>
+              <div class="liff-step-dot">5</div>
+            </div>
+            <div class="liff-step-labels"><span>登録</span><span>説明会</span><span>1次面接</span><span>最終</span><span>内定</span></div>
+          </div>
+
+          <div class="liff-card">
+            <div style="font-size:12px;font-weight:700;margin-bottom:8px;">提出書類</div>
+            <div class="liff-upload-row">
+              <div class="liff-upload-icon">📄</div>
+              <div><div style="font-size:12px;font-weight:600;">エントリーシート</div><div style="font-size:10px;color:#94A0A8;">PDF・5MB以下</div></div>
+              <div class="liff-upload-status done">提出済み ✓</div>
+            </div>
+            <div class="liff-upload-row">
+              <div class="liff-upload-icon">🪪</div>
+              <div><div style="font-size:12px;font-weight:600;">証明写真</div><div style="font-size:10px;color:#94A0A8;">JPG・3ヶ月以内</div></div>
+              <div class="liff-upload-status todo">未提出</div>
+            </div>
+            <button class="liff-btn secondary" style="margin-top:10px;">📎 証明写真をアップロード</button>
+          </div>
+
+          <div class="liff-card">
+            <div style="font-size:12px;font-weight:700;margin-bottom:8px;">プロフィール編集</div>
+            <span class="liff-label">電話番号</span>
+            <input class="liff-input" value="090-1234-5678">
+            <span class="liff-label">現住所</span>
+            <input class="liff-input" value="東京都目黒区大岡山◯-◯-◯">
+            <button class="liff-btn secondary">変更を保存</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="wf-note-col">
+      <h3>この画面について</h3>
+      <div class="wf-step"><div class="wf-step-num">1</div><div>リッチメニュー「マイページ」または通知メッセージ内リンクから起動</div></div>
+      <div class="wf-step"><div class="wf-step-num">2</div><div>選考ステップはATS内部の選考ステータスと連動し、進捗に応じて自動更新される（内部の「選考管理」と同じデータ）</div></div>
+      <div class="wf-step"><div class="wf-step-num">3</div><div>書類アップロードは<code>liff.getProfile()</code>で取得したLINE UserIDに紐付けてサーバーへ送信</div></div>
+      <div class="wf-step"><div class="wf-step-num">4</div><div>プロフィール編集内容はATS側の応募者詳細画面にリアルタイム反映される</div></div>
+      <div style="margin-top:16px;padding-top:12px;border-top:1px solid #D9E0E3;">
+        <span class="fr-ref">FR002</span> 対応する要件：マイページ（LIFF）— 個人情報登録・書類アップロード・画像アップロード・選考状況確認
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ PAGE 3: 説明会予約 ============ -->
+<div id="pg-seminar" class="page-content">
+  <div class="wf-wrap">
+    <div class="phone-wrap">
+      <div class="phone-frame">
+        <div class="phone-notch"></div>
+        <div class="phone-statusbar"><span>9:41</span><span>LINE</span></div>
+        <div class="liff-header"><span class="liff-header-back">‹</span> 説明会予約 <span class="liff-header-close">✕</span></div>
+        <div class="liff-body">
+          <div class="liff-card" style="background:#E6EEF1;border-color:#C3CBD0;">
+            <div style="font-size:11px;color:#1B3F52;">エンジニア職メニューから遷移。あなたの条件に合う説明会を表示しています</div>
+          </div>
+          <div class="liff-seminar-card">
+            <div class="liff-seminar-date">11月10日（月） 14:00〜15:30</div>
+            <div class="liff-seminar-meta">技術説明会（オンライン）・残り 8席</div>
+            <button class="liff-btn">予約する</button>
+          </div>
+          <div class="liff-seminar-card" style="background:#E3EFE8;border-color:#C7D8CC;">
+            <div class="liff-seminar-date">11月15日（土） 10:00〜12:00</div>
+            <div class="liff-seminar-meta">本社見学会（対面・東京）・残り 3席</div>
+            <button class="liff-btn" style="background:#4C8C6B;" disabled>✓ 予約済み</button>
+          </div>
+          <div class="liff-seminar-card" style="opacity:.55;">
+            <div class="liff-seminar-date">11月22日（土） 13:00〜14:00</div>
+            <div class="liff-seminar-meta">技術説明会（オンライン）・満席</div>
+            <button class="liff-btn secondary" disabled>満席</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="wf-note-col">
+      <h3>この画面について</h3>
+      <div class="wf-step"><div class="wf-step-num">1</div><div>リッチメニューの「説明会予約」ボタン（LIFFアクション）から起動</div></div>
+      <div class="wf-step"><div class="wf-step-num">2</div><div>開催枠はATS内部の「カレンダー／枠管理」と連動。予約が入ると残席数がリアルタイムで減少する</div></div>
+      <div class="wf-step"><div class="wf-step-num">3</div><div>予約確定時、学生のLINEへ日時・場所・地図リンクを自動送信（FR097系の一括登録枠とも連動）</div></div>
+      <div style="margin-top:16px;padding-top:12px;border-top:1px solid #D9E0E3;">
+        <span class="fr-ref">FR022</span> 対応する要件：説明会予約（学生）— LINEリッチメニューまたはLIFFから学生が直接予約
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ PAGE 4: アンケート ============ -->
+<div id="pg-survey" class="page-content">
+  <div class="wf-wrap">
+    <div class="phone-wrap">
+      <div class="phone-frame">
+        <div class="phone-notch"></div>
+        <div class="phone-statusbar"><span>9:41</span><span>LINE</span></div>
+        <div class="liff-header"><span class="liff-header-back">‹</span> アンケート <span class="liff-header-close">✕</span></div>
+        <div class="liff-body">
+          <div class="liff-card">
+            <div style="font-size:12px;font-weight:700;margin-bottom:4px;">説明会の満足度を教えてください</div>
+            <div style="font-size:10.5px;color:#94A0A8;margin-bottom:10px;">11/10 技術説明会（オンライン）参加者向け</div>
+            <label style="display:flex;align-items:center;gap:8px;font-size:12px;padding:6px 0;"><input type="radio" name="q1" checked> とても満足</label>
+            <label style="display:flex;align-items:center;gap:8px;font-size:12px;padding:6px 0;"><input type="radio" name="q1"> 満足</label>
+            <label style="display:flex;align-items:center;gap:8px;font-size:12px;padding:6px 0;"><input type="radio" name="q1"> どちらとも言えない</label>
+            <label style="display:flex;align-items:center;gap:8px;font-size:12px;padding:6px 0;"><input type="radio" name="q1"> 不満</label>
+          </div>
+          <div class="liff-card">
+            <div style="font-size:12px;font-weight:700;margin-bottom:8px;">興味のある職種（複数選択可）</div>
+            <span class="liff-chip selected">機械設計</span>
+            <span class="liff-chip">回路設計</span>
+            <span class="liff-chip selected">生産技術</span>
+            <span class="liff-chip">品質管理</span>
+          </div>
+          <div class="liff-card">
+            <div style="font-size:12px;font-weight:700;margin-bottom:8px;">入社意欲を10点満点でお聞かせください</div>
+            <div style="display:grid;grid-template-columns:repeat(10,1fr);gap:4px;">
+              <button type="button" style="padding:6px 0;border:1px solid #D3DADE;border-radius:4px;background:#fff;font-size:11px;">1</button>
+              <button type="button" style="padding:6px 0;border:1px solid #D3DADE;border-radius:4px;background:#fff;font-size:11px;">2</button>
+              <button type="button" style="padding:6px 0;border:1px solid #D3DADE;border-radius:4px;background:#fff;font-size:11px;">3</button>
+              <button type="button" style="padding:6px 0;border:1px solid #D3DADE;border-radius:4px;background:#fff;font-size:11px;">4</button>
+              <button type="button" style="padding:6px 0;border:1px solid #D3DADE;border-radius:4px;background:#fff;font-size:11px;">5</button>
+              <button type="button" style="padding:6px 0;border:1px solid #D3DADE;border-radius:4px;background:#fff;font-size:11px;">6</button>
+              <button type="button" style="padding:6px 0;border:1px solid #D3DADE;border-radius:4px;background:#fff;font-size:11px;">7</button>
+              <button type="button" style="padding:6px 0;border:1px solid #D3DADE;border-radius:4px;background:#fff;font-size:11px;">8</button>
+              <button type="button" style="padding:6px 0;border-radius:4px;background:#06C755;color:#fff;border:1px solid #06C755;font-size:11px;font-weight:700;">9</button>
+              <button type="button" style="padding:6px 0;border:1px solid #D3DADE;border-radius:4px;background:#fff;font-size:11px;">10</button>
+            </div>
+          </div>
+          <div class="liff-card">
+            <span class="liff-label">ご意見・ご感想（任意）</span>
+            <textarea class="liff-input" rows="3" style="resize:vertical;">現場見学の時間をもう少し長くしてほしいです。</textarea>
+          </div>
+          <button class="liff-btn">回答を送信</button>
+        </div>
+      </div>
+    </div>
+    <div class="wf-note-col">
+      <h3>この画面について</h3>
+      <div class="wf-step"><div class="wf-step-num">1</div><div>説明会後・選考後などのタイミングでLINEメッセージとしてアンケートURL（LIFF）を一斉送信</div></div>
+      <div class="wf-step"><div class="wf-step-num">2</div><div>回答はATS内部の「アンケート管理」画面でリアルタイム集計・分析に反映される</div></div>
+      <div class="wf-step"><div class="wf-step-num">3</div><div>未回答者には一定期間後にリマインドメッセージを自動送信（設定による）</div></div>
+      <div style="margin-top:16px;padding-top:12px;border-top:1px solid #D9E0E3;">
+        <span class="fr-ref">FR036</span> 対応する要件：LINEアンケート — LIFF経由のアンケートをLINEで送付・回答回収・集計
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+function swPage(el, id) {
+  document.querySelectorAll('.page-tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.page-content').forEach(c => c.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById(id).classList.add('active');
+  const hashKey = Object.keys(hashToPageId).find(k => hashToPageId[k] === id);
+  if (hashKey) history.replaceState(null, '', '#' + hashKey);
+}
+
+// 管理画面側（リッチメニュー編集等）から「#mypage」のようなハッシュ付きURLで
+// 直接該当画面を開けるようにする
+const hashToPageId = { onboard: 'pg-onboard', mypage: 'pg-mypage', seminar: 'pg-seminar', survey: 'pg-survey' };
+function openByHash() {
+  const key = location.hash.replace('#', '');
+  const pageId = hashToPageId[key];
+  if (!pageId) return;
+  const tabIndex = Object.keys(hashToPageId).indexOf(key);
+  const tab = document.querySelectorAll('.page-tab')[tabIndex];
+  if (tab) swPage(tab, pageId);
+}
+window.addEventListener('hashchange', openByHash);
+openByHash();
+</script>
+</body>
+</html>
