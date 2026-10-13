@@ -9,7 +9,7 @@ test("面接記録を登録して一覧に表示され、削除できる", async
   await page.getByLabel("姓").fill(lastName);
   await page.getByLabel("名").fill(firstName);
   await page.getByLabel("メールアドレス").fill(email);
-  await page.getByRole("button", { name: "登録" }).click();
+  await page.getByRole("button", { name: "登録", exact: true }).click();
   await expect(
     page.getByRole("row").filter({ hasText: `${lastName} ${firstName}` })
   ).toBeVisible();
@@ -21,7 +21,7 @@ test("面接記録を登録して一覧に表示され、削除できる", async
   await page.getByLabel("面接官").selectOption({ label: "E2Eテストスタッフ" });
   await page.getByLabel("面接日時").fill("2027-01-15T10:00");
   await page.getByLabel("評価(1〜5)").fill("4");
-  await page.getByRole("button", { name: "登録" }).click();
+  await page.getByRole("button", { name: "登録", exact: true }).click();
 
   const row = page.getByRole("row").filter({ hasText: `${lastName} ${firstName}` });
   await expect(row).toBeVisible();

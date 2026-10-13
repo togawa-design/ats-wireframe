@@ -33,7 +33,7 @@ const SECTIONS: NavSection[] = [
     label: "LINE",
     badge: "新卒のみ",
     items: [
-      { icon: "💬", label: "メッセージ送信" },
+      { href: "/line-send", icon: "💬", label: "メッセージ送信" },
       { icon: "📝", label: "アンケート" },
       { icon: "🎛️", label: "リッチメニュー" },
       { icon: "🔄", label: "自動化シナリオ" },

@@ -9,7 +9,7 @@ test("応募登録すると選考が自動作成され、ステージ進行・�
   await page.getByLabel("姓").fill(lastName);
   await page.getByLabel("名").fill(firstName);
   await page.getByLabel("メールアドレス").fill(email);
-  await page.getByRole("button", { name: "登録" }).click();
+  await page.getByRole("button", { name: "登録", exact: true }).click();
   await expect(
     page.getByRole("row").filter({ hasText: `${lastName} ${firstName}` })
   ).toBeVisible();
