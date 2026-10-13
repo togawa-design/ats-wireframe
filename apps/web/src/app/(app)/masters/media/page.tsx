@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -94,7 +95,12 @@ export default async function MediaPage() {
                   </TableCell>
                   {canEdit && (
                     <TableCell className="text-right">
-                      <DeleteButton id={media.id} action={deleteMedia} confirmText="この媒体を削除しますか?" />
+                      <div className="flex justify-end gap-2">
+                        <Button variant="ghost" size="sm" asChild>
+                          <Link href={`/masters/media/${media.id}/import`}>CSV取込</Link>
+                        </Button>
+                        <DeleteButton id={media.id} action={deleteMedia} confirmText="この媒体を削除しますか?" />
+                      </div>
                     </TableCell>
                   )}
                 </TableRow>
