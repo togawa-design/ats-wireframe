@@ -19,5 +19,6 @@ export function proxy(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/((?!login|api|_next/static|_next/image|favicon.ico).*)"],
+  // /line 以下は応募者本人向けの公開ページ(LIFF連携など)のため、スタッフ認証を適用しない。
+  matcher: ["/((?!login|line|api|_next/static|_next/image|favicon.ico).*)"],
 };

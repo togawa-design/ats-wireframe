@@ -279,6 +279,7 @@ model Applicant {
   tags           ApplicantTag[]
   line_tokens    LineRegistrationToken[]
   selection      Selection?
+  line_messages  LineMessage[]
 
   @@index([email], map: "applicant_email_idx")
   @@index([sf_contact_id], map: "applicant_sf_idx")
@@ -446,4 +447,43 @@ model EvaluationResponse {
   submitter Staff          @relation("EvaluationResponseSubmitter", fields: [submitted_by], references: [id])
 
   @@unique([interview_id, item_id], map: "eval_resp_interview_idx")
+}
+
+// ===== LINE基本連携(FR030: 友だち登録・紐付け / FR031: メッセージ送信) =====
+// RichMenu/Survey/ScenarioStep等の高度なLINE機能はPhase2以降(roadmap.html STEP5〜)。
+
+enum LineMessageDirection {
+  inbound
+  outbound
+
+  @@map("line_message_direction")
+}
+
+enum LineMessageType {
+  text
+  image
+  file
+  sticker
+  template
+  flex
+
+  @@map("line_message_type")
+}
+
+/// LINEチャット履歴テーブル。
+model LineMessage {
+  id           String               @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  applicant_id String               @db.Uuid
+  direction    LineMessageDirection
+  message_type LineMessageType      @default(text)
+  content      String?
+  file_url     String?              @db.VarChar(500)
+  file_name    String?              @db.VarChar(200)
+  is_read      Boolean              @default(false)
+  sent_at      DateTime             @default(now())
+
+  applicant Applicant @relation(fields: [applicant_id], references: [id], onDelete: Cascade)
+
+  @@index([applicant_id, sent_at(sort: Desc)], map: "linemsg_applicant_idx")
+  @@index([is_read, direction, sent_at], map: "linemsg_unread_idx")
 }

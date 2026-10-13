@@ -3,7 +3,7 @@ import { mockDeep, type DeepMockProxy } from "vitest-mock-extended";
 import type { PrismaClient } from "@/generated/prisma/client";
 import { prisma } from "@/lib/prisma";
 import { getCurrentStaff } from "@/lib/auth";
-import { createApplicant, deleteApplicant } from "./actions";
+import { createApplicant, deleteApplicant, issueLineRegistrationToken } from "./actions";
 
 vi.mock("@/lib/prisma", () => ({
   prisma: mockDeep<PrismaClient>(),
@@ -129,5 +129,30 @@ describe("deleteApplicant", () => {
     vi.mocked(getCurrentStaff).mockResolvedValue(mockStaff);
     await deleteApplicant("applicant-1");
     expect(prismaMock.applicant.delete).toHaveBeenCalledWith({ where: { id: "applicant-1" } });
+  });
+});
+
+describe("issueLineRegistrationToken", () => {
+  it("未ログインなら例外を投げる", async () => {
+    vi.mocked(getCurrentStaff).mockResolvedValue(null);
+    await expect(issueLineRegistrationToken("applicant-1")).rejects.toThrow(
+      "ログインが必要です"
+    );
+    expect(prismaMock.lineRegistrationToken.create).not.toHaveBeenCalled();
+  });
+
+  it("ログイン済みなら64文字のトークンと24時間後の有効期限で作成する", async () => {
+    vi.mocked(getCurrentStaff).mockResolvedValue(mockStaff);
+    const before = Date.now();
+
+    await issueLineRegistrationToken("applicant-1");
+
+    expect(prismaMock.lineRegistrationToken.create).toHaveBeenCalledTimes(1);
+    const callArg = prismaMock.lineRegistrationToken.create.mock.calls[0][0].data;
+    expect(callArg.applicant_id).toBe("applicant-1");
+    expect(callArg.token).toMatch(/^[0-9a-f]{64}$/);
+    expect((callArg.expires_at as Date).getTime()).toBeGreaterThan(
+      before + 23 * 60 * 60 * 1000
+    );
   });
 });

@@ -1,9 +1,12 @@
 "use server";
 
+import { randomBytes } from "node:crypto";
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
 import { getCurrentStaff } from "@/lib/auth";
 import type { ApplicantType, HireType, PositionType } from "@/generated/prisma/client";
+
+const LINE_TOKEN_EXPIRES_IN_MS = 24 * 60 * 60 * 1000; // 24時間
 
 export async function createApplicant(formData: FormData) {
   const staff = await getCurrentStaff();
@@ -69,5 +72,22 @@ export async function deleteApplicant(id: string) {
   if (!staff) throw new Error("ログインが必要です");
 
   await prisma.applicant.delete({ where: { id } });
+  revalidatePath("/applicants");
+}
+
+/** LINE友だち登録・紐付け用のワンタイムトークンを発行する(FR030)。 */
+export async function issueLineRegistrationToken(applicantId: string) {
+  const staff = await getCurrentStaff();
+  if (!staff) throw new Error("ログインが必要です");
+
+  const token = randomBytes(32).toString("hex");
+  await prisma.lineRegistrationToken.create({
+    data: {
+      token,
+      applicant_id: applicantId,
+      expires_at: new Date(Date.now() + LINE_TOKEN_EXPIRES_IN_MS),
+    },
+  });
+
   revalidatePath("/applicants");
 }

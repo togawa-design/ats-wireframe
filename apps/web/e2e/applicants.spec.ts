@@ -11,7 +11,7 @@ test("応募者を登録して一覧に表示され、削除できる", async ({
   await page.getByLabel("姓").fill(lastName);
   await page.getByLabel("名").fill(firstName);
   await page.getByLabel("メールアドレス").fill(email);
-  await page.getByRole("button", { name: "登録" }).click();
+  await page.getByRole("button", { name: "登録", exact: true }).click();
 
   const row = page.getByRole("row").filter({ hasText: `${lastName} ${firstName}` });
   await expect(row).toBeVisible();

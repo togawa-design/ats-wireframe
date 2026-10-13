@@ -12,8 +12,9 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { createApplicant, deleteApplicant } from "./actions";
+import { createApplicant, deleteApplicant, issueLineRegistrationToken } from "./actions";
 import { DeleteButton } from "@/components/delete-button";
+import { headers } from "next/headers";
 
 const APPLICANT_TYPE_LABELS: Record<string, string> = {
   new_grad: "新卒",
@@ -32,14 +33,23 @@ const POSITION_TYPE_LABELS: Record<string, string> = {
 };
 
 export default async function ApplicantsPage() {
-  const [applicants, schools, tags] = await Promise.all([
+  const [applicants, schools, tags, headersList] = await Promise.all([
     prisma.applicant.findMany({
-      include: { school: true, tags: { include: { tag: true } } },
+      include: {
+        school: true,
+        tags: { include: { tag: true } },
+        line_tokens: { orderBy: { created_at: "desc" }, take: 1 },
+      },
       orderBy: { created_at: "desc" },
     }),
     prisma.school.findMany({ orderBy: { name: "asc" } }),
     prisma.tag.findMany({ orderBy: { name: "asc" } }),
+    headers(),
   ]);
+
+  const protocol = headersList.get("x-forwarded-proto") ?? "http";
+  const host = headersList.get("host");
+  const origin = host ? `${protocol}://${host}` : "";
 
   return (
     <div className="flex flex-col gap-6">
@@ -170,13 +180,14 @@ export default async function ApplicantsPage() {
                 <TableHead>学校</TableHead>
                 <TableHead>区分</TableHead>
                 <TableHead>タグ</TableHead>
+                <TableHead>LINE連携</TableHead>
                 <TableHead className="text-right">操作</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {applicants.length === 0 && (
                 <TableRow>
-                  <TableCell colSpan={6} className="text-center text-muted-foreground">
+                  <TableCell colSpan={7} className="text-center text-muted-foreground">
                     応募者がまだ登録されていません
                   </TableCell>
                 </TableRow>
@@ -210,6 +221,33 @@ export default async function ApplicantsPage() {
                         </Badge>
                       ))}
                     </div>
+                  </TableCell>
+                  <TableCell className="text-xs">
+                    {applicant.line_user_id ? (
+                      <Badge variant="secondary">連携済み</Badge>
+                    ) : (() => {
+                        const latestToken = applicant.line_tokens[0];
+                        const isActive =
+                          latestToken && !latestToken.used_at && latestToken.expires_at > new Date();
+                        if (isActive) {
+                          const url = `${origin}/line/register?token=${latestToken.token}`;
+                          return (
+                            <code
+                              title={url}
+                              className="block max-w-[180px] truncate rounded bg-muted px-1.5 py-0.5 text-[11px] text-muted-foreground"
+                            >
+                              {url}
+                            </code>
+                          );
+                        }
+                        return (
+                          <form action={issueLineRegistrationToken.bind(null, applicant.id)}>
+                            <Button type="submit" variant="outline" size="sm">
+                              登録リンクを発行
+                            </Button>
+                          </form>
+                        );
+                      })()}
                   </TableCell>
                   <TableCell className="text-right">
                     <DeleteButton
