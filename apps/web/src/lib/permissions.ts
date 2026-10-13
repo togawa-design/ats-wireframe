@@ -41,6 +41,11 @@ export function isRestrictedToOwnApplicants(staff: Staff): boolean {
   return staff.role === "interviewer";
 }
 
+/** 分析・レポート画面を閲覧できるか(管理者・採用担当・閲覧のみ。面接官は対象外)。 */
+export function canViewAnalytics(staff: Staff): boolean {
+  return staff.role !== "interviewer";
+}
+
 export function assertCanManage(staff: Staff) {
   if (!canManage(staff)) throw new Error("この操作を行う権限がありません");
 }

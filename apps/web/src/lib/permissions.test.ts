@@ -6,6 +6,7 @@ import {
   canDeleteInterview,
   isAdmin,
   isRestrictedToOwnApplicants,
+  canViewAnalytics,
   assertCanManage,
   assertIsAdmin,
 } from "./permissions";
@@ -62,6 +63,15 @@ describe("isAdmin / isRestrictedToOwnApplicants", () => {
     expect(isRestrictedToOwnApplicants(staff("interviewer"))).toBe(true);
     expect(isRestrictedToOwnApplicants(staff("viewer"))).toBe(false);
     expect(isRestrictedToOwnApplicants(staff("admin"))).toBe(false);
+  });
+});
+
+describe("canViewAnalytics", () => {
+  it("面接官以外はtrue", () => {
+    expect(canViewAnalytics(staff("admin"))).toBe(true);
+    expect(canViewAnalytics(staff("recruiter"))).toBe(true);
+    expect(canViewAnalytics(staff("viewer"))).toBe(true);
+    expect(canViewAnalytics(staff("interviewer"))).toBe(false);
   });
 });
 

@@ -58,6 +58,13 @@ const SECTIONS: NavSection[] = [
     ],
   },
   {
+    label: "書類・データ",
+    items: [
+      { icon: "📄", label: "書類管理" },
+      { href: "/analytics", icon: "📈", label: "分析・レポート" },
+    ],
+  },
+  {
     label: "設定",
     items: [
       { href: "/users", icon: "👤", label: "ユーザー管理", roles: ["admin"] },
