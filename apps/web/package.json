@@ -14,6 +14,7 @@
     "posttest:e2e": "docker compose -f e2e/docker-compose.yml down"
   },
   "dependencies": {
+    "@dnd-kit/core": "^6.3.1",
     "@line/bot-sdk": "^11.3.0",
     "@line/liff": "^2.31.2",
     "@prisma/client": "^6.19.3",
