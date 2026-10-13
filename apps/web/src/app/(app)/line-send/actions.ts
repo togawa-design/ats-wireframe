@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
 import { getCurrentStaff } from "@/lib/auth";
+import { assertCanSendLine } from "@/lib/permissions";
 import { sendTextMessage } from "@/lib/line/client";
 
 function fillTemplate(template: string, applicant: { last_name: string; first_name: string }) {
@@ -18,6 +19,7 @@ function fillTemplate(template: string, applicant: { last_name: string; first_na
 export async function sendBulkLineMessage(formData: FormData) {
   const staff = await getCurrentStaff();
   if (!staff) throw new Error("ログインが必要です");
+  assertCanSendLine(staff);
 
   const text = String(formData.get("text") ?? "").trim();
   if (!text) throw new Error("メッセージ本文を入力してください");

@@ -11,9 +11,17 @@ import {
 } from "@/components/ui/table";
 import { AdvanceButton } from "./advance-button";
 import { ResultSelect } from "./result-select";
+import { RESULT_LABELS } from "./result-labels";
+import { getCurrentStaff } from "@/lib/auth";
+import { canManage, isRestrictedToOwnApplicants } from "@/lib/permissions";
 
 export default async function SelectionsPage() {
+  const staff = await getCurrentStaff();
+  const canEdit = staff ? canManage(staff) : false;
+  const restrictToOwn = staff ? isRestrictedToOwnApplicants(staff) : false;
+
   const selections = await prisma.selection.findMany({
+    where: restrictToOwn ? { assigned_to: staff!.id } : undefined,
     include: {
       applicant: true,
       current_stage: true,
@@ -41,13 +49,13 @@ export default async function SelectionsPage() {
                 <TableHead>現在のステージ</TableHead>
                 <TableHead>結果</TableHead>
                 <TableHead>担当者</TableHead>
-                <TableHead className="text-right">操作</TableHead>
+                {canEdit && <TableHead className="text-right">操作</TableHead>}
               </TableRow>
             </TableHeader>
             <TableBody>
               {selections.length === 0 && (
                 <TableRow>
-                  <TableCell colSpan={5} className="text-center text-muted-foreground">
+                  <TableCell colSpan={canEdit ? 5 : 4} className="text-center text-muted-foreground">
                     選考中の応募者がいません
                   </TableCell>
                 </TableRow>
@@ -64,14 +72,20 @@ export default async function SelectionsPage() {
                       <Badge variant="secondary">{selection.current_stage.name}</Badge>
                     </TableCell>
                     <TableCell>
-                      <ResultSelect selectionId={selection.id} value={selection.result} />
+                      {canEdit ? (
+                        <ResultSelect selectionId={selection.id} value={selection.result} />
+                      ) : (
+                        <Badge variant="outline">{RESULT_LABELS[selection.result]}</Badge>
+                      )}
                     </TableCell>
                     <TableCell className="text-sm text-muted-foreground">
                       {selection.assignee?.name ?? "—"}
                     </TableCell>
-                    <TableCell className="text-right">
-                      {!isLastStage && <AdvanceButton selectionId={selection.id} />}
-                    </TableCell>
+                    {canEdit && (
+                      <TableCell className="text-right">
+                        {!isLastStage && <AdvanceButton selectionId={selection.id} />}
+                      </TableCell>
+                    )}
                   </TableRow>
                 );
               })}

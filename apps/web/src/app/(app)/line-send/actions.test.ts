@@ -18,7 +18,7 @@ vi.mock("@/lib/line/client", () => ({
 vi.mock("next/cache", () => ({ revalidatePath: vi.fn() }));
 
 const prismaMock = prisma as unknown as DeepMockProxy<PrismaClient>;
-const mockStaff = { id: "staff-1", name: "テスト太郎" } as never;
+const mockStaff = { id: "staff-1", name: "テスト太郎", role: "admin" } as never;
 
 function buildForm(fields: Record<string, string>) {
   const form = new FormData();
@@ -31,6 +31,13 @@ describe("sendBulkLineMessage", () => {
     vi.mocked(getCurrentStaff).mockResolvedValue(null);
     await expect(sendBulkLineMessage(buildForm({ text: "hi" }))).rejects.toThrow(
       "ログインが必要です"
+    );
+  });
+
+  it("面接官ロールでは権限エラーになる", async () => {
+    vi.mocked(getCurrentStaff).mockResolvedValue({ id: "staff-2", role: "interviewer" } as never);
+    await expect(sendBulkLineMessage(buildForm({ text: "hi" }))).rejects.toThrow(
+      "この操作を行う権限がありません"
     );
   });
 

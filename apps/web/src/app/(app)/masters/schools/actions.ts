@@ -3,11 +3,13 @@
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
 import { getCurrentStaff } from "@/lib/auth";
+import { assertCanManage } from "@/lib/permissions";
 import type { SchoolType } from "@/generated/prisma/client";
 
 export async function createSchool(formData: FormData) {
   const staff = await getCurrentStaff();
   if (!staff) throw new Error("ログインが必要です");
+  assertCanManage(staff);
 
   const name = String(formData.get("name") ?? "").trim();
   const type = String(formData.get("type") ?? "") as SchoolType;
@@ -24,6 +26,7 @@ export async function createSchool(formData: FormData) {
 export async function deleteSchool(id: string) {
   const staff = await getCurrentStaff();
   if (!staff) throw new Error("ログインが必要です");
+  assertCanManage(staff);
 
   await prisma.school.delete({ where: { id } });
   revalidatePath("/masters/schools");

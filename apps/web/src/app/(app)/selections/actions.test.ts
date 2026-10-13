@@ -14,7 +14,7 @@ vi.mock("@/lib/auth", () => ({
 vi.mock("next/cache", () => ({ revalidatePath: vi.fn() }));
 
 const prismaMock = prisma as unknown as DeepMockProxy<PrismaClient>;
-const mockStaff = { id: "staff-1", name: "テスト太郎" } as never;
+const mockStaff = { id: "staff-1", name: "テスト太郎", role: "admin" } as never;
 
 const stages = [{ id: "stage-1" }, { id: "stage-2" }, { id: "stage-3" }];
 
@@ -22,6 +22,12 @@ describe("advanceStage", () => {
   it("未ログインなら例外を投げる", async () => {
     vi.mocked(getCurrentStaff).mockResolvedValue(null);
     await expect(advanceStage("selection-1")).rejects.toThrow("ログインが必要です");
+  });
+
+  it("面接官ロールでは権限エラーになる", async () => {
+    vi.mocked(getCurrentStaff).mockResolvedValue({ id: "staff-2", role: "interviewer" } as never);
+    await expect(advanceStage("selection-1")).rejects.toThrow("この操作を行う権限がありません");
+    expect(prismaMock.selection.update).not.toHaveBeenCalled();
   });
 
   it("次のステージがあれば更新と履歴作成を行う", async () => {

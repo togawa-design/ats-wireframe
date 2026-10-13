@@ -22,7 +22,7 @@ export default async function AppLayout({
 
   return (
     <div className="flex h-screen w-full overflow-hidden bg-background text-foreground">
-      <Sidebar />
+      <Sidebar role={staff.role} />
       <div className="flex min-h-0 flex-1 flex-col">
         <header className="flex items-center justify-between border-b border-border bg-card px-6 py-3">
           <div className="text-sm text-muted-foreground">

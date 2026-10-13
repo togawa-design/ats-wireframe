@@ -13,6 +13,8 @@ import {
 } from "@/components/ui/table";
 import { createSchool, deleteSchool } from "./actions";
 import { DeleteButton } from "@/components/delete-button";
+import { getCurrentStaff } from "@/lib/auth";
+import { canManage } from "@/lib/permissions";
 
 const SCHOOL_TYPE_LABELS: Record<string, string> = {
   university: "大学",
@@ -23,6 +25,9 @@ const SCHOOL_TYPE_LABELS: Record<string, string> = {
 };
 
 export default async function SchoolsPage() {
+  const staff = await getCurrentStaff();
+  const canEdit = staff ? canManage(staff) : false;
+
   const schools = await prisma.school.findMany({ orderBy: { name: "asc" } });
 
   return (
@@ -34,6 +39,7 @@ export default async function SchoolsPage() {
         </p>
       </div>
 
+      {canEdit && (
       <Card className="border-border">
         <CardHeader>
           <CardTitle className="text-sm">新規学校追加</CardTitle>
@@ -72,6 +78,7 @@ export default async function SchoolsPage() {
           </form>
         </CardContent>
       </Card>
+      )}
 
       <Card className="border-border">
         <CardContent className="p-0">
@@ -81,13 +88,13 @@ export default async function SchoolsPage() {
                 <TableHead>学校名</TableHead>
                 <TableHead>種別</TableHead>
                 <TableHead>カテゴリ</TableHead>
-                <TableHead className="text-right">操作</TableHead>
+                {canEdit && <TableHead className="text-right">操作</TableHead>}
               </TableRow>
             </TableHeader>
             <TableBody>
               {schools.length === 0 && (
                 <TableRow>
-                  <TableCell colSpan={4} className="text-center text-muted-foreground">
+                  <TableCell colSpan={canEdit ? 4 : 3} className="text-center text-muted-foreground">
                     学校がまだ登録されていません
                   </TableCell>
                 </TableRow>
@@ -101,9 +108,11 @@ export default async function SchoolsPage() {
                   <TableCell className="text-sm text-muted-foreground">
                     {school.category ?? "—"}
                   </TableCell>
-                  <TableCell className="text-right">
-                    <DeleteButton id={school.id} action={deleteSchool} confirmText="この学校を削除しますか?" />
-                  </TableCell>
+                  {canEdit && (
+                    <TableCell className="text-right">
+                      <DeleteButton id={school.id} action={deleteSchool} confirmText="この学校を削除しますか?" />
+                    </TableCell>
+                  )}
                 </TableRow>
               ))}
             </TableBody>

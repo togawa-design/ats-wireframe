@@ -3,10 +3,12 @@
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
 import { getCurrentStaff } from "@/lib/auth";
+import { assertCanRecordInterview, assertCanDeleteInterview } from "@/lib/permissions";
 
 export async function createInterview(formData: FormData) {
   const staff = await getCurrentStaff();
   if (!staff) throw new Error("ログインが必要です");
+  assertCanRecordInterview(staff);
 
   const selection_id = String(formData.get("selection_id") ?? "");
   const interviewer_id = String(formData.get("interviewer_id") ?? "");
@@ -40,6 +42,7 @@ export async function createInterview(formData: FormData) {
 export async function deleteInterview(id: string) {
   const staff = await getCurrentStaff();
   if (!staff) throw new Error("ログインが必要です");
+  assertCanDeleteInterview(staff);
 
   await prisma.interview.delete({ where: { id } });
   revalidatePath("/interviews");
