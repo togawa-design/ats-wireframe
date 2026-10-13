@@ -39,6 +39,33 @@ export async function advanceStage(selectionId: string) {
   revalidatePath("/selections");
 }
 
+/** カンバン表示でのドラッグ&ドロップによる任意ステージへの移動(FR011)。 */
+export async function moveToStage(selectionId: string, toStageId: string) {
+  const staff = await getCurrentStaff();
+  if (!staff) throw new Error("ログインが必要です");
+  assertCanManage(staff);
+
+  const selection = await prisma.selection.findUniqueOrThrow({ where: { id: selectionId } });
+  if (selection.current_stage_id === toStageId) return;
+
+  await prisma.$transaction([
+    prisma.selection.update({
+      where: { id: selectionId },
+      data: { current_stage_id: toStageId },
+    }),
+    prisma.selectionHistory.create({
+      data: {
+        selection_id: selectionId,
+        from_stage_id: selection.current_stage_id,
+        to_stage_id: toStageId,
+        changed_by: staff.id,
+      },
+    }),
+  ]);
+
+  revalidatePath("/selections");
+}
+
 export async function setResult(selectionId: string, result: SelectionResult) {
   const staff = await getCurrentStaff();
   if (!staff) throw new Error("ログインが必要です");

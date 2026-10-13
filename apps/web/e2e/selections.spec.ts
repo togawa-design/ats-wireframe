@@ -15,6 +15,10 @@ test("応募登録すると選考が自動作成され、ステージ進行・�
   ).toBeVisible();
 
   await page.goto("/selections");
+  // このテストはリスト表示固有の操作(次のステージへボタン・結果セレクト)を検証するため、
+  // デフォルト表示のカンバンからリスト表示に切り替える。カンバンのドラッグ操作自体は
+  // selections-kanban.spec.ts で別途検証している。
+  await page.getByRole("button", { name: "リスト" }).click();
   const row = page.getByRole("row").filter({ hasText: `${lastName} ${firstName}` });
   await expect(row).toBeVisible();
   await expect(row.getByText("エントリー")).toBeVisible();

@@ -3,7 +3,7 @@ import { mockDeep, type DeepMockProxy } from "vitest-mock-extended";
 import type { PrismaClient } from "@/generated/prisma/client";
 import { prisma } from "@/lib/prisma";
 import { getCurrentStaff } from "@/lib/auth";
-import { advanceStage, setResult } from "./actions";
+import { advanceStage, moveToStage, setResult } from "./actions";
 
 vi.mock("@/lib/prisma", () => ({
   prisma: mockDeep<PrismaClient>(),
@@ -64,6 +64,56 @@ describe("advanceStage", () => {
 
     await expect(advanceStage("selection-1")).rejects.toThrow("既に最終ステージです");
     expect(prismaMock.selection.update).not.toHaveBeenCalled();
+  });
+});
+
+describe("moveToStage", () => {
+  it("未ログインなら例外を投げる", async () => {
+    vi.mocked(getCurrentStaff).mockResolvedValue(null);
+    await expect(moveToStage("selection-1", "stage-3")).rejects.toThrow("ログインが必要です");
+  });
+
+  it("面接官ロールでは権限エラーになる", async () => {
+    vi.mocked(getCurrentStaff).mockResolvedValue({ id: "staff-2", role: "interviewer" } as never);
+    await expect(moveToStage("selection-1", "stage-3")).rejects.toThrow(
+      "この操作を行う権限がありません"
+    );
+  });
+
+  it("任意のステージへ移動し履歴を作成する", async () => {
+    vi.mocked(getCurrentStaff).mockResolvedValue(mockStaff);
+    prismaMock.selection.findUniqueOrThrow.mockResolvedValue({
+      id: "selection-1",
+      current_stage_id: "stage-1",
+    } as never);
+
+    await moveToStage("selection-1", "stage-3");
+
+    expect(prismaMock.selection.update).toHaveBeenCalledWith({
+      where: { id: "selection-1" },
+      data: { current_stage_id: "stage-3" },
+    });
+    expect(prismaMock.selectionHistory.create).toHaveBeenCalledWith({
+      data: {
+        selection_id: "selection-1",
+        from_stage_id: "stage-1",
+        to_stage_id: "stage-3",
+        changed_by: "staff-1",
+      },
+    });
+  });
+
+  it("移動先が現在のステージと同じなら何もしない", async () => {
+    vi.mocked(getCurrentStaff).mockResolvedValue(mockStaff);
+    prismaMock.selection.findUniqueOrThrow.mockResolvedValue({
+      id: "selection-1",
+      current_stage_id: "stage-2",
+    } as never);
+
+    await moveToStage("selection-1", "stage-2");
+
+    expect(prismaMock.selection.update).not.toHaveBeenCalled();
+    expect(prismaMock.selectionHistory.create).not.toHaveBeenCalled();
   });
 });
 
