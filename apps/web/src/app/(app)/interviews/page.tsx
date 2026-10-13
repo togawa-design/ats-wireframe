@@ -14,14 +14,23 @@ import {
 } from "@/components/ui/table";
 import { createInterview, deleteInterview } from "./actions";
 import { DeleteButton } from "@/components/delete-button";
+import { getCurrentStaff } from "@/lib/auth";
+import { canRecordInterview, canDeleteInterview, isRestrictedToOwnApplicants } from "@/lib/permissions";
 
 export default async function InterviewsPage() {
+  const staff = await getCurrentStaff();
+  const canCreate = staff ? canRecordInterview(staff) : false;
+  const canDelete = staff ? canDeleteInterview(staff) : false;
+  const restrictToOwn = staff ? isRestrictedToOwnApplicants(staff) : false;
+
   const [interviews, selections, staffList] = await Promise.all([
     prisma.interview.findMany({
+      where: restrictToOwn ? { interviewer_id: staff!.id } : undefined,
       include: { selection: { include: { applicant: true } }, stage: true, interviewer: true },
       orderBy: { scheduled_at: "desc" },
     }),
     prisma.selection.findMany({
+      where: restrictToOwn ? { assigned_to: staff!.id } : undefined,
       include: { applicant: true },
       orderBy: { applicant: { created_at: "desc" } },
     }),
@@ -37,6 +46,7 @@ export default async function InterviewsPage() {
         </p>
       </div>
 
+      {canCreate && (
       <Card className="border-border">
         <CardHeader>
           <CardTitle className="text-sm">面接記録を登録</CardTitle>
@@ -105,6 +115,7 @@ export default async function InterviewsPage() {
           </form>
         </CardContent>
       </Card>
+      )}
 
       <Card className="border-border">
         <CardContent className="p-0">
@@ -116,13 +127,13 @@ export default async function InterviewsPage() {
                 <TableHead>面接官</TableHead>
                 <TableHead>面接日時</TableHead>
                 <TableHead>評価</TableHead>
-                <TableHead className="text-right">操作</TableHead>
+                {canDelete && <TableHead className="text-right">操作</TableHead>}
               </TableRow>
             </TableHeader>
             <TableBody>
               {interviews.length === 0 && (
                 <TableRow>
-                  <TableCell colSpan={6} className="text-center text-muted-foreground">
+                  <TableCell colSpan={canDelete ? 6 : 5} className="text-center text-muted-foreground">
                     面接記録がまだありません
                   </TableCell>
                 </TableRow>
@@ -150,13 +161,15 @@ export default async function InterviewsPage() {
                       </span>
                     )}
                   </TableCell>
-                  <TableCell className="text-right">
-                    <DeleteButton
-                      id={interview.id}
-                      action={deleteInterview}
-                      confirmText="この面接記録を削除しますか?"
-                    />
-                  </TableCell>
+                  {canDelete && (
+                    <TableCell className="text-right">
+                      <DeleteButton
+                        id={interview.id}
+                        action={deleteInterview}
+                        confirmText="この面接記録を削除しますか?"
+                      />
+                    </TableCell>
+                  )}
                 </TableRow>
               ))}
             </TableBody>

@@ -1,8 +1,16 @@
+import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { SendForm } from "./send-form";
+import { getCurrentStaff } from "@/lib/auth";
+import { canSendLine } from "@/lib/permissions";
 
 export default async function LineSendPage() {
+  const staff = await getCurrentStaff();
+  if (!staff || !canSendLine(staff)) {
+    redirect("/");
+  }
+
   const [tags, recipientCount] = await Promise.all([
     prisma.tag.findMany({ orderBy: { name: "asc" } }),
     prisma.applicant.count({ where: { hire_type: "new_grad", line_user_id: { not: null } } }),

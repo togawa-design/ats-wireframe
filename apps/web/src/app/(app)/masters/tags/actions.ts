@@ -3,12 +3,14 @@
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
 import { getCurrentStaff } from "@/lib/auth";
+import { assertCanManage } from "@/lib/permissions";
 
 const DEFAULT_COLOR = "#2E6480";
 
 export async function createTag(formData: FormData) {
   const staff = await getCurrentStaff();
   if (!staff) throw new Error("ログインが必要です");
+  assertCanManage(staff);
 
   const name = String(formData.get("name") ?? "").trim();
   const color = String(formData.get("color") ?? DEFAULT_COLOR).trim();
@@ -24,6 +26,7 @@ export async function createTag(formData: FormData) {
 export async function deleteTag(id: string) {
   const staff = await getCurrentStaff();
   if (!staff) throw new Error("ログインが必要です");
+  assertCanManage(staff);
 
   await prisma.tag.delete({ where: { id } });
   revalidatePath("/masters/tags");

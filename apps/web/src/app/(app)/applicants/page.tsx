@@ -15,6 +15,8 @@ import {
 import { createApplicant, deleteApplicant, issueLineRegistrationToken } from "./actions";
 import { DeleteButton } from "@/components/delete-button";
 import { headers } from "next/headers";
+import { getCurrentStaff } from "@/lib/auth";
+import { canManage, isRestrictedToOwnApplicants } from "@/lib/permissions";
 
 const APPLICANT_TYPE_LABELS: Record<string, string> = {
   new_grad: "新卒",
@@ -33,8 +35,13 @@ const POSITION_TYPE_LABELS: Record<string, string> = {
 };
 
 export default async function ApplicantsPage() {
+  const staff = await getCurrentStaff();
+  const canEdit = staff ? canManage(staff) : false;
+  const restrictToOwn = staff ? isRestrictedToOwnApplicants(staff) : false;
+
   const [applicants, schools, tags, headersList] = await Promise.all([
     prisma.applicant.findMany({
+      where: restrictToOwn ? { selection: { assigned_to: staff!.id } } : undefined,
       include: {
         school: true,
         tags: { include: { tag: true } },
@@ -60,6 +67,7 @@ export default async function ApplicantsPage() {
         </p>
       </div>
 
+      {canEdit && (
       <Card className="border-border">
         <CardHeader>
           <CardTitle className="text-sm">新規応募者登録</CardTitle>
@@ -169,6 +177,7 @@ export default async function ApplicantsPage() {
           </form>
         </CardContent>
       </Card>
+      )}
 
       <Card className="border-border">
         <CardContent className="p-0">
@@ -181,13 +190,13 @@ export default async function ApplicantsPage() {
                 <TableHead>区分</TableHead>
                 <TableHead>タグ</TableHead>
                 <TableHead>LINE連携</TableHead>
-                <TableHead className="text-right">操作</TableHead>
+                {canEdit && <TableHead className="text-right">操作</TableHead>}
               </TableRow>
             </TableHeader>
             <TableBody>
               {applicants.length === 0 && (
                 <TableRow>
-                  <TableCell colSpan={7} className="text-center text-muted-foreground">
+                  <TableCell colSpan={canEdit ? 7 : 6} className="text-center text-muted-foreground">
                     応募者がまだ登録されていません
                   </TableCell>
                 </TableRow>
@@ -240,6 +249,7 @@ export default async function ApplicantsPage() {
                             </code>
                           );
                         }
+                        if (!canEdit) return <span className="text-muted-foreground">未連携</span>;
                         return (
                           <form action={issueLineRegistrationToken.bind(null, applicant.id)}>
                             <Button type="submit" variant="outline" size="sm">
@@ -249,13 +259,15 @@ export default async function ApplicantsPage() {
                         );
                       })()}
                   </TableCell>
-                  <TableCell className="text-right">
-                    <DeleteButton
-                      id={applicant.id}
-                      action={deleteApplicant}
-                      confirmText="この応募者を削除しますか?"
-                    />
-                  </TableCell>
+                  {canEdit && (
+                    <TableCell className="text-right">
+                      <DeleteButton
+                        id={applicant.id}
+                        action={deleteApplicant}
+                        confirmText="この応募者を削除しますか?"
+                      />
+                    </TableCell>
+                  )}
                 </TableRow>
               ))}
             </TableBody>

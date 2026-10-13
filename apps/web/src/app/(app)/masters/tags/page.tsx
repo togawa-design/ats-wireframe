@@ -19,8 +19,13 @@ import {
 } from "@/components/ui/table";
 import { createTag, deleteTag } from "./actions";
 import { DeleteButton } from "@/components/delete-button";
+import { getCurrentStaff } from "@/lib/auth";
+import { canManage } from "@/lib/permissions";
 
 export default async function TagsPage() {
+  const staff = await getCurrentStaff();
+  const canEdit = staff ? canManage(staff) : false;
+
   const tags = await prisma.tag.findMany({
     include: { creator: { select: { name: true } } },
     orderBy: { name: "asc" },
@@ -35,6 +40,7 @@ export default async function TagsPage() {
         </p>
       </div>
 
+      {canEdit && (
       <Card className="border-border">
         <CardHeader>
           <CardTitle className="text-sm">新規タグ追加</CardTitle>
@@ -59,6 +65,7 @@ export default async function TagsPage() {
           </form>
         </CardContent>
       </Card>
+      )}
 
       <Card className="border-border">
         <CardContent className="p-0">
@@ -68,13 +75,13 @@ export default async function TagsPage() {
                 <TableHead>タグ</TableHead>
                 <TableHead>カラー</TableHead>
                 <TableHead>作成者</TableHead>
-                <TableHead className="text-right">操作</TableHead>
+                {canEdit && <TableHead className="text-right">操作</TableHead>}
               </TableRow>
             </TableHeader>
             <TableBody>
               {tags.length === 0 && (
                 <TableRow>
-                  <TableCell colSpan={4} className="text-center text-muted-foreground">
+                  <TableCell colSpan={canEdit ? 4 : 3} className="text-center text-muted-foreground">
                     タグがまだ登録されていません
                   </TableCell>
                 </TableRow>
@@ -92,9 +99,11 @@ export default async function TagsPage() {
                   <TableCell className="text-sm text-muted-foreground">
                     {tag.creator.name}
                   </TableCell>
-                  <TableCell className="text-right">
-                    <DeleteButton id={tag.id} action={deleteTag} confirmText="このタグを削除しますか?" />
-                  </TableCell>
+                  {canEdit && (
+                    <TableCell className="text-right">
+                      <DeleteButton id={tag.id} action={deleteTag} confirmText="このタグを削除しますか?" />
+                    </TableCell>
+                  )}
                 </TableRow>
               ))}
             </TableBody>

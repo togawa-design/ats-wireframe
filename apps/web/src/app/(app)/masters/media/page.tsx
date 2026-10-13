@@ -13,8 +13,13 @@ import {
 } from "@/components/ui/table";
 import { createMedia, deleteMedia } from "./actions";
 import { DeleteButton } from "@/components/delete-button";
+import { getCurrentStaff } from "@/lib/auth";
+import { canManage } from "@/lib/permissions";
 
 export default async function MediaPage() {
+  const staff = await getCurrentStaff();
+  const canEdit = staff ? canManage(staff) : false;
+
   const mediaList = await prisma.media.findMany({ orderBy: { name: "asc" } });
 
   return (
@@ -26,6 +31,7 @@ export default async function MediaPage() {
         </p>
       </div>
 
+      {canEdit && (
       <Card className="border-border">
         <CardHeader>
           <CardTitle className="text-sm">新規媒体追加</CardTitle>
@@ -56,6 +62,7 @@ export default async function MediaPage() {
           </form>
         </CardContent>
       </Card>
+      )}
 
       <Card className="border-border">
         <CardContent className="p-0">
@@ -65,13 +72,13 @@ export default async function MediaPage() {
                 <TableHead>媒体名</TableHead>
                 <TableHead>連携方式</TableHead>
                 <TableHead>月額費用</TableHead>
-                <TableHead className="text-right">操作</TableHead>
+                {canEdit && <TableHead className="text-right">操作</TableHead>}
               </TableRow>
             </TableHeader>
             <TableBody>
               {mediaList.length === 0 && (
                 <TableRow>
-                  <TableCell colSpan={4} className="text-center text-muted-foreground">
+                  <TableCell colSpan={canEdit ? 4 : 3} className="text-center text-muted-foreground">
                     媒体がまだ登録されていません
                   </TableCell>
                 </TableRow>
@@ -85,9 +92,11 @@ export default async function MediaPage() {
                   <TableCell className="text-sm text-muted-foreground">
                     {media.cost ? `¥${media.cost.toLocaleString()}` : "—"}
                   </TableCell>
-                  <TableCell className="text-right">
-                    <DeleteButton id={media.id} action={deleteMedia} confirmText="この媒体を削除しますか?" />
-                  </TableCell>
+                  {canEdit && (
+                    <TableCell className="text-right">
+                      <DeleteButton id={media.id} action={deleteMedia} confirmText="この媒体を削除しますか?" />
+                    </TableCell>
+                  )}
                 </TableRow>
               ))}
             </TableBody>

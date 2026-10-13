@@ -3,11 +3,14 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
+import type { StaffRole } from "@/generated/prisma/client";
 
 type NavItem = {
   href?: string;
   icon: string;
   label: string;
+  /** 指定時はこのロールのみ表示する(FR086)。未指定なら全ロールに表示。 */
+  roles?: StaffRole[];
 };
 
 type NavSection = {
@@ -33,7 +36,12 @@ const SECTIONS: NavSection[] = [
     label: "LINE",
     badge: "新卒のみ",
     items: [
-      { href: "/line-send", icon: "💬", label: "メッセージ送信" },
+      {
+        href: "/line-send",
+        icon: "💬",
+        label: "メッセージ送信",
+        roles: ["admin", "recruiter"],
+      },
       { icon: "📝", label: "アンケート" },
       { icon: "🎛️", label: "リッチメニュー" },
       { icon: "🔄", label: "自動化シナリオ" },
@@ -51,11 +59,14 @@ const SECTIONS: NavSection[] = [
   },
   {
     label: "設定",
-    items: [{ icon: "⚙️", label: "システム設定" }],
+    items: [
+      { href: "/users", icon: "👤", label: "ユーザー管理", roles: ["admin"] },
+      { icon: "⚙️", label: "システム設定" },
+    ],
   },
 ];
 
-export function Sidebar() {
+export function Sidebar({ role }: { role: StaffRole }) {
   const pathname = usePathname();
 
   return (
@@ -67,7 +78,10 @@ export function Sidebar() {
         </span>
       </div>
 
-      {SECTIONS.map((section) => (
+      {SECTIONS.map((section) => {
+        const visibleItems = section.items.filter((item) => !item.roles || item.roles.includes(role));
+        if (visibleItems.length === 0) return null;
+        return (
         <div key={section.label} className="pt-3.5 pb-1">
           <div className="flex items-center gap-1.5 px-4 pb-1.5 text-[10.5px] font-medium tracking-wide text-sidebar-ring">
             {section.label}
@@ -77,7 +91,7 @@ export function Sidebar() {
               </span>
             )}
           </div>
-          {section.items.map((item) => {
+          {visibleItems.map((item) => {
             const active = item.href && pathname === item.href;
             const content = (
               <span className="flex items-center gap-2.5">
@@ -111,7 +125,8 @@ export function Sidebar() {
             );
           })}
         </div>
-      ))}
+        );
+      })}
     </nav>
   );
 }

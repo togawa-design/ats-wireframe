@@ -2,15 +2,8 @@
 
 import { useTransition } from "react";
 import { setResult } from "./actions";
+import { RESULT_LABELS } from "./result-labels";
 import type { SelectionResult } from "@/generated/prisma/client";
-
-const RESULT_LABELS: Record<SelectionResult, string> = {
-  pending: "選考中",
-  passed: "通過",
-  failed: "不合格",
-  withdrawn: "辞退",
-  offer_declined: "内定辞退",
-};
 
 export function ResultSelect({
   selectionId,

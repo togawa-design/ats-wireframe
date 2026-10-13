@@ -3,11 +3,13 @@
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
 import { getCurrentStaff } from "@/lib/auth";
+import { assertCanManage } from "@/lib/permissions";
 import type { SelectionResult } from "@/generated/prisma/client";
 
 export async function advanceStage(selectionId: string) {
   const staff = await getCurrentStaff();
   if (!staff) throw new Error("ログインが必要です");
+  assertCanManage(staff);
 
   const selection = await prisma.selection.findUniqueOrThrow({
     where: { id: selectionId },
@@ -40,6 +42,7 @@ export async function advanceStage(selectionId: string) {
 export async function setResult(selectionId: string, result: SelectionResult) {
   const staff = await getCurrentStaff();
   if (!staff) throw new Error("ログインが必要です");
+  assertCanManage(staff);
 
   await prisma.selection.update({
     where: { id: selectionId },

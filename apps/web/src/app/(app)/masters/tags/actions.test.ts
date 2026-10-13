@@ -16,7 +16,7 @@ vi.mock("@/lib/auth", () => ({
 vi.mock("next/cache", () => ({ revalidatePath: vi.fn() }));
 
 const prismaMock = prisma as unknown as DeepMockProxy<PrismaClient>;
-const mockStaff = { id: "staff-1", name: "テスト太郎" } as never;
+const mockStaff = { id: "staff-1", name: "テスト太郎", role: "admin" } as never;
 
 describe("createTag", () => {
   it("未ログインなら例外を投げる", async () => {
@@ -25,6 +25,15 @@ describe("createTag", () => {
     form.set("name", "理系");
 
     await expect(createTag(form)).rejects.toThrow("ログインが必要です");
+    expect(prismaMock.tag.create).not.toHaveBeenCalled();
+  });
+
+  it("閲覧のみロールでは権限エラーになる", async () => {
+    vi.mocked(getCurrentStaff).mockResolvedValue({ id: "staff-2", role: "viewer" } as never);
+    const form = new FormData();
+    form.set("name", "理系");
+
+    await expect(createTag(form)).rejects.toThrow("この操作を行う権限がありません");
     expect(prismaMock.tag.create).not.toHaveBeenCalled();
   });
 

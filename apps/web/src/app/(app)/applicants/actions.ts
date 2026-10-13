@@ -4,6 +4,7 @@ import { randomBytes } from "node:crypto";
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
 import { getCurrentStaff } from "@/lib/auth";
+import { assertCanManage } from "@/lib/permissions";
 import type { ApplicantType, HireType, PositionType } from "@/generated/prisma/client";
 
 const LINE_TOKEN_EXPIRES_IN_MS = 24 * 60 * 60 * 1000; // 24時間
@@ -11,6 +12,7 @@ const LINE_TOKEN_EXPIRES_IN_MS = 24 * 60 * 60 * 1000; // 24時間
 export async function createApplicant(formData: FormData) {
   const staff = await getCurrentStaff();
   if (!staff) throw new Error("ログインが必要です");
+  assertCanManage(staff);
 
   const last_name = String(formData.get("last_name") ?? "").trim();
   const first_name = String(formData.get("first_name") ?? "").trim();
@@ -70,6 +72,7 @@ export async function createApplicant(formData: FormData) {
 export async function deleteApplicant(id: string) {
   const staff = await getCurrentStaff();
   if (!staff) throw new Error("ログインが必要です");
+  assertCanManage(staff);
 
   await prisma.applicant.delete({ where: { id } });
   revalidatePath("/applicants");
@@ -79,6 +82,7 @@ export async function deleteApplicant(id: string) {
 export async function issueLineRegistrationToken(applicantId: string) {
   const staff = await getCurrentStaff();
   if (!staff) throw new Error("ログインが必要です");
+  assertCanManage(staff);
 
   const token = randomBytes(32).toString("hex");
   await prisma.lineRegistrationToken.create({
