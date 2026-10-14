@@ -8,6 +8,7 @@ import {
   getMediaBreakdown,
   getSchoolBreakdown,
   getOfferAndAcceptanceSelections,
+  getAllApplicantsForExport,
 } from "./analytics";
 
 vi.mock("@/lib/prisma", () => ({
@@ -116,8 +117,88 @@ describe("getOfferAndAcceptanceSelections", () => {
 
     expect(prismaMock.selection.findMany).toHaveBeenCalledWith(
       expect.objectContaining({
-        where: { current_stage: { stage_type: { in: ["offer", "acceptance"] } } },
+        where: {
+          current_stage: { stage_type: { in: ["offer", "acceptance"] } },
+          applicant: {},
+        },
       })
+    );
+  });
+
+  it("職種区分が指定されていれば応募者をその区分(と未設定)に絞り込む(FR095)", async () => {
+    prismaMock.selection.findMany.mockResolvedValue([] as never);
+
+    await getOfferAndAcceptanceSelections("sogo");
+
+    expect(prismaMock.selection.findMany).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: expect.objectContaining({
+          applicant: { OR: [{ position_type: "sogo" }, { position_type: null }] },
+        }),
+      })
+    );
+  });
+});
+
+describe("FR095: 職種区分によるアクセス制限", () => {
+  it("getFunnelDataは指定した職種区分でSelectionを絞り込む", async () => {
+    prismaMock.selectionFlow.findFirst.mockResolvedValue({ stages: [] } as never);
+    prismaMock.selection.findMany.mockResolvedValue([] as never);
+
+    await getFunnelData("gino");
+
+    expect(prismaMock.selection.findMany).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: { applicant: { OR: [{ position_type: "gino" }, { position_type: null }] } },
+      })
+    );
+  });
+
+  it("getMediaBreakdownは指定した職種区分でApplicantSourceを絞り込む", async () => {
+    prismaMock.media.findMany.mockResolvedValue([] as never);
+    (prismaMock.applicantSource.groupBy as unknown as Mock).mockResolvedValue([]);
+
+    await getMediaBreakdown("sogo");
+
+    expect(prismaMock.applicantSource.groupBy).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: { applicant: { OR: [{ position_type: "sogo" }, { position_type: null }] } },
+      })
+    );
+  });
+
+  it("getSchoolBreakdownは指定した職種区分でApplicantを絞り込む", async () => {
+    (prismaMock.applicant.groupBy as unknown as Mock).mockResolvedValue([]);
+
+    await getSchoolBreakdown("gino");
+
+    expect(prismaMock.applicant.groupBy).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: {
+          school_id: { not: null },
+          OR: [{ position_type: "gino" }, { position_type: null }],
+        },
+      })
+    );
+  });
+
+  it("getAllApplicantsForExportは指定した職種区分でApplicantを絞り込む", async () => {
+    prismaMock.applicant.findMany.mockResolvedValue([] as never);
+
+    await getAllApplicantsForExport("sogo");
+
+    expect(prismaMock.applicant.findMany).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: { OR: [{ position_type: "sogo" }, { position_type: null }] },
+      })
+    );
+  });
+
+  it("職種区分未指定(null)ならどの関数も絞り込み無し({})になる", async () => {
+    prismaMock.applicant.findMany.mockResolvedValue([] as never);
+    await getAllApplicantsForExport();
+    expect(prismaMock.applicant.findMany).toHaveBeenCalledWith(
+      expect.objectContaining({ where: {} })
     );
   });
 });

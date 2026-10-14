@@ -18,6 +18,8 @@ import { isAdmin } from "@/lib/permissions";
 import { inviteStaff } from "./actions";
 import { RoleSelect } from "./role-select";
 import { ROLE_LABELS } from "./role-labels";
+import { PositionAccessSelect } from "./position-access-select";
+import { POSITION_ACCESS_LABELS } from "./position-access-labels";
 import { ActiveToggle } from "./active-toggle";
 
 export default async function UsersPage() {
@@ -65,6 +67,20 @@ export default async function UsersPage() {
                 ))}
               </select>
             </div>
+            <div className="flex flex-col gap-1.5">
+              <Label htmlFor="position_type_access">職種区分(FR095)</Label>
+              <select
+                id="position_type_access"
+                name="position_type_access"
+                className="h-9 w-32 rounded-md border border-input bg-transparent px-3 text-sm"
+              >
+                {Object.entries(POSITION_ACCESS_LABELS).map(([value, label]) => (
+                  <option key={value} value={value}>
+                    {label}
+                  </option>
+                ))}
+              </select>
+            </div>
             <Button type="submit">追加</Button>
           </form>
         </CardContent>
@@ -78,6 +94,7 @@ export default async function UsersPage() {
                 <TableHead>氏名</TableHead>
                 <TableHead>メールアドレス</TableHead>
                 <TableHead>ロール</TableHead>
+                <TableHead>職種区分</TableHead>
                 <TableHead>状態</TableHead>
                 <TableHead className="text-right">操作</TableHead>
               </TableRow>
@@ -98,6 +115,12 @@ export default async function UsersPage() {
                     </TableCell>
                     <TableCell>
                       <RoleSelect staffId={member.id} value={member.role} disabled={isSelf} />
+                    </TableCell>
+                    <TableCell>
+                      <PositionAccessSelect
+                        staffId={member.id}
+                        value={member.position_type_access}
+                      />
                     </TableCell>
                     <TableCell>
                       {member.is_active ? (

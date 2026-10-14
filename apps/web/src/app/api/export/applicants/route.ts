@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { getCurrentStaff } from "@/lib/auth";
-import { canViewAnalytics } from "@/lib/permissions";
+import { canViewAnalytics, restrictedPositionType } from "@/lib/permissions";
 import { getAllApplicantsForExport } from "@/lib/analytics";
 import { toCsv } from "@/lib/csv";
 import { recordAuditLog } from "@/lib/audit-log";
@@ -21,7 +21,7 @@ export async function GET() {
 
   await recordAuditLog({ staffId: staff.id, action: "export", targetType: "applicants" });
 
-  const applicants = await getAllApplicantsForExport();
+  const applicants = await getAllApplicantsForExport(restrictedPositionType(staff));
   const rows = applicants.map((applicant) => ({
     last_name: applicant.last_name,
     first_name: applicant.first_name,

@@ -1,4 +1,4 @@
-import type { ApplicantType, Prisma } from "@/generated/prisma/client";
+import type { ApplicantType, PositionType, Prisma } from "@/generated/prisma/client";
 
 export type ApplicantFilters = {
   q?: string;
@@ -7,6 +7,7 @@ export type ApplicantFilters = {
   stageId?: string;
   mediaId?: string;
   applicantType?: ApplicantType;
+  positionType?: PositionType;
 };
 
 type RawSearchParams = Record<string, string | string[] | undefined>;
@@ -33,6 +34,7 @@ export function parseApplicantFilters(searchParams: RawSearchParams): ApplicantF
     stageId: getOne(searchParams, "stage_id"),
     mediaId: getOne(searchParams, "media_id"),
     applicantType: getOne(searchParams, "applicant_type") as ApplicantType | undefined,
+    positionType: getOne(searchParams, "position_type") as PositionType | undefined,
   };
 }
 
@@ -65,6 +67,9 @@ export function buildApplicantWhere(filters: ApplicantFilters): Prisma.Applicant
   }
   if (filters.applicantType) {
     where.applicant_type = filters.applicantType;
+  }
+  if (filters.positionType) {
+    where.position_type = filters.positionType;
   }
 
   return where;

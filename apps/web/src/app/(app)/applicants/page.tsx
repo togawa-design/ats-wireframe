@@ -18,7 +18,7 @@ import { parseApplicantFilters, buildApplicantWhere } from "./filters";
 import { DeleteButton } from "@/components/delete-button";
 import { headers } from "next/headers";
 import { getCurrentStaff } from "@/lib/auth";
-import { canManage, isRestrictedToOwnApplicants } from "@/lib/permissions";
+import { canManage, isRestrictedToOwnApplicants, restrictedPositionType } from "@/lib/permissions";
 import type { Prisma } from "@/generated/prisma/client";
 
 const APPLICANT_TYPE_LABELS: Record<string, string> = {
@@ -41,12 +41,16 @@ export default async function ApplicantsPage({ searchParams }: PageProps<"/appli
   const staff = await getCurrentStaff();
   const canEdit = staff ? canManage(staff) : false;
   const restrictToOwn = staff ? isRestrictedToOwnApplicants(staff) : false;
+  const positionType = staff ? restrictedPositionType(staff) : null;
 
   const filters = parseApplicantFilters(await searchParams);
-  const filterWhere = buildApplicantWhere(filters);
-  const where: Prisma.ApplicantWhereInput = restrictToOwn
-    ? { AND: [filterWhere, { selection: { assigned_to: staff!.id } }] }
-    : filterWhere;
+  const conditions: Prisma.ApplicantWhereInput[] = [buildApplicantWhere(filters)];
+  if (restrictToOwn) conditions.push({ selection: { assigned_to: staff!.id } });
+  // FR095: 職種区分によるアクセス制限(未設定の応募者は全員が閲覧可能)。
+  if (positionType) {
+    conditions.push({ OR: [{ position_type: positionType }, { position_type: null }] });
+  }
+  const where: Prisma.ApplicantWhereInput = conditions.length > 1 ? { AND: conditions } : conditions[0];
 
   const [applicants, schools, tags, mediaList, defaultFlow, headersList] = await Promise.all([
     prisma.applicant.findMany({
@@ -158,6 +162,22 @@ export default async function ApplicantsPage({ searchParams }: PageProps<"/appli
                 >
                   <option value="">(すべて)</option>
                   {Object.entries(APPLICANT_TYPE_LABELS).map(([value, label]) => (
+                    <option key={value} value={value}>
+                      {label}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div className="flex flex-col gap-1.5">
+                <Label htmlFor="filter-position_type">職種区分</Label>
+                <select
+                  id="filter-position_type"
+                  name="position_type"
+                  defaultValue={filters.positionType ?? ""}
+                  className="h-9 w-28 rounded-md border border-input bg-transparent px-3 text-sm"
+                >
+                  <option value="">(すべて)</option>
+                  {Object.entries(POSITION_TYPE_LABELS).map(([value, label]) => (
                     <option key={value} value={value}>
                       {label}
                     </option>

@@ -15,16 +15,27 @@ import { RESULT_LABELS } from "./result-labels";
 import { ViewToggle } from "./view-toggle";
 import { KanbanBoard } from "./kanban-board";
 import { getCurrentStaff } from "@/lib/auth";
-import { canManage, isRestrictedToOwnApplicants } from "@/lib/permissions";
+import { canManage, isRestrictedToOwnApplicants, restrictedPositionType } from "@/lib/permissions";
+import type { Prisma } from "@/generated/prisma/client";
 
 export default async function SelectionsPage() {
   const staff = await getCurrentStaff();
   const canEdit = staff ? canManage(staff) : false;
   const restrictToOwn = staff ? isRestrictedToOwnApplicants(staff) : false;
+  const positionType = staff ? restrictedPositionType(staff) : null;
+
+  const conditions: Prisma.SelectionWhereInput[] = [];
+  if (restrictToOwn) conditions.push({ assigned_to: staff!.id });
+  // FR095: 職種区分によるアクセス制限(未設定の応募者は全員が閲覧可能)。
+  if (positionType) {
+    conditions.push({
+      applicant: { OR: [{ position_type: positionType }, { position_type: null }] },
+    });
+  }
 
   const [selections, defaultFlow] = await Promise.all([
     prisma.selection.findMany({
-      where: restrictToOwn ? { assigned_to: staff!.id } : undefined,
+      where: conditions.length > 0 ? { AND: conditions } : undefined,
       include: {
         applicant: true,
         current_stage: true,
