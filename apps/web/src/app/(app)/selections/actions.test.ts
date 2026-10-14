@@ -3,6 +3,7 @@ import { mockDeep, type DeepMockProxy } from "vitest-mock-extended";
 import type { PrismaClient } from "@/generated/prisma/client";
 import { prisma } from "@/lib/prisma";
 import { getCurrentStaff } from "@/lib/auth";
+import { recordAuditLog } from "@/lib/audit-log";
 import { advanceStage, moveToStage, setResult } from "./actions";
 
 vi.mock("@/lib/prisma", () => ({
@@ -11,12 +12,19 @@ vi.mock("@/lib/prisma", () => ({
 vi.mock("@/lib/auth", () => ({
   getCurrentStaff: vi.fn(),
 }));
+vi.mock("@/lib/audit-log", () => ({
+  recordAuditLog: vi.fn(),
+}));
 vi.mock("next/cache", () => ({ revalidatePath: vi.fn() }));
 
 const prismaMock = prisma as unknown as DeepMockProxy<PrismaClient>;
 const mockStaff = { id: "staff-1", name: "テスト太郎", role: "admin" } as never;
 
-const stages = [{ id: "stage-1" }, { id: "stage-2" }, { id: "stage-3" }];
+const stages = [
+  { id: "stage-1", stage_type: "entry" },
+  { id: "stage-2", stage_type: "screening" },
+  { id: "stage-3", stage_type: "offer" },
+];
 
 describe("advanceStage", () => {
   it("未ログインなら例外を投げる", async () => {
@@ -52,6 +60,29 @@ describe("advanceStage", () => {
         changed_by: "staff-1",
       },
     });
+    expect(recordAuditLog).toHaveBeenCalledWith({
+      staffId: "staff-1",
+      action: "status_change",
+      targetType: "Selection",
+      targetId: "selection-1",
+      beforeValue: { stage_id: "stage-1" },
+      afterValue: { stage_id: "stage-2" },
+    });
+  });
+
+  it("進んだ先がofferステージなら監査ログのactionをofferにする", async () => {
+    vi.mocked(getCurrentStaff).mockResolvedValue(mockStaff);
+    prismaMock.selection.findUniqueOrThrow.mockResolvedValue({
+      id: "selection-1",
+      current_stage_id: "stage-2",
+      flow: { stages },
+    } as never);
+
+    await advanceStage("selection-1");
+
+    expect(recordAuditLog).toHaveBeenCalledWith(
+      expect.objectContaining({ action: "offer" })
+    );
   });
 
   it("最終ステージの場合は例外を投げる", async () => {
@@ -86,6 +117,10 @@ describe("moveToStage", () => {
       id: "selection-1",
       current_stage_id: "stage-1",
     } as never);
+    prismaMock.selectionStage.findUniqueOrThrow.mockResolvedValue({
+      id: "stage-3",
+      stage_type: "offer",
+    } as never);
 
     await moveToStage("selection-1", "stage-3");
 
@@ -101,6 +136,32 @@ describe("moveToStage", () => {
         changed_by: "staff-1",
       },
     });
+    expect(recordAuditLog).toHaveBeenCalledWith({
+      staffId: "staff-1",
+      action: "offer",
+      targetType: "Selection",
+      targetId: "selection-1",
+      beforeValue: { stage_id: "stage-1" },
+      afterValue: { stage_id: "stage-3" },
+    });
+  });
+
+  it("移動先がacceptanceステージなら監査ログのactionをacceptanceにする", async () => {
+    vi.mocked(getCurrentStaff).mockResolvedValue(mockStaff);
+    prismaMock.selection.findUniqueOrThrow.mockResolvedValue({
+      id: "selection-1",
+      current_stage_id: "stage-1",
+    } as never);
+    prismaMock.selectionStage.findUniqueOrThrow.mockResolvedValue({
+      id: "stage-4",
+      stage_type: "acceptance",
+    } as never);
+
+    await moveToStage("selection-1", "stage-4");
+
+    expect(recordAuditLog).toHaveBeenCalledWith(
+      expect.objectContaining({ action: "acceptance" })
+    );
   });
 
   it("移動先が現在のステージと同じなら何もしない", async () => {
@@ -114,6 +175,7 @@ describe("moveToStage", () => {
 
     expect(prismaMock.selection.update).not.toHaveBeenCalled();
     expect(prismaMock.selectionHistory.create).not.toHaveBeenCalled();
+    expect(recordAuditLog).not.toHaveBeenCalled();
   });
 });
 
@@ -123,12 +185,22 @@ describe("setResult", () => {
     await expect(setResult("selection-1", "passed")).rejects.toThrow("ログインが必要です");
   });
 
-  it("ログイン済みなら結果を更新する", async () => {
+  it("ログイン済みなら結果を更新し、監査ログに記録する", async () => {
     vi.mocked(getCurrentStaff).mockResolvedValue(mockStaff);
+    prismaMock.selection.update.mockResolvedValue({ result: "passed" } as never);
+
     await setResult("selection-1", "passed");
+
     expect(prismaMock.selection.update).toHaveBeenCalledWith({
       where: { id: "selection-1" },
       data: { result: "passed" },
+    });
+    expect(recordAuditLog).toHaveBeenCalledWith({
+      staffId: "staff-1",
+      action: "status_change",
+      targetType: "Selection",
+      targetId: "selection-1",
+      afterValue: { result: "passed" },
     });
   });
 });

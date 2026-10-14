@@ -4,6 +4,7 @@ import type { PrismaClient } from "@/generated/prisma/client";
 import { prisma } from "@/lib/prisma";
 import { getCurrentStaff } from "@/lib/auth";
 import { sendTextMessage } from "@/lib/line/client";
+import { recordAuditLog } from "@/lib/audit-log";
 import { sendBulkLineMessage } from "./actions";
 
 vi.mock("@/lib/prisma", () => ({
@@ -14,6 +15,9 @@ vi.mock("@/lib/auth", () => ({
 }));
 vi.mock("@/lib/line/client", () => ({
   sendTextMessage: vi.fn(),
+}));
+vi.mock("@/lib/audit-log", () => ({
+  recordAuditLog: vi.fn(),
 }));
 vi.mock("next/cache", () => ({ revalidatePath: vi.fn() }));
 
@@ -89,6 +93,13 @@ describe("sendBulkLineMessage", () => {
     expect(prismaMock.lineBroadcast.update).toHaveBeenCalledWith({
       where: { id: "broadcast-1" },
       data: { sent_count: 2 },
+    });
+    expect(recordAuditLog).toHaveBeenCalledWith({
+      staffId: "staff-1",
+      action: "line_send",
+      targetType: "LineBroadcast",
+      targetId: "broadcast-1",
+      afterValue: { recipient_count: 2, sent_count: 2 },
     });
     expect(result).toEqual({ successCount: 2, failureCount: 0, total: 2 });
   });

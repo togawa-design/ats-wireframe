@@ -4,6 +4,7 @@ import type { PrismaClient } from "@/generated/prisma/client";
 import { prisma } from "@/lib/prisma";
 import { getCurrentStaff } from "@/lib/auth";
 import { uploadApplicantFile } from "@/lib/firebase/storage";
+import { recordAuditLog } from "@/lib/audit-log";
 import { uploadApplicantDocument } from "./actions";
 
 vi.mock("@/lib/prisma", () => ({
@@ -11,6 +12,9 @@ vi.mock("@/lib/prisma", () => ({
 }));
 vi.mock("@/lib/auth", () => ({
   getCurrentStaff: vi.fn(),
+}));
+vi.mock("@/lib/audit-log", () => ({
+  recordAuditLog: vi.fn(),
 }));
 vi.mock("@/lib/firebase/storage", () => ({
   uploadApplicantFile: vi.fn(),
@@ -91,6 +95,13 @@ describe("uploadApplicantDocument", () => {
     expect(prismaMock.applicant.update).toHaveBeenCalledWith({
       where: { id: "applicant-1" },
       data: { resume_url: "https://storage.example.com/es.pdf" },
+    });
+    expect(recordAuditLog).toHaveBeenCalledWith({
+      staffId: "staff-1",
+      action: "edit_applicant",
+      targetType: "Applicant",
+      targetId: "applicant-1",
+      afterValue: { kind: "resume", url: "https://storage.example.com/es.pdf" },
     });
   });
 

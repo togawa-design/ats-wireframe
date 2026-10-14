@@ -5,6 +5,7 @@ import { prisma } from "@/lib/prisma";
 import { getCurrentStaff } from "@/lib/auth";
 import { assertCanManage } from "@/lib/permissions";
 import { uploadApplicantFile } from "@/lib/firebase/storage";
+import { recordAuditLog } from "@/lib/audit-log";
 
 const MAX_FILE_SIZE_BYTES = 5 * 1024 * 1024;
 const ALLOWED_CONTENT_TYPES: Record<"resume" | "photo", string[]> = {
@@ -39,6 +40,13 @@ export async function uploadApplicantDocument(applicantId: string, formData: For
   await prisma.applicant.update({
     where: { id: applicantId },
     data: kind === "resume" ? { resume_url: url } : { photo_url: url },
+  });
+  await recordAuditLog({
+    staffId: staff.id,
+    action: "edit_applicant",
+    targetType: "Applicant",
+    targetId: applicantId,
+    afterValue: { kind, url },
   });
 
   revalidatePath(`/applicants/${applicantId}`);

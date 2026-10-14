@@ -68,7 +68,7 @@ const SECTIONS: NavSection[] = [
     label: "設定",
     items: [
       { href: "/users", icon: "👤", label: "ユーザー管理", roles: ["admin"] },
-      { icon: "⚙️", label: "システム設定" },
+      { href: "/masters/audit-logs", icon: "📜", label: "監査ログ", roles: ["admin"] },
     ],
   },
 ];
