@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -185,6 +186,9 @@ export default async function ApplicantsPage({ searchParams }: PageProps<"/appli
             <div className="flex gap-2">
               <Button type="submit">絞り込む</Button>
               <Button type="button" variant="outline" asChild>
+                {/* フォームの未制御な入力値(キーワード欄等)を確実にリセットするため、
+                    クライアント遷移ではなくハードリロードするプレーンな<a>にしている。 */}
+                {/* eslint-disable-next-line @next/next/no-html-link-for-pages */}
                 <a href="/applicants">クリア</a>
               </Button>
             </div>
@@ -334,7 +338,9 @@ export default async function ApplicantsPage({ searchParams }: PageProps<"/appli
               {applicants.map((applicant) => (
                 <TableRow key={applicant.id}>
                   <TableCell>
-                    {applicant.last_name} {applicant.first_name}
+                    <Link href={`/applicants/${applicant.id}`} className="hover:underline">
+                      {applicant.last_name} {applicant.first_name}
+                    </Link>
                   </TableCell>
                   <TableCell className="text-sm text-muted-foreground">
                     {applicant.email}
