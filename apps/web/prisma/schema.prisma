@@ -266,6 +266,7 @@ model Applicant {
   document_deadline         DateTime?     @db.Date
   offer_acceptance_deadline DateTime?     @db.Date
   resume_url                String?       @db.VarChar(500)
+  photo_url                 String?       @db.VarChar(500)
   call_status               CallStatus    @default(none)
   hire_type                 HireType      @default(new_grad)
   sf_contact_id             String?       @db.VarChar(20)

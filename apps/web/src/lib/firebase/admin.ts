@@ -9,7 +9,7 @@ export { SESSION_COOKIE_NAME, SESSION_EXPIRES_IN_MS };
 // JSONを自動的に使う(ADCの標準的な解決順序)。
 // FIREBASE_AUTH_EMULATOR_HOST が設定されている場合(E2Eテスト時)は、Authの検証は
 // エミュレータ側で行われ実際の認証情報を必要としないため、credentialを省略する。
-const adminApp = getApps().length
+export const adminApp = getApps().length
   ? getApps()[0]
   : initializeApp(
       process.env.FIREBASE_AUTH_EMULATOR_HOST
