@@ -10,7 +10,7 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "pretest:e2e": "docker compose -f e2e/docker-compose.yml up -d --wait && DATABASE_URL=\"postgresql://postgres:postgres@localhost:5433/ats_e2e?schema=public\" npx prisma migrate deploy",
-    "test:e2e": "FIREBASE_AUTH_EMULATOR_HOST=localhost:9099 npx firebase emulators:exec --project fujiarte-ats-e2e --only auth \"playwright test\"",
+    "test:e2e": "FIREBASE_AUTH_EMULATOR_HOST=localhost:9099 FIREBASE_STORAGE_EMULATOR_HOST=localhost:9199 npx firebase emulators:exec --project fujiarte-ats-e2e --only auth,storage \"playwright test\"",
     "posttest:e2e": "docker compose -f e2e/docker-compose.yml down"
   },
   "dependencies": {

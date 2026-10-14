@@ -1,0 +1,11 @@
+rules_version = '2';
+
+// クライアントSDKからの直接アクセスは行わない(アップロードは常にAdmin SDK経由)ため、
+// クライアント向けアクセスは全面禁止にしておく。
+service firebase.storage {
+  match /b/{bucket}/o {
+    match /{allPaths=**} {
+      allow read, write: if false;
+    }
+  }
+}

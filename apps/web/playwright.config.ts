@@ -36,7 +36,10 @@ export default defineConfig({
         process.env.DATABASE_URL ??
         "postgresql://postgres:postgres@localhost:5433/ats_e2e?schema=public",
       FIREBASE_AUTH_EMULATOR_HOST: process.env.FIREBASE_AUTH_EMULATOR_HOST ?? "localhost:9099",
+      FIREBASE_STORAGE_EMULATOR_HOST:
+        process.env.FIREBASE_STORAGE_EMULATOR_HOST ?? "localhost:9199",
       NEXT_PUBLIC_FIREBASE_PROJECT_ID: "fujiarte-ats-e2e",
+      FIREBASE_STORAGE_BUCKET: "fujiarte-ats-e2e.firebasestorage.app",
     },
   },
 });
