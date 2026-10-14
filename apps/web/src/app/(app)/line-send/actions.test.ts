@@ -54,6 +54,7 @@ describe("sendBulkLineMessage", () => {
       { id: "a1", last_name: "山田", first_name: "太郎", line_user_id: "U1" },
       { id: "a2", last_name: "鈴木", first_name: "花子", line_user_id: "U2" },
     ] as never);
+    prismaMock.lineBroadcast.create.mockResolvedValue({ id: "broadcast-1" } as never);
     vi.mocked(sendTextMessage).mockResolvedValue(undefined);
 
     const result = await sendBulkLineMessage(
@@ -64,15 +65,38 @@ describe("sendBulkLineMessage", () => {
       where: { hire_type: "new_grad", line_user_id: { not: null } },
       select: { id: true, last_name: true, first_name: true, line_user_id: true },
     });
+    expect(prismaMock.lineBroadcast.create).toHaveBeenCalledWith({
+      data: {
+        template_text: "{{last_name}} {{first_name}} さん、こんにちは",
+        tag_id: null,
+        recipient_count: 2,
+        sent_count: 0,
+        sent_by: "staff-1",
+      },
+    });
     expect(sendTextMessage).toHaveBeenNthCalledWith(1, "U1", "山田 太郎 さん、こんにちは");
     expect(sendTextMessage).toHaveBeenNthCalledWith(2, "U2", "鈴木 花子 さん、こんにちは");
     expect(prismaMock.lineMessage.create).toHaveBeenCalledTimes(2);
+    expect(prismaMock.lineMessage.create).toHaveBeenNthCalledWith(1, {
+      data: {
+        applicant_id: "a1",
+        broadcast_id: "broadcast-1",
+        direction: "outbound",
+        message_type: "text",
+        content: "山田 太郎 さん、こんにちは",
+      },
+    });
+    expect(prismaMock.lineBroadcast.update).toHaveBeenCalledWith({
+      where: { id: "broadcast-1" },
+      data: { sent_count: 2 },
+    });
     expect(result).toEqual({ successCount: 2, failureCount: 0, total: 2 });
   });
 
-  it("タグ指定時はApplicantTagでの絞り込み条件を付与する", async () => {
+  it("タグ指定時はApplicantTagでの絞り込み条件を付与し、broadcastにもtag_idを記録する", async () => {
     vi.mocked(getCurrentStaff).mockResolvedValue(mockStaff);
     prismaMock.applicant.findMany.mockResolvedValue([]);
+    prismaMock.lineBroadcast.create.mockResolvedValue({ id: "broadcast-1" } as never);
 
     await sendBulkLineMessage(buildForm({ text: "hi", tag_id: "tag-1" }));
 
@@ -84,18 +108,32 @@ describe("sendBulkLineMessage", () => {
       },
       select: { id: true, last_name: true, first_name: true, line_user_id: true },
     });
+    expect(prismaMock.lineBroadcast.create).toHaveBeenCalledWith({
+      data: {
+        template_text: "hi",
+        tag_id: "tag-1",
+        recipient_count: 0,
+        sent_count: 0,
+        sent_by: "staff-1",
+      },
+    });
   });
 
-  it("送信に失敗した応募者はfailureCountに数える", async () => {
+  it("送信に失敗した応募者はfailureCountに数え、broadcastは記録に残す", async () => {
     vi.mocked(getCurrentStaff).mockResolvedValue(mockStaff);
     prismaMock.applicant.findMany.mockResolvedValue([
       { id: "a1", last_name: "山田", first_name: "太郎", line_user_id: "U1" },
     ] as never);
+    prismaMock.lineBroadcast.create.mockResolvedValue({ id: "broadcast-1" } as never);
     vi.mocked(sendTextMessage).mockRejectedValue(new Error("LINE API error"));
 
     const result = await sendBulkLineMessage(buildForm({ text: "hi" }));
 
     expect(result).toEqual({ successCount: 0, failureCount: 1, total: 1 });
     expect(prismaMock.lineMessage.create).not.toHaveBeenCalled();
+    expect(prismaMock.lineBroadcast.update).toHaveBeenCalledWith({
+      where: { id: "broadcast-1" },
+      data: { sent_count: 0 },
+    });
   });
 });

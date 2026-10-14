@@ -20,10 +20,17 @@ test("LINE連携済みの応募者にメッセージを送信すると結果が�
   });
 
   await page.goto("/line-send");
-  await page.getByLabel("メッセージ本文").fill("{{last_name}} {{first_name}} さん、こんにちは");
+  const messageText = `{{last_name}} {{first_name}} さん、こんにちは(${Date.now()})`;
+  await page.getByLabel("メッセージ本文").fill(messageText);
   await page.getByRole("button", { name: "送信" }).click();
 
   // 実際のLINE送信はテスト環境では成功しない(本物のチャネルが無いため)が、
   // 「何件中何件送信できたか」という結果表示まで一気通貫で動くことを確認する。
   await expect(page.getByText(/件中、\d+件送信しました/)).toBeVisible();
+
+  // FR033: 送信履歴に今回の送信が記録される(実送信は失敗するため送信数は0件)。
+  await page.reload();
+  const historyRow = page.getByRole("row").filter({ hasText: messageText });
+  await expect(historyRow).toBeVisible();
+  await expect(historyRow.locator("td").nth(5)).toHaveText("0");
 });
