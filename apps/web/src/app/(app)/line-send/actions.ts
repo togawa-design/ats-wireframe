@@ -5,6 +5,7 @@ import { prisma } from "@/lib/prisma";
 import { getCurrentStaff } from "@/lib/auth";
 import { assertCanSendLine } from "@/lib/permissions";
 import { sendTextMessage } from "@/lib/line/client";
+import { recordAuditLog } from "@/lib/audit-log";
 
 function fillTemplate(template: string, applicant: { last_name: string; first_name: string }) {
   return template
@@ -72,6 +73,13 @@ export async function sendBulkLineMessage(formData: FormData) {
   await prisma.lineBroadcast.update({
     where: { id: broadcast.id },
     data: { sent_count: successCount },
+  });
+  await recordAuditLog({
+    staffId: staff.id,
+    action: "line_send",
+    targetType: "LineBroadcast",
+    targetId: broadcast.id,
+    afterValue: { recipient_count: recipients.length, sent_count: successCount },
   });
 
   revalidatePath("/line-send");

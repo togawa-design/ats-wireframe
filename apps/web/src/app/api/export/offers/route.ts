@@ -3,6 +3,7 @@ import { getCurrentStaff } from "@/lib/auth";
 import { canViewAnalytics } from "@/lib/permissions";
 import { getOfferAndAcceptanceSelections } from "@/lib/analytics";
 import { toCsv } from "@/lib/csv";
+import { recordAuditLog } from "@/lib/audit-log";
 
 /** FR052: 内定者・承諾者一覧CSV。 */
 export async function GET() {
@@ -10,6 +11,8 @@ export async function GET() {
   if (!staff || !canViewAnalytics(staff)) {
     return NextResponse.json({ error: "この操作を行う権限がありません" }, { status: 403 });
   }
+
+  await recordAuditLog({ staffId: staff.id, action: "export", targetType: "offers" });
 
   const selections = await getOfferAndAcceptanceSelections();
   const rows = selections.map((selection) => ({
