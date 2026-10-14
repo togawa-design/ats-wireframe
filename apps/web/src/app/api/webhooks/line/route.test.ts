@@ -2,7 +2,8 @@ import { describe, expect, it, vi } from "vitest";
 import { mockDeep, type DeepMockProxy } from "vitest-mock-extended";
 import type { PrismaClient } from "@/generated/prisma/client";
 import { prisma } from "@/lib/prisma";
-import { verifyLineSignature } from "@/lib/line/client";
+import { verifyLineSignature, fetchLineMessageContent } from "@/lib/line/client";
+import { uploadLineMessageImage } from "@/lib/firebase/storage";
 import { POST } from "./route";
 
 vi.mock("@/lib/prisma", () => ({
@@ -10,6 +11,10 @@ vi.mock("@/lib/prisma", () => ({
 }));
 vi.mock("@/lib/line/client", () => ({
   verifyLineSignature: vi.fn(),
+  fetchLineMessageContent: vi.fn(),
+}));
+vi.mock("@/lib/firebase/storage", () => ({
+  uploadLineMessageImage: vi.fn(),
 }));
 
 const prismaMock = prisma as unknown as DeepMockProxy<PrismaClient>;
@@ -75,6 +80,63 @@ describe("POST /api/webhooks/line", () => {
         content: "よろしくお願いします",
       },
     });
+  });
+
+  it("登録済み応募者からの画像メッセージをアップロードしinboundとして記録する", async () => {
+    vi.mocked(verifyLineSignature).mockReturnValue(true);
+    prismaMock.applicant.findUnique.mockResolvedValue({ id: "applicant-1" } as never);
+    vi.mocked(fetchLineMessageContent).mockResolvedValue({
+      buffer: Buffer.from([1, 2, 3]),
+      contentType: "image/jpeg",
+    });
+    vi.mocked(uploadLineMessageImage).mockResolvedValue("https://storage.example.com/a.jpg");
+
+    const res = await POST(
+      makeRequest({
+        destination: "Ubot",
+        events: [
+          {
+            type: "message",
+            source: { type: "user", userId: "Uknown" },
+            message: { type: "image", id: "msg-1" },
+          },
+        ],
+      })
+    );
+
+    expect(res.status).toBe(200);
+    expect(fetchLineMessageContent).toHaveBeenCalledWith("msg-1");
+    expect(uploadLineMessageImage).toHaveBeenCalledWith(
+      "applicant-1",
+      Buffer.from([1, 2, 3]),
+      "image/jpeg"
+    );
+    expect(prismaMock.lineMessage.create).toHaveBeenCalledWith({
+      data: {
+        applicant_id: "applicant-1",
+        direction: "inbound",
+        message_type: "image",
+        file_url: "https://storage.example.com/a.jpg",
+      },
+    });
+  });
+
+  it("テキスト・画像以外のメッセージ種別(スタンプ等)は無視する", async () => {
+    vi.mocked(verifyLineSignature).mockReturnValue(true);
+    const res = await POST(
+      makeRequest({
+        destination: "Ubot",
+        events: [
+          {
+            type: "message",
+            source: { type: "user", userId: "Uknown" },
+            message: { type: "sticker", id: "1" },
+          },
+        ],
+      })
+    );
+    expect(res.status).toBe(200);
+    expect(prismaMock.applicant.findUnique).not.toHaveBeenCalled();
   });
 
   it("message以外のイベント(follow等)は無視する", async () => {

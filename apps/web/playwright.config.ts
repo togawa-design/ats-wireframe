@@ -40,6 +40,11 @@ export default defineConfig({
         process.env.FIREBASE_STORAGE_EMULATOR_HOST ?? "localhost:9199",
       NEXT_PUBLIC_FIREBASE_PROJECT_ID: "fujiarte-ats-e2e",
       FIREBASE_STORAGE_BUCKET: "fujiarte-ats-e2e.firebasestorage.app",
+      // 実際のLINEチャネルには絶対に送信しない(line-send.spec.ts等が前提とする
+      // 「E2E環境には本物のLINEチャネルが無い」を、手元シェルの環境変数に左右されず
+      // 保証するため明示的に空にする)。
+      LINE_CHANNEL_ACCESS_TOKEN: "",
+      LINE_CHANNEL_SECRET: "",
     },
   },
 });
