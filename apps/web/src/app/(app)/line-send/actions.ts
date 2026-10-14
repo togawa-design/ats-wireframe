@@ -35,6 +35,17 @@ export async function sendBulkLineMessage(formData: FormData) {
     select: { id: true, last_name: true, first_name: true, line_user_id: true },
   });
 
+  // FR033: 送信履歴・開封集計のため、1回の一斉送信操作を1レコードとして先に作成しておく。
+  const broadcast = await prisma.lineBroadcast.create({
+    data: {
+      template_text: text,
+      tag_id: tag_id ?? null,
+      recipient_count: recipients.length,
+      sent_count: 0,
+      sent_by: staff.id,
+    },
+  });
+
   let successCount = 0;
   let failureCount = 0;
 
@@ -46,6 +57,7 @@ export async function sendBulkLineMessage(formData: FormData) {
       await prisma.lineMessage.create({
         data: {
           applicant_id: recipient.id,
+          broadcast_id: broadcast.id,
           direction: "outbound",
           message_type: "text",
           content,
@@ -56,6 +68,11 @@ export async function sendBulkLineMessage(formData: FormData) {
       failureCount++;
     }
   }
+
+  await prisma.lineBroadcast.update({
+    where: { id: broadcast.id },
+    data: { sent_count: successCount },
+  });
 
   revalidatePath("/line-send");
   return { successCount, failureCount, total: recipients.length };

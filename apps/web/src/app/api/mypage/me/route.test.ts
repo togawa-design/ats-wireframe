@@ -42,6 +42,7 @@ describe("GET /api/mypage/me", () => {
   it("選考ステージの進捗をステータス付きで返す", async () => {
     vi.mocked(verifyLiffIdToken).mockResolvedValue("U123");
     prismaMock.applicant.findUnique.mockResolvedValue({
+      id: "applicant-1",
       last_name: "山田",
       first_name: "太郎",
       department: "機械系",
@@ -71,11 +72,16 @@ describe("GET /api/mypage/me", () => {
       { id: "s2", name: "説明会", status: "current" },
       { id: "s3", name: "1次面接", status: "upcoming" },
     ]);
+    expect(prismaMock.applicant.update).toHaveBeenCalledWith({
+      where: { id: "applicant-1" },
+      data: { mypage_last_accessed_at: expect.any(Date) },
+    });
   });
 
   it("Selectionが無い応募者はstepsが空配列", async () => {
     vi.mocked(verifyLiffIdToken).mockResolvedValue("U123");
     prismaMock.applicant.findUnique.mockResolvedValue({
+      id: "applicant-2",
       last_name: "山田",
       first_name: "太郎",
       department: null,

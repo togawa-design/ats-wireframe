@@ -71,6 +71,7 @@ model Staff {
   interviews_conducted           Interview[]          @relation("InterviewInterviewer")
   evaluation_templates_created   EvaluationTemplate[] @relation("EvaluationTemplateCreator")
   evaluation_responses_submitted EvaluationResponse[] @relation("EvaluationResponseSubmitter")
+  line_broadcasts_sent           LineBroadcast[]
 
   @@index([email], map: "staff_email_idx")
   @@index([google_id], map: "staff_google_id_idx")
@@ -146,8 +147,9 @@ model Tag {
   color      String @db.VarChar(7)
   created_by String @db.Uuid
 
-  creator        Staff          @relation(fields: [created_by], references: [id])
-  applicant_tags ApplicantTag[]
+  creator          Staff           @relation(fields: [created_by], references: [id])
+  applicant_tags   ApplicantTag[]
+  line_broadcasts  LineBroadcast[]
 }
 
 /// 学校マスター。
@@ -257,6 +259,9 @@ model Applicant {
   applicant_type            ApplicantType @default(new_grad)
   line_user_id              String?       @unique @db.VarChar(50)
   line_linked_at            DateTime?
+  // FR033: LINE既読確認はAPI仕様上不可のため、マイページアクセス日時を
+  // 「開封」の代替指標として使う(U-01参照)。
+  mypage_last_accessed_at   DateTime?
   primary_source_id         String?       @unique @db.Uuid
   // AgencyContactテーブルは未実装(エージェント機能のPhaseで追加予定)のため、
   // 今はFK制約を張らずスカラーとして保持する。
@@ -475,6 +480,7 @@ enum LineMessageType {
 model LineMessage {
   id           String               @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   applicant_id String               @db.Uuid
+  broadcast_id String?              @db.Uuid
   direction    LineMessageDirection
   message_type LineMessageType      @default(text)
   content      String?
@@ -483,8 +489,28 @@ model LineMessage {
   is_read      Boolean              @default(false)
   sent_at      DateTime             @default(now())
 
-  applicant Applicant @relation(fields: [applicant_id], references: [id], onDelete: Cascade)
+  applicant Applicant      @relation(fields: [applicant_id], references: [id], onDelete: Cascade)
+  broadcast LineBroadcast? @relation(fields: [broadcast_id], references: [id])
 
   @@index([applicant_id, sent_at(sort: Desc)], map: "linemsg_applicant_idx")
   @@index([is_read, direction, sent_at], map: "linemsg_unread_idx")
+}
+
+/// FR033: LINE一斉送信の送信履歴(1回の一斉送信操作を1レコードにまとめる)。
+/// 開封率はLINE API仕様上個人の既読取得ができない(U-01)ため、
+/// 「マイページアクセス日時が送信日時より後か」を暫定的な代替指標として使う。
+model LineBroadcast {
+  id              String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  template_text   String
+  tag_id          String?  @db.Uuid
+  recipient_count Int      @db.SmallInt
+  sent_count      Int      @db.SmallInt
+  sent_by         String   @db.Uuid
+  sent_at         DateTime @default(now())
+
+  tag      Tag?          @relation(fields: [tag_id], references: [id])
+  sender   Staff         @relation(fields: [sent_by], references: [id])
+  messages LineMessage[]
+
+  @@index([sent_at(sort: Desc)], map: "linebroadcast_sent_idx")
 }
