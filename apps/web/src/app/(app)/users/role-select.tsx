@@ -18,6 +18,7 @@ export function RoleSelect({
 
   return (
     <select
+      aria-label="ロールを変更"
       disabled={disabled || isPending}
       defaultValue={value}
       onChange={(e) => startTransition(() => updateStaffRole(staffId, e.target.value as StaffRole))}

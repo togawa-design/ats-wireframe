@@ -7,13 +7,15 @@ import {
   isAdmin,
   isRestrictedToOwnApplicants,
   canViewAnalytics,
+  restrictedPositionType,
+  canAccessPositionType,
   assertCanManage,
   assertIsAdmin,
 } from "./permissions";
-import type { StaffRole } from "@/generated/prisma/client";
+import type { StaffPositionAccess, StaffRole } from "@/generated/prisma/client";
 
-function staff(role: StaffRole) {
-  return { id: "s1", role };
+function staff(role: StaffRole, positionTypeAccess: StaffPositionAccess = "both") {
+  return { id: "s1", role, position_type_access: positionTypeAccess };
 }
 
 describe("canManage", () => {
@@ -72,6 +74,39 @@ describe("canViewAnalytics", () => {
     expect(canViewAnalytics(staff("recruiter"))).toBe(true);
     expect(canViewAnalytics(staff("viewer"))).toBe(true);
     expect(canViewAnalytics(staff("interviewer"))).toBe(false);
+  });
+});
+
+describe("restrictedPositionType", () => {
+  it("bothならnull(制限なし)", () => {
+    expect(restrictedPositionType(staff("recruiter", "both"))).toBeNull();
+  });
+  it("sogo/ginoならその値を返す", () => {
+    expect(restrictedPositionType(staff("recruiter", "sogo"))).toBe("sogo");
+    expect(restrictedPositionType(staff("recruiter", "gino"))).toBe("gino");
+  });
+});
+
+describe("canAccessPositionType", () => {
+  it("bothのスタッフはどの職種区分でもtrue", () => {
+    const s = staff("recruiter", "both");
+    expect(canAccessPositionType(s, "sogo")).toBe(true);
+    expect(canAccessPositionType(s, "gino")).toBe(true);
+    expect(canAccessPositionType(s, null)).toBe(true);
+  });
+
+  it("sogo限定のスタッフはsogoと未設定のみtrue", () => {
+    const s = staff("recruiter", "sogo");
+    expect(canAccessPositionType(s, "sogo")).toBe(true);
+    expect(canAccessPositionType(s, null)).toBe(true);
+    expect(canAccessPositionType(s, "gino")).toBe(false);
+  });
+
+  it("gino限定のスタッフはginoと未設定のみtrue", () => {
+    const s = staff("recruiter", "gino");
+    expect(canAccessPositionType(s, "gino")).toBe(true);
+    expect(canAccessPositionType(s, null)).toBe(true);
+    expect(canAccessPositionType(s, "sogo")).toBe(false);
   });
 });
 

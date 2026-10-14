@@ -2,7 +2,13 @@ import { notFound, redirect } from "next/navigation";
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { getCurrentStaff } from "@/lib/auth";
-import { canManage, canSendLine, isRestrictedToOwnApplicants } from "@/lib/permissions";
+import {
+  canManage,
+  canSendLine,
+  isRestrictedToOwnApplicants,
+  restrictedPositionType,
+} from "@/lib/permissions";
+import type { Prisma } from "@/generated/prisma/client";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -28,9 +34,17 @@ export default async function ApplicantDetailPage({ params }: PageProps<"/applic
   const canEdit = canManage(staff);
   const canChat = canSendLine(staff);
   const restrictToOwn = isRestrictedToOwnApplicants(staff);
+  const positionType = restrictedPositionType(staff);
+
+  const conditions: Prisma.ApplicantWhereInput[] = [{ id }];
+  if (restrictToOwn) conditions.push({ selection: { assigned_to: staff.id } });
+  // FR095: 職種区分によるアクセス制限(未設定の応募者は全員が閲覧可能)。
+  if (positionType) {
+    conditions.push({ OR: [{ position_type: positionType }, { position_type: null }] });
+  }
 
   const applicant = await prisma.applicant.findFirst({
-    where: restrictToOwn ? { id, selection: { assigned_to: staff.id } } : { id },
+    where: { AND: conditions },
     include: {
       school: true,
       tags: { include: { tag: true } },

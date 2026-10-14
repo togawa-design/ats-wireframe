@@ -11,7 +11,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { getCurrentStaff } from "@/lib/auth";
-import { canViewAnalytics } from "@/lib/permissions";
+import { canViewAnalytics, restrictedPositionType } from "@/lib/permissions";
 import {
   getFunnelData,
   getMediaBreakdown,
@@ -24,12 +24,13 @@ export default async function AnalyticsPage() {
   if (!staff || !canViewAnalytics(staff)) {
     redirect("/");
   }
+  const positionType = restrictedPositionType(staff);
 
   const [funnel, mediaBreakdown, schoolBreakdown, offerSelections] = await Promise.all([
-    getFunnelData(),
-    getMediaBreakdown(),
-    getSchoolBreakdown(),
-    getOfferAndAcceptanceSelections(),
+    getFunnelData(positionType),
+    getMediaBreakdown(positionType),
+    getSchoolBreakdown(positionType),
+    getOfferAndAcceptanceSelections(positionType),
   ]);
 
   const maxFunnelCount = Math.max(1, ...funnel.map((f) => f.count));

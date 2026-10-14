@@ -18,6 +18,7 @@ test("応募者一覧を氏名・応募者区分で絞り込める", async ({ pa
   await createForm.getByLabel("名").fill(nameB);
   await createForm.getByLabel("メールアドレス").fill(`e2e-filter-b-${suffix}@example.com`);
   await createForm.getByLabel("応募者区分").selectOption("existing_grad");
+  await createForm.getByLabel("職種区分").selectOption("gino");
   await createForm.getByRole("button", { name: "登録", exact: true }).click();
   await expect(page.getByRole("row").filter({ hasText: nameB })).toBeVisible();
 
@@ -32,6 +33,13 @@ test("応募者一覧を氏名・応募者区分で絞り込める", async ({ pa
   // クリアして応募者区分(既卒)で絞り込むとBのみ表示される
   await page.getByRole("link", { name: "クリア" }).click();
   await page.getByRole("form", { name: "絞り込み検索フォーム" }).getByLabel("応募者区分").selectOption("existing_grad");
+  await page.getByRole("form", { name: "絞り込み検索フォーム" }).getByRole("button", { name: "絞り込む" }).click();
+  await expect(page.getByRole("row").filter({ hasText: nameB })).toBeVisible();
+  await expect(page.getByRole("row").filter({ hasText: nameA })).toHaveCount(0);
+
+  // クリアして職種区分(技能職)で絞り込むとBのみ表示される(FR095)
+  await page.getByRole("link", { name: "クリア" }).click();
+  await page.getByRole("form", { name: "絞り込み検索フォーム" }).getByLabel("職種区分").selectOption("gino");
   await page.getByRole("form", { name: "絞り込み検索フォーム" }).getByRole("button", { name: "絞り込む" }).click();
   await expect(page.getByRole("row").filter({ hasText: nameB })).toBeVisible();
   await expect(page.getByRole("row").filter({ hasText: nameA })).toHaveCount(0);
