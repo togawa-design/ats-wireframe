@@ -13,10 +13,12 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { createApplicant, deleteApplicant, issueLineRegistrationToken } from "./actions";
+import { parseApplicantFilters, buildApplicantWhere } from "./filters";
 import { DeleteButton } from "@/components/delete-button";
 import { headers } from "next/headers";
 import { getCurrentStaff } from "@/lib/auth";
 import { canManage, isRestrictedToOwnApplicants } from "@/lib/permissions";
+import type { Prisma } from "@/generated/prisma/client";
 
 const APPLICANT_TYPE_LABELS: Record<string, string> = {
   new_grad: "新卒",
@@ -34,25 +36,38 @@ const POSITION_TYPE_LABELS: Record<string, string> = {
   gino: "技能職",
 };
 
-export default async function ApplicantsPage() {
+export default async function ApplicantsPage({ searchParams }: PageProps<"/applicants">) {
   const staff = await getCurrentStaff();
   const canEdit = staff ? canManage(staff) : false;
   const restrictToOwn = staff ? isRestrictedToOwnApplicants(staff) : false;
 
-  const [applicants, schools, tags, headersList] = await Promise.all([
+  const filters = parseApplicantFilters(await searchParams);
+  const filterWhere = buildApplicantWhere(filters);
+  const where: Prisma.ApplicantWhereInput = restrictToOwn
+    ? { AND: [filterWhere, { selection: { assigned_to: staff!.id } }] }
+    : filterWhere;
+
+  const [applicants, schools, tags, mediaList, defaultFlow, headersList] = await Promise.all([
     prisma.applicant.findMany({
-      where: restrictToOwn ? { selection: { assigned_to: staff!.id } } : undefined,
+      where,
       include: {
         school: true,
         tags: { include: { tag: true } },
         line_tokens: { orderBy: { created_at: "desc" }, take: 1 },
+        selection: { include: { current_stage: true } },
       },
       orderBy: { created_at: "desc" },
     }),
     prisma.school.findMany({ orderBy: { name: "asc" } }),
     prisma.tag.findMany({ orderBy: { name: "asc" } }),
+    prisma.media.findMany({ orderBy: { name: "asc" } }),
+    prisma.selectionFlow.findFirst({
+      where: { is_default: true },
+      include: { stages: { orderBy: { order: "asc" } } },
+    }),
     headers(),
   ]);
+  const stages = defaultFlow?.stages ?? [];
 
   const protocol = headersList.get("x-forwarded-proto") ?? "http";
   const host = headersList.get("host");
@@ -67,13 +82,127 @@ export default async function ApplicantsPage() {
         </p>
       </div>
 
+      <Card className="border-border">
+        <CardHeader>
+          <CardTitle className="text-sm">絞り込み検索(FR004)</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <form aria-label="絞り込み検索フォーム" className="flex flex-col gap-4">
+            <div className="flex flex-wrap items-end gap-3">
+              <div className="flex flex-col gap-1.5">
+                <Label htmlFor="filter-q">キーワード</Label>
+                <Input
+                  id="filter-q"
+                  name="q"
+                  placeholder="氏名・カナで検索"
+                  defaultValue={filters.q ?? ""}
+                  className="w-48"
+                />
+              </div>
+              <div className="flex flex-col gap-1.5">
+                <Label htmlFor="filter-school_id">学校</Label>
+                <select
+                  id="filter-school_id"
+                  name="school_id"
+                  defaultValue={filters.schoolId ?? ""}
+                  className="h-9 w-44 rounded-md border border-input bg-transparent px-3 text-sm"
+                >
+                  <option value="">(すべて)</option>
+                  {schools.map((school) => (
+                    <option key={school.id} value={school.id}>
+                      {school.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div className="flex flex-col gap-1.5">
+                <Label htmlFor="filter-stage_id">現在のステージ</Label>
+                <select
+                  id="filter-stage_id"
+                  name="stage_id"
+                  defaultValue={filters.stageId ?? ""}
+                  className="h-9 w-36 rounded-md border border-input bg-transparent px-3 text-sm"
+                >
+                  <option value="">(すべて)</option>
+                  {stages.map((stage) => (
+                    <option key={stage.id} value={stage.id}>
+                      {stage.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div className="flex flex-col gap-1.5">
+                <Label htmlFor="filter-media_id">媒体</Label>
+                <select
+                  id="filter-media_id"
+                  name="media_id"
+                  defaultValue={filters.mediaId ?? ""}
+                  className="h-9 w-36 rounded-md border border-input bg-transparent px-3 text-sm"
+                >
+                  <option value="">(すべて)</option>
+                  {mediaList.map((media) => (
+                    <option key={media.id} value={media.id}>
+                      {media.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div className="flex flex-col gap-1.5">
+                <Label htmlFor="filter-applicant_type">応募者区分</Label>
+                <select
+                  id="filter-applicant_type"
+                  name="applicant_type"
+                  defaultValue={filters.applicantType ?? ""}
+                  className="h-9 w-28 rounded-md border border-input bg-transparent px-3 text-sm"
+                >
+                  <option value="">(すべて)</option>
+                  {Object.entries(APPLICANT_TYPE_LABELS).map(([value, label]) => (
+                    <option key={value} value={value}>
+                      {label}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </div>
+            {tags.length > 0 && (
+              <div className="flex flex-col gap-1.5">
+                <Label>タグ</Label>
+                <div className="flex flex-wrap gap-3">
+                  {tags.map((tag) => (
+                    <label key={tag.id} className="flex items-center gap-1.5 text-sm">
+                      <input
+                        type="checkbox"
+                        name="tag_ids"
+                        value={tag.id}
+                        defaultChecked={filters.tagIds.includes(tag.id)}
+                      />
+                      {tag.name}
+                    </label>
+                  ))}
+                </div>
+              </div>
+            )}
+            <div className="flex gap-2">
+              <Button type="submit">絞り込む</Button>
+              <Button type="button" variant="outline" asChild>
+                <a href="/applicants">クリア</a>
+              </Button>
+            </div>
+          </form>
+        </CardContent>
+      </Card>
+
       {canEdit && (
       <Card className="border-border">
         <CardHeader>
           <CardTitle className="text-sm">新規応募者登録</CardTitle>
         </CardHeader>
         <CardContent>
-          <form action={createApplicant} className="flex flex-col gap-4">
+          <form
+            action={createApplicant}
+            aria-label="新規応募者登録フォーム"
+            className="flex flex-col gap-4"
+          >
             <div className="flex flex-wrap items-end gap-3">
               <div className="flex flex-col gap-1.5">
                 <Label htmlFor="last_name">姓</Label>
@@ -188,6 +317,7 @@ export default async function ApplicantsPage() {
                 <TableHead>メールアドレス</TableHead>
                 <TableHead>学校</TableHead>
                 <TableHead>区分</TableHead>
+                <TableHead>現在のステージ</TableHead>
                 <TableHead>タグ</TableHead>
                 <TableHead>LINE連携</TableHead>
                 {canEdit && <TableHead className="text-right">操作</TableHead>}
@@ -196,7 +326,7 @@ export default async function ApplicantsPage() {
             <TableBody>
               {applicants.length === 0 && (
                 <TableRow>
-                  <TableCell colSpan={canEdit ? 7 : 6} className="text-center text-muted-foreground">
+                  <TableCell colSpan={canEdit ? 8 : 7} className="text-center text-muted-foreground">
                     応募者がまだ登録されていません
                   </TableCell>
                 </TableRow>
@@ -221,6 +351,9 @@ export default async function ApplicantsPage() {
                         {APPLICANT_TYPE_LABELS[applicant.applicant_type]}
                       </Badge>
                     </div>
+                  </TableCell>
+                  <TableCell className="text-sm text-muted-foreground">
+                    {applicant.selection?.current_stage.name ?? "—"}
                   </TableCell>
                   <TableCell>
                     <div className="flex flex-wrap gap-1">
