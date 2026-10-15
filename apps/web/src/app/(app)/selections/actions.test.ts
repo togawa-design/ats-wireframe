@@ -4,7 +4,7 @@ import type { PrismaClient } from "@/generated/prisma/client";
 import { prisma } from "@/lib/prisma";
 import { getCurrentStaff } from "@/lib/auth";
 import { recordAuditLog } from "@/lib/audit-log";
-import { advanceStage, moveToStage, setResult } from "./actions";
+import { advanceStage, moveToStage, setResult, bulkSetResult } from "./actions";
 
 vi.mock("@/lib/prisma", () => ({
   prisma: mockDeep<PrismaClient>(),
@@ -201,6 +201,55 @@ describe("setResult", () => {
       targetType: "Selection",
       targetId: "selection-1",
       afterValue: { result: "passed" },
+    });
+  });
+});
+
+describe("bulkSetResult", () => {
+  it("未ログインなら例外を投げる", async () => {
+    vi.mocked(getCurrentStaff).mockResolvedValue(null);
+    await expect(bulkSetResult(["selection-1"], "passed")).rejects.toThrow(
+      "ログインが必要です"
+    );
+  });
+
+  it("面接官ロールでは権限エラーになる", async () => {
+    vi.mocked(getCurrentStaff).mockResolvedValue({ id: "staff-2", role: "interviewer" } as never);
+    await expect(bulkSetResult(["selection-1"], "passed")).rejects.toThrow(
+      "この操作を行う権限がありません"
+    );
+    expect(prismaMock.selection.updateMany).not.toHaveBeenCalled();
+  });
+
+  it("対象が空なら例外を投げる", async () => {
+    vi.mocked(getCurrentStaff).mockResolvedValue(mockStaff);
+    await expect(bulkSetResult([], "passed")).rejects.toThrow("対象を選択してください");
+    expect(prismaMock.selection.updateMany).not.toHaveBeenCalled();
+  });
+
+  it("複数の選考結果をまとめて更新し、それぞれ監査ログに記録する", async () => {
+    vi.mocked(getCurrentStaff).mockResolvedValue(mockStaff);
+
+    await bulkSetResult(["selection-1", "selection-2"], "failed");
+
+    expect(prismaMock.selection.updateMany).toHaveBeenCalledWith({
+      where: { id: { in: ["selection-1", "selection-2"] } },
+      data: { result: "failed" },
+    });
+    expect(recordAuditLog).toHaveBeenCalledTimes(2);
+    expect(recordAuditLog).toHaveBeenCalledWith({
+      staffId: "staff-1",
+      action: "status_change",
+      targetType: "Selection",
+      targetId: "selection-1",
+      afterValue: { result: "failed" },
+    });
+    expect(recordAuditLog).toHaveBeenCalledWith({
+      staffId: "staff-1",
+      action: "status_change",
+      targetType: "Selection",
+      targetId: "selection-2",
+      afterValue: { result: "failed" },
     });
   });
 });
