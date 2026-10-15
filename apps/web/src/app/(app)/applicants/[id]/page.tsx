@@ -14,6 +14,8 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { uploadApplicantDocument } from "./actions";
 import { LineSendForm } from "./line-send-form";
+import { createCallLog } from "./call-log-actions";
+import { CallStatusSelect, CALL_STATUS_LABELS } from "./call-status-select";
 
 const APPLICANT_TYPE_LABELS: Record<string, string> = {
   new_grad: "新卒",
@@ -50,6 +52,7 @@ export default async function ApplicantDetailPage({ params }: PageProps<"/applic
       tags: { include: { tag: true } },
       selection: { include: { current_stage: true } },
       line_messages: { orderBy: { sent_at: "asc" } },
+      call_logs: { orderBy: { called_at: "desc" }, include: { staff: true } },
     },
   });
   if (!applicant) notFound();
@@ -84,6 +87,18 @@ export default async function ApplicantDetailPage({ params }: PageProps<"/applic
             }
           />
           <InfoRow label="現在のステージ" value={applicant.selection?.current_stage.name ?? "—"} />
+          <InfoRow
+            label="架電状況(FR110)"
+            value={
+              canEdit ? (
+                <CallStatusSelect applicantId={applicant.id} value={applicant.call_status} />
+              ) : (
+                <Badge variant={applicant.call_status === "none" ? "outline" : "destructive"}>
+                  {CALL_STATUS_LABELS[applicant.call_status]}
+                </Badge>
+              )
+            }
+          />
           <InfoRow
             label="タグ"
             value={
@@ -126,6 +141,91 @@ export default async function ApplicantDetailPage({ params }: PageProps<"/applic
             canEdit={canEdit}
             uploadAction={uploadApplicantDocument.bind(null, applicant.id)}
           />
+        </CardContent>
+      </Card>
+
+      <Card className="border-border">
+        <CardHeader>
+          <CardTitle className="text-sm">架電履歴(FR109)</CardTitle>
+        </CardHeader>
+        <CardContent className="flex flex-col gap-4">
+          <div className="flex flex-col gap-2">
+            {applicant.call_logs.length === 0 && (
+              <p className="text-sm text-muted-foreground">まだ架電履歴はありません</p>
+            )}
+            {applicant.call_logs.map((log) => (
+              <div
+                key={log.id}
+                className="flex flex-col gap-1 border-b border-border pb-3 text-sm last:border-0 last:pb-0"
+              >
+                <div className="flex flex-wrap items-center gap-2 text-muted-foreground">
+                  <span>
+                    {new Intl.DateTimeFormat("ja-JP", {
+                      dateStyle: "short",
+                      timeStyle: "short",
+                    }).format(log.called_at)}
+                  </span>
+                  <Badge variant="secondary">{log.result}</Badge>
+                  <span className="text-xs">{log.staff.name}</span>
+                </div>
+                {log.note && <p className="whitespace-pre-wrap">{log.note}</p>}
+              </div>
+            ))}
+          </div>
+          {canEdit && (
+            <form
+              action={createCallLog.bind(null, applicant.id)}
+              aria-label="架電履歴の登録フォーム"
+              className="flex flex-col gap-3 border-t border-border pt-4"
+            >
+              <div className="flex flex-wrap items-end gap-3">
+                <div className="flex flex-col gap-1.5">
+                  <label htmlFor="called_at" className="text-sm text-muted-foreground">
+                    架電日時
+                  </label>
+                  <input
+                    id="called_at"
+                    name="called_at"
+                    type="datetime-local"
+                    required
+                    className="h-9 rounded-md border border-input bg-transparent px-3 text-sm"
+                  />
+                </div>
+                <div className="flex flex-col gap-1.5">
+                  <label htmlFor="result" className="text-sm text-muted-foreground">
+                    架電結果
+                  </label>
+                  <select
+                    id="result"
+                    name="result"
+                    required
+                    className="h-9 rounded-md border border-input bg-transparent px-3 text-sm"
+                  >
+                    <option value="つながった">つながった</option>
+                    <option value="不在">不在</option>
+                    <option value="留守電">留守電</option>
+                    <option value="その他">その他</option>
+                  </select>
+                </div>
+              </div>
+              <div className="flex flex-col gap-1.5">
+                <label htmlFor="note" className="text-sm text-muted-foreground">
+                  内容
+                </label>
+                <textarea
+                  id="note"
+                  name="note"
+                  rows={2}
+                  className="rounded-md border border-input bg-transparent px-3 py-1.5 text-sm"
+                />
+              </div>
+              <div>
+                <Button type="submit" variant="outline" size="sm">
+                  記録を追加
+                </Button>
+              </div>
+            </form>
+          )}
         </CardContent>
       </Card>
 

@@ -72,6 +72,7 @@ model Staff {
   evaluation_templates_created   EvaluationTemplate[] @relation("EvaluationTemplateCreator")
   evaluation_responses_submitted EvaluationResponse[] @relation("EvaluationResponseSubmitter")
   line_broadcasts_sent           LineBroadcast[]
+  call_logs_recorded             CallLog[]            @relation("CallLogStaff")
 
   @@index([email], map: "staff_email_idx")
   @@index([google_id], map: "staff_google_id_idx")
@@ -286,6 +287,7 @@ model Applicant {
   line_tokens    LineRegistrationToken[]
   selection      Selection?
   line_messages  LineMessage[]
+  call_logs      CallLog[]
 
   @@index([email], map: "applicant_email_idx")
   @@index([sf_contact_id], map: "applicant_sf_idx")
@@ -319,6 +321,22 @@ model ApplicantTag {
   tagged_staff Staff?    @relation(fields: [tagged_by], references: [id])
 
   @@id([applicant_id, tag_id])
+}
+
+/// 架電履歴(FR109)。担当者が学生への電話を手動記録する(1学生に複数件登録可)。
+model CallLog {
+  id           String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  applicant_id String   @db.Uuid
+  staff_id     String   @db.Uuid
+  called_at    DateTime
+  result       String   @db.VarChar(50)
+  note         String?
+  created_at   DateTime @default(now())
+
+  applicant Applicant @relation(fields: [applicant_id], references: [id], onDelete: Cascade)
+  staff     Staff     @relation("CallLogStaff", fields: [staff_id], references: [id])
+
+  @@index([applicant_id, called_at(sort: Desc)], map: "call_log_applicant_idx")
 }
 
 /// LINE連携ワンタイムトークン。
