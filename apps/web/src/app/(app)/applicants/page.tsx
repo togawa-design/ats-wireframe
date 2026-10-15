@@ -37,6 +37,11 @@ const POSITION_TYPE_LABELS: Record<string, string> = {
   gino: "技能職",
 };
 
+const CALL_STATUS_LABELS: Record<string, string> = {
+  callback_needed: "要架電",
+  no_answer: "不在",
+};
+
 export default async function ApplicantsPage({ searchParams }: PageProps<"/applicants">) {
   const staff = await getCurrentStaff();
   const canEdit = staff ? canManage(staff) : false;
@@ -178,6 +183,22 @@ export default async function ApplicantsPage({ searchParams }: PageProps<"/appli
                 >
                   <option value="">(すべて)</option>
                   {Object.entries(POSITION_TYPE_LABELS).map(([value, label]) => (
+                    <option key={value} value={value}>
+                      {label}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div className="flex flex-col gap-1.5">
+                <Label htmlFor="filter-call_status">架電状況(FR110)</Label>
+                <select
+                  id="filter-call_status"
+                  name="call_status"
+                  defaultValue={filters.callStatus ?? ""}
+                  className="h-9 w-28 rounded-md border border-input bg-transparent px-3 text-sm"
+                >
+                  <option value="">(すべて)</option>
+                  {Object.entries(CALL_STATUS_LABELS).map(([value, label]) => (
                     <option key={value} value={value}>
                       {label}
                     </option>
@@ -343,6 +364,7 @@ export default async function ApplicantsPage({ searchParams }: PageProps<"/appli
                 <TableHead>区分</TableHead>
                 <TableHead>現在のステージ</TableHead>
                 <TableHead>タグ</TableHead>
+                <TableHead>架電状況</TableHead>
                 <TableHead>LINE連携</TableHead>
                 {canEdit && <TableHead className="text-right">操作</TableHead>}
               </TableRow>
@@ -350,7 +372,7 @@ export default async function ApplicantsPage({ searchParams }: PageProps<"/appli
             <TableBody>
               {applicants.length === 0 && (
                 <TableRow>
-                  <TableCell colSpan={canEdit ? 8 : 7} className="text-center text-muted-foreground">
+                  <TableCell colSpan={canEdit ? 9 : 8} className="text-center text-muted-foreground">
                     応募者がまだ登録されていません
                   </TableCell>
                 </TableRow>
@@ -389,6 +411,13 @@ export default async function ApplicantsPage({ searchParams }: PageProps<"/appli
                         </Badge>
                       ))}
                     </div>
+                  </TableCell>
+                  <TableCell className="text-xs">
+                    {applicant.call_status !== "none" && (
+                      <Badge variant={applicant.call_status === "callback_needed" ? "destructive" : "outline"}>
+                        {CALL_STATUS_LABELS[applicant.call_status]}
+                      </Badge>
+                    )}
                   </TableCell>
                   <TableCell className="text-xs">
                     {applicant.line_user_id ? (

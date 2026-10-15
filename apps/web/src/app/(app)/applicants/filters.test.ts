@@ -11,6 +11,7 @@ describe("parseApplicantFilters", () => {
       mediaId: undefined,
       applicantType: undefined,
       positionType: undefined,
+      callStatus: undefined,
     });
   });
 
@@ -23,6 +24,7 @@ describe("parseApplicantFilters", () => {
       media_id: "media-1",
       applicant_type: "new_grad",
       position_type: "sogo",
+      call_status: "callback_needed",
     });
     expect(filters).toEqual({
       q: "山田",
@@ -32,6 +34,7 @@ describe("parseApplicantFilters", () => {
       mediaId: "media-1",
       applicantType: "new_grad",
       positionType: "sogo",
+      callStatus: "callback_needed",
     });
   });
 
@@ -64,7 +67,7 @@ describe("buildApplicantWhere", () => {
     expect(where.tags).toEqual({ some: { tag_id: { in: ["tag-1", "tag-2"] } } });
   });
 
-  it("学校・ステージ・媒体・応募者区分・職種区分をそれぞれ指定できる", () => {
+  it("学校・ステージ・媒体・応募者区分・職種区分・架電状況をそれぞれ指定できる", () => {
     const where = buildApplicantWhere({
       tagIds: [],
       schoolId: "school-1",
@@ -72,6 +75,7 @@ describe("buildApplicantWhere", () => {
       mediaId: "media-1",
       applicantType: "existing_grad",
       positionType: "sogo",
+      callStatus: "no_answer",
     });
     expect(where).toEqual({
       school_id: "school-1",
@@ -79,6 +83,7 @@ describe("buildApplicantWhere", () => {
       sources: { some: { media_id: "media-1" } },
       applicant_type: "existing_grad",
       position_type: "sogo",
+      call_status: "no_answer",
     });
   });
 
@@ -91,9 +96,19 @@ describe("buildApplicantWhere", () => {
       mediaId: "media-1",
       applicantType: "new_grad",
       positionType: "gino",
+      callStatus: "callback_needed",
     });
     expect(Object.keys(where).sort()).toEqual(
-      ["OR", "school_id", "tags", "selection", "sources", "applicant_type", "position_type"].sort()
+      [
+        "OR",
+        "school_id",
+        "tags",
+        "selection",
+        "sources",
+        "applicant_type",
+        "position_type",
+        "call_status",
+      ].sort()
     );
   });
 });
