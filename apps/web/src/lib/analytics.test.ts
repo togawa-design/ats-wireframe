@@ -31,7 +31,6 @@ describe("getFunnelData", () => {
         { id: "s3", name: "1次面接", order: 3 },
       ],
     } as never);
-    // 4人がエントリー到達、2人が書類選考到達、1人が1次面接到達
     prismaMock.selection.findMany.mockResolvedValue([
       { current_stage: { order: 1 } },
       { current_stage: { order: 1 } },
@@ -63,7 +62,7 @@ describe("getFunnelData", () => {
 });
 
 describe("getMediaBreakdown", () => {
-  it("媒体ごとの流入数を集計する(流入0件の媒体も含む)", async () => {
+  it("媒体ごとの流入数を集計する(流入0件の媒体も含み、ドリルダウン用にidも返す)", async () => {
     prismaMock.media.findMany.mockResolvedValue([
       { id: "m1", name: "マイナビ" },
       { id: "m2", name: "OfferBox" },
@@ -77,8 +76,8 @@ describe("getMediaBreakdown", () => {
     const result = await getMediaBreakdown();
 
     expect(result).toEqual([
-      { name: "マイナビ", count: 5 },
-      { name: "OfferBox", count: 0 },
+      { id: "m1", name: "マイナビ", count: 5 },
+      { id: "m2", name: "OfferBox", count: 0 },
     ]);
   });
 });
@@ -90,7 +89,7 @@ describe("getSchoolBreakdown", () => {
     expect(prismaMock.school.findMany).not.toHaveBeenCalled();
   });
 
-  it("学校別の人数を多い順に並べる", async () => {
+  it("学校別の人数を多い順に並べる(ドリルダウン用にidも返す)", async () => {
     (prismaMock.applicant.groupBy as unknown as Mock).mockResolvedValue([
       { school_id: "sc1", _count: { _all: 2 } },
       { school_id: "sc2", _count: { _all: 5 } },
@@ -103,8 +102,8 @@ describe("getSchoolBreakdown", () => {
     const result = await getSchoolBreakdown();
 
     expect(result).toEqual([
-      { name: "B大学", count: 5 },
-      { name: "A大学", count: 2 },
+      { id: "sc2", name: "B大学", count: 5 },
+      { id: "sc1", name: "A大学", count: 2 },
     ]);
   });
 });
@@ -128,7 +127,7 @@ describe("getOfferAndAcceptanceSelections", () => {
   it("職種区分が指定されていれば応募者をその区分(と未設定)に絞り込む(FR095)", async () => {
     prismaMock.selection.findMany.mockResolvedValue([] as never);
 
-    await getOfferAndAcceptanceSelections("sogo");
+    await getOfferAndAcceptanceSelections({ positionType: "sogo" });
 
     expect(prismaMock.selection.findMany).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -145,7 +144,7 @@ describe("FR095: 職種区分によるアクセス制限", () => {
     prismaMock.selectionFlow.findFirst.mockResolvedValue({ stages: [] } as never);
     prismaMock.selection.findMany.mockResolvedValue([] as never);
 
-    await getFunnelData("gino");
+    await getFunnelData({ positionType: "gino" });
 
     expect(prismaMock.selection.findMany).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -158,7 +157,7 @@ describe("FR095: 職種区分によるアクセス制限", () => {
     prismaMock.media.findMany.mockResolvedValue([] as never);
     (prismaMock.applicantSource.groupBy as unknown as Mock).mockResolvedValue([]);
 
-    await getMediaBreakdown("sogo");
+    await getMediaBreakdown({ positionType: "sogo" });
 
     expect(prismaMock.applicantSource.groupBy).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -170,7 +169,7 @@ describe("FR095: 職種区分によるアクセス制限", () => {
   it("getSchoolBreakdownは指定した職種区分でApplicantを絞り込む", async () => {
     (prismaMock.applicant.groupBy as unknown as Mock).mockResolvedValue([]);
 
-    await getSchoolBreakdown("gino");
+    await getSchoolBreakdown({ positionType: "gino" });
 
     expect(prismaMock.applicant.groupBy).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -199,6 +198,64 @@ describe("FR095: 職種区分によるアクセス制限", () => {
     await getAllApplicantsForExport();
     expect(prismaMock.applicant.findMany).toHaveBeenCalledWith(
       expect.objectContaining({ where: {} })
+    );
+  });
+});
+
+describe("FR103: 集計期間による絞り込み", () => {
+  it("getFunnelDataはfrom/toを応募者のcreated_atの範囲条件に変換する", async () => {
+    prismaMock.selectionFlow.findFirst.mockResolvedValue({ stages: [] } as never);
+    prismaMock.selection.findMany.mockResolvedValue([] as never);
+    const from = new Date("2026-01-01T00:00:00Z");
+    const to = new Date("2026-03-31T23:59:59Z");
+
+    await getFunnelData({ from, to });
+
+    expect(prismaMock.selection.findMany).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: { applicant: { created_at: { gte: from, lte: to } } },
+      })
+    );
+  });
+
+  it("fromのみ指定すればgteのみになる", async () => {
+    prismaMock.selectionFlow.findFirst.mockResolvedValue({ stages: [] } as never);
+    prismaMock.selection.findMany.mockResolvedValue([] as never);
+    const from = new Date("2026-01-01T00:00:00Z");
+
+    await getFunnelData({ from });
+
+    expect(prismaMock.selection.findMany).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: { applicant: { created_at: { gte: from } } },
+      })
+    );
+  });
+
+  it("職種区分と集計期間を両方指定すれば両方の条件が付く", async () => {
+    (prismaMock.applicant.groupBy as unknown as Mock).mockResolvedValue([]);
+    const to = new Date("2026-03-31T23:59:59Z");
+
+    await getSchoolBreakdown({ positionType: "sogo", to });
+
+    expect(prismaMock.applicant.groupBy).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: {
+          school_id: { not: null },
+          OR: [{ position_type: "sogo" }, { position_type: null }],
+          created_at: { lte: to },
+        },
+      })
+    );
+  });
+
+  it("getAllApplicantsForExportは集計期間を考慮しない(全件対象のエクスポートのため)", async () => {
+    prismaMock.applicant.findMany.mockResolvedValue([] as never);
+    await getAllApplicantsForExport("gino");
+    expect(prismaMock.applicant.findMany).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: { OR: [{ position_type: "gino" }, { position_type: null }] },
+      })
     );
   });
 });

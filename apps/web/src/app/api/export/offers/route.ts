@@ -1,12 +1,12 @@
 import { NextResponse } from "next/server";
 import { getCurrentStaff } from "@/lib/auth";
 import { canViewAnalytics, restrictedPositionType } from "@/lib/permissions";
-import { getOfferAndAcceptanceSelections } from "@/lib/analytics";
+import { getOfferAndAcceptanceSelections, parseFromDate, parseToDate } from "@/lib/analytics";
 import { toCsv } from "@/lib/csv";
 import { recordAuditLog } from "@/lib/audit-log";
 
-/** FR052: 内定者・承諾者一覧CSV。 */
-export async function GET() {
+/** FR052: 内定者・承諾者一覧CSV。FR103: ?from=&to=(YYYY-MM-DD)で集計期間を指定できる。 */
+export async function GET(request: Request) {
   const staff = await getCurrentStaff();
   if (!staff || !canViewAnalytics(staff)) {
     return NextResponse.json({ error: "この操作を行う権限がありません" }, { status: 403 });
@@ -14,7 +14,12 @@ export async function GET() {
 
   await recordAuditLog({ staffId: staff.id, action: "export", targetType: "offers" });
 
-  const selections = await getOfferAndAcceptanceSelections(restrictedPositionType(staff));
+  const { searchParams } = new URL(request.url);
+  const selections = await getOfferAndAcceptanceSelections({
+    positionType: restrictedPositionType(staff),
+    from: parseFromDate(searchParams.get("from") ?? undefined),
+    to: parseToDate(searchParams.get("to") ?? undefined),
+  });
   const rows = selections.map((selection) => ({
     last_name: selection.applicant.last_name,
     first_name: selection.applicant.first_name,
