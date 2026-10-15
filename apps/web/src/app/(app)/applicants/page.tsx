@@ -15,6 +15,13 @@ import {
 } from "@/components/ui/table";
 import { createApplicant, deleteApplicant, issueLineRegistrationToken } from "./actions";
 import { parseApplicantFilters, buildApplicantWhere } from "./filters";
+import {
+  APPLICANT_COLUMNS,
+  DEFAULT_APPLICANT_COLUMN_ORDER,
+  parseColumnOrder,
+  type ApplicantColumnKey,
+} from "./columns";
+import { ColumnSettingsForm } from "./column-settings-form";
 import { DeleteButton } from "@/components/delete-button";
 import { headers } from "next/headers";
 import { getCurrentStaff } from "@/lib/auth";
@@ -42,6 +49,8 @@ const CALL_STATUS_LABELS: Record<string, string> = {
   no_answer: "不在",
 };
 
+const COLUMN_LABEL_BY_KEY = new Map(APPLICANT_COLUMNS.map((c) => [c.key, c.label]));
+
 export default async function ApplicantsPage({ searchParams }: PageProps<"/applicants">) {
   const staff = await getCurrentStaff();
   const canEdit = staff ? canManage(staff) : false;
@@ -57,31 +66,125 @@ export default async function ApplicantsPage({ searchParams }: PageProps<"/appli
   }
   const where: Prisma.ApplicantWhereInput = conditions.length > 1 ? { AND: conditions } : conditions[0];
 
-  const [applicants, schools, tags, mediaList, defaultFlow, headersList] = await Promise.all([
-    prisma.applicant.findMany({
-      where,
-      include: {
-        school: true,
-        tags: { include: { tag: true } },
-        line_tokens: { orderBy: { created_at: "desc" }, take: 1 },
-        selection: { include: { current_stage: true } },
-      },
-      orderBy: { created_at: "desc" },
-    }),
-    prisma.school.findMany({ orderBy: { name: "asc" } }),
-    prisma.tag.findMany({ orderBy: { name: "asc" } }),
-    prisma.media.findMany({ orderBy: { name: "asc" } }),
-    prisma.selectionFlow.findFirst({
-      where: { is_default: true },
-      include: { stages: { orderBy: { order: "asc" } } },
-    }),
-    headers(),
-  ]);
+  const [applicants, schools, tags, mediaList, defaultFlow, headersList, columnPreference] =
+    await Promise.all([
+      prisma.applicant.findMany({
+        where,
+        include: {
+          school: true,
+          tags: { include: { tag: true } },
+          line_tokens: { orderBy: { created_at: "desc" }, take: 1 },
+          selection: { include: { current_stage: true } },
+        },
+        orderBy: { created_at: "desc" },
+      }),
+      prisma.school.findMany({ orderBy: { name: "asc" } }),
+      prisma.tag.findMany({ orderBy: { name: "asc" } }),
+      prisma.media.findMany({ orderBy: { name: "asc" } }),
+      prisma.selectionFlow.findFirst({
+        where: { is_default: true },
+        include: { stages: { orderBy: { order: "asc" } } },
+      }),
+      headers(),
+      staff ? prisma.staffColumnPreference.findUnique({ where: { staff_id: staff.id } }) : null,
+    ]);
   const stages = defaultFlow?.stages ?? [];
+  // FR099: 担当者ごとの表示列・並び順の設定(未設定なら既定の並び順ですべて表示)。
+  const columnOrder: ApplicantColumnKey[] = columnPreference
+    ? parseColumnOrder(columnPreference.columns)
+    : DEFAULT_APPLICANT_COLUMN_ORDER;
 
   const protocol = headersList.get("x-forwarded-proto") ?? "http";
   const host = headersList.get("host");
   const origin = host ? `${protocol}://${host}` : "";
+
+  /** FR099: 表示列キーに対応するTableCellを描画する(氏名・操作列は固定のため対象外)。 */
+  function renderApplicantCell(key: ApplicantColumnKey, applicant: (typeof applicants)[number]) {
+    switch (key) {
+      case "email":
+        return (
+          <TableCell key={key} className="text-sm text-muted-foreground">
+            {applicant.email}
+          </TableCell>
+        );
+      case "school":
+        return (
+          <TableCell key={key} className="text-sm text-muted-foreground">
+            {applicant.school?.name ?? "—"}
+          </TableCell>
+        );
+      case "type":
+        return (
+          <TableCell key={key} className="text-sm">
+            <div className="flex flex-wrap gap-1">
+              <Badge variant="secondary">{HIRE_TYPE_LABELS[applicant.hire_type]}</Badge>
+              <Badge variant="outline">{APPLICANT_TYPE_LABELS[applicant.applicant_type]}</Badge>
+            </div>
+          </TableCell>
+        );
+      case "stage":
+        return (
+          <TableCell key={key} className="text-sm text-muted-foreground">
+            {applicant.selection?.current_stage.name ?? "—"}
+          </TableCell>
+        );
+      case "tags":
+        return (
+          <TableCell key={key}>
+            <div className="flex flex-wrap gap-1">
+              {applicant.tags.map(({ tag }) => (
+                <Badge key={tag.id} style={{ backgroundColor: tag.color, color: "#fff" }}>
+                  {tag.name}
+                </Badge>
+              ))}
+            </div>
+          </TableCell>
+        );
+      case "call_status":
+        return (
+          <TableCell key={key} className="text-xs">
+            {applicant.call_status !== "none" && (
+              <Badge
+                variant={applicant.call_status === "callback_needed" ? "destructive" : "outline"}
+              >
+                {CALL_STATUS_LABELS[applicant.call_status]}
+              </Badge>
+            )}
+          </TableCell>
+        );
+      case "line":
+        return (
+          <TableCell key={key} className="text-xs">
+            {applicant.line_user_id ? (
+              <Badge variant="secondary">連携済み</Badge>
+            ) : (() => {
+                const latestToken = applicant.line_tokens[0];
+                const isActive =
+                  latestToken && !latestToken.used_at && latestToken.expires_at > new Date();
+                if (isActive) {
+                  const url = `${origin}/line/register?token=${latestToken.token}`;
+                  return (
+                    <code
+                      title={url}
+                      className="block max-w-[180px] truncate rounded bg-muted px-1.5 py-0.5 text-[11px] text-muted-foreground"
+                    >
+                      {url}
+                    </code>
+                  );
+                }
+                if (!canEdit) return <span className="text-muted-foreground">未連携</span>;
+                return (
+                  <form action={issueLineRegistrationToken.bind(null, applicant.id)}>
+                    <Button type="submit" variant="outline" size="sm">
+                      登録リンクを発行
+                    </Button>
+                  </form>
+                );
+              })()}
+          </TableCell>
+        );
+    }
+  }
 
   return (
     <div className="flex flex-col gap-6">
@@ -237,6 +340,21 @@ export default async function ApplicantsPage({ searchParams }: PageProps<"/appli
         </CardContent>
       </Card>
 
+      {staff && (
+        <Card className="border-border">
+          <CardContent className="pt-6">
+            <details data-testid="column-settings">
+              <summary className="cursor-pointer text-sm font-bold text-foreground">
+                表示列設定(FR099)
+              </summary>
+              <div className="mt-4">
+                <ColumnSettingsForm initialOrder={columnOrder} />
+              </div>
+            </details>
+          </CardContent>
+        </Card>
+      )}
+
       {canEdit && (
       <Card className="border-border">
         <CardHeader>
@@ -359,20 +477,19 @@ export default async function ApplicantsPage({ searchParams }: PageProps<"/appli
             <TableHeader>
               <TableRow>
                 <TableHead>氏名</TableHead>
-                <TableHead>メールアドレス</TableHead>
-                <TableHead>学校</TableHead>
-                <TableHead>区分</TableHead>
-                <TableHead>現在のステージ</TableHead>
-                <TableHead>タグ</TableHead>
-                <TableHead>架電状況</TableHead>
-                <TableHead>LINE連携</TableHead>
+                {columnOrder.map((key) => (
+                  <TableHead key={key}>{COLUMN_LABEL_BY_KEY.get(key)}</TableHead>
+                ))}
                 {canEdit && <TableHead className="text-right">操作</TableHead>}
               </TableRow>
             </TableHeader>
             <TableBody>
               {applicants.length === 0 && (
                 <TableRow>
-                  <TableCell colSpan={canEdit ? 9 : 8} className="text-center text-muted-foreground">
+                  <TableCell
+                    colSpan={1 + columnOrder.length + (canEdit ? 1 : 0)}
+                    className="text-center text-muted-foreground"
+                  >
                     応募者がまだ登録されていません
                   </TableCell>
                 </TableRow>
@@ -384,69 +501,7 @@ export default async function ApplicantsPage({ searchParams }: PageProps<"/appli
                       {applicant.last_name} {applicant.first_name}
                     </Link>
                   </TableCell>
-                  <TableCell className="text-sm text-muted-foreground">
-                    {applicant.email}
-                  </TableCell>
-                  <TableCell className="text-sm text-muted-foreground">
-                    {applicant.school?.name ?? "—"}
-                  </TableCell>
-                  <TableCell className="text-sm">
-                    <div className="flex flex-wrap gap-1">
-                      <Badge variant="secondary">
-                        {HIRE_TYPE_LABELS[applicant.hire_type]}
-                      </Badge>
-                      <Badge variant="outline">
-                        {APPLICANT_TYPE_LABELS[applicant.applicant_type]}
-                      </Badge>
-                    </div>
-                  </TableCell>
-                  <TableCell className="text-sm text-muted-foreground">
-                    {applicant.selection?.current_stage.name ?? "—"}
-                  </TableCell>
-                  <TableCell>
-                    <div className="flex flex-wrap gap-1">
-                      {applicant.tags.map(({ tag }) => (
-                        <Badge key={tag.id} style={{ backgroundColor: tag.color, color: "#fff" }}>
-                          {tag.name}
-                        </Badge>
-                      ))}
-                    </div>
-                  </TableCell>
-                  <TableCell className="text-xs">
-                    {applicant.call_status !== "none" && (
-                      <Badge variant={applicant.call_status === "callback_needed" ? "destructive" : "outline"}>
-                        {CALL_STATUS_LABELS[applicant.call_status]}
-                      </Badge>
-                    )}
-                  </TableCell>
-                  <TableCell className="text-xs">
-                    {applicant.line_user_id ? (
-                      <Badge variant="secondary">連携済み</Badge>
-                    ) : (() => {
-                        const latestToken = applicant.line_tokens[0];
-                        const isActive =
-                          latestToken && !latestToken.used_at && latestToken.expires_at > new Date();
-                        if (isActive) {
-                          const url = `${origin}/line/register?token=${latestToken.token}`;
-                          return (
-                            <code
-                              title={url}
-                              className="block max-w-[180px] truncate rounded bg-muted px-1.5 py-0.5 text-[11px] text-muted-foreground"
-                            >
-                              {url}
-                            </code>
-                          );
-                        }
-                        if (!canEdit) return <span className="text-muted-foreground">未連携</span>;
-                        return (
-                          <form action={issueLineRegistrationToken.bind(null, applicant.id)}>
-                            <Button type="submit" variant="outline" size="sm">
-                              登録リンクを発行
-                            </Button>
-                          </form>
-                        );
-                      })()}
-                  </TableCell>
+                  {columnOrder.map((key) => renderApplicantCell(key, applicant))}
                   {canEdit && (
                     <TableCell className="text-right">
                       <DeleteButton
