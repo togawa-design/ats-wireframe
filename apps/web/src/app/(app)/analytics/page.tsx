@@ -1,6 +1,9 @@
+import Link from "next/link";
 import { redirect } from "next/navigation";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Table,
@@ -17,24 +20,39 @@ import {
   getMediaBreakdown,
   getSchoolBreakdown,
   getOfferAndAcceptanceSelections,
+  parseFromDate,
+  parseToDate,
 } from "@/lib/analytics";
 
-export default async function AnalyticsPage() {
+export default async function AnalyticsPage({ searchParams }: PageProps<"/analytics">) {
   const staff = await getCurrentStaff();
   if (!staff || !canViewAnalytics(staff)) {
     redirect("/");
   }
   const positionType = restrictedPositionType(staff);
 
+  const params = await searchParams;
+  const fromRaw = typeof params.from === "string" ? params.from : undefined;
+  const toRaw = typeof params.to === "string" ? params.to : undefined;
+  const filters = { positionType, from: parseFromDate(fromRaw), to: parseToDate(toRaw) };
+
   const [funnel, mediaBreakdown, schoolBreakdown, offerSelections] = await Promise.all([
-    getFunnelData(positionType),
-    getMediaBreakdown(positionType),
-    getSchoolBreakdown(positionType),
-    getOfferAndAcceptanceSelections(positionType),
+    getFunnelData(filters),
+    getMediaBreakdown(filters),
+    getSchoolBreakdown(filters),
+    getOfferAndAcceptanceSelections(filters),
   ]);
 
   const maxFunnelCount = Math.max(1, ...funnel.map((f) => f.count));
   const maxMediaCount = Math.max(1, ...mediaBreakdown.map((m) => m.count));
+
+  const periodQuery = new URLSearchParams({
+    ...(fromRaw ? { from: fromRaw } : {}),
+    ...(toRaw ? { to: toRaw } : {}),
+  }).toString();
+  const offersExportHref = periodQuery
+    ? `/api/export/offers?${periodQuery}`
+    : "/api/export/offers";
 
   return (
     <div className="flex flex-col gap-6">
@@ -42,13 +60,38 @@ export default async function AnalyticsPage() {
         <div>
           <h1 className="text-lg font-bold text-foreground">分析・レポート</h1>
           <p className="text-sm text-muted-foreground">
-            基本的な選考ファネル・流入経路の可視化です(FR050-053)。
+            基本的な選考ファネル・流入経路の可視化です(FR050-053)。各数値から学生一覧へドリルダウンできます(FR102)。
           </p>
         </div>
         <Button asChild variant="outline" size="sm">
           <a href="/api/export/applicants">全応募者CSVエクスポート</a>
         </Button>
       </div>
+
+      <Card className="border-border">
+        <CardHeader>
+          <CardTitle className="text-sm">集計期間(FR103)</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <form className="flex flex-wrap items-end gap-3">
+            <div className="flex flex-col gap-1.5">
+              <Label htmlFor="from">開始日</Label>
+              <Input id="from" name="from" type="date" defaultValue={fromRaw ?? ""} className="w-40" />
+            </div>
+            <div className="flex flex-col gap-1.5">
+              <Label htmlFor="to">終了日</Label>
+              <Input id="to" name="to" type="date" defaultValue={toRaw ?? ""} className="w-40" />
+            </div>
+            <Button type="submit">絞り込む</Button>
+            {/* 未制御な入力値を確実にリセットするためプレーンな<a>でハードリロードする。 */}
+            <a href="/analytics">
+              <Button type="button" variant="outline">
+                クリア
+              </Button>
+            </a>
+          </form>
+        </CardContent>
+      </Card>
 
       <Card className="border-border">
         <CardHeader>
@@ -59,7 +102,11 @@ export default async function AnalyticsPage() {
             <p className="text-sm text-muted-foreground">選考フローが未設定です</p>
           )}
           {funnel.map((stage) => (
-            <div key={stage.stageId} className="flex items-center gap-3">
+            <Link
+              key={stage.stageId}
+              href={`/applicants?stage_id=${stage.stageId}`}
+              className="flex items-center gap-3 rounded-md px-1 py-0.5 hover:bg-secondary"
+            >
               <span className="w-28 shrink-0 text-sm">{stage.stageName}</span>
               <div className="h-5 flex-1 overflow-hidden rounded bg-secondary">
                 <div
@@ -67,11 +114,13 @@ export default async function AnalyticsPage() {
                   style={{ width: `${(stage.count / maxFunnelCount) * 100}%` }}
                 />
               </div>
-              <span className="w-12 shrink-0 text-right text-sm font-medium">{stage.count}</span>
+              <span className="w-12 shrink-0 text-right text-sm font-medium underline">
+                {stage.count}
+              </span>
               <span className="w-16 shrink-0 text-right text-xs text-muted-foreground">
                 {stage.conversionFromPrev === null ? "—" : `${stage.conversionFromPrev}%`}
               </span>
-            </div>
+            </Link>
           ))}
         </CardContent>
       </Card>
@@ -88,7 +137,11 @@ export default async function AnalyticsPage() {
               </p>
             )}
             {mediaBreakdown.map((media) => (
-              <div key={media.name} className="flex items-center gap-3">
+              <Link
+                key={media.id}
+                href={`/applicants?media_id=${media.id}`}
+                className="flex items-center gap-3 rounded-md px-1 py-0.5 hover:bg-secondary"
+              >
                 <span className="w-28 shrink-0 truncate text-sm">{media.name}</span>
                 <div className="h-4 flex-1 overflow-hidden rounded bg-secondary">
                   <div
@@ -96,8 +149,10 @@ export default async function AnalyticsPage() {
                     style={{ width: `${(media.count / maxMediaCount) * 100}%` }}
                   />
                 </div>
-                <span className="w-10 shrink-0 text-right text-sm font-medium">{media.count}</span>
-              </div>
+                <span className="w-10 shrink-0 text-right text-sm font-medium underline">
+                  {media.count}
+                </span>
+              </Link>
             ))}
           </CardContent>
         </Card>
@@ -111,10 +166,14 @@ export default async function AnalyticsPage() {
               <p className="text-sm text-muted-foreground">学校が登録された応募者がまだいません</p>
             )}
             {schoolBreakdown.map((school) => (
-              <div key={school.name} className="flex items-center justify-between text-sm">
+              <Link
+                key={school.id}
+                href={`/applicants?school_id=${school.id}`}
+                className="flex items-center justify-between rounded-md px-1 py-0.5 text-sm hover:bg-secondary"
+              >
                 <span className="truncate">{school.name}</span>
                 <Badge variant="secondary">{school.count}名</Badge>
-              </div>
+              </Link>
             ))}
           </CardContent>
         </Card>
@@ -124,7 +183,7 @@ export default async function AnalyticsPage() {
         <CardHeader className="flex flex-row items-center justify-between">
           <CardTitle className="text-sm">内定者・承諾者一覧</CardTitle>
           <Button asChild variant="outline" size="sm">
-            <a href="/api/export/offers">CSVエクスポート</a>
+            <a href={offersExportHref}>CSVエクスポート</a>
           </Button>
         </CardHeader>
         <CardContent className="p-0">
@@ -148,7 +207,12 @@ export default async function AnalyticsPage() {
               {offerSelections.map((selection) => (
                 <TableRow key={selection.id}>
                   <TableCell>
-                    {selection.applicant.last_name} {selection.applicant.first_name}
+                    <Link
+                      href={`/applicants/${selection.applicant.id}`}
+                      className="hover:underline"
+                    >
+                      {selection.applicant.last_name} {selection.applicant.first_name}
+                    </Link>
                   </TableCell>
                   <TableCell className="text-sm text-muted-foreground">
                     {selection.applicant.school?.name ?? "—"}
