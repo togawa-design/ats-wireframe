@@ -66,16 +66,29 @@ model Staff {
   audit_logs                     AuditLog[]
   tags                           Tag[]
   tagged_applicant_tags          ApplicantTag[]
-  assigned_selections            Selection[]          @relation("SelectionAssignee")
-  selection_history_changes      SelectionHistory[]   @relation("SelectionHistoryChangedBy")
-  interviews_conducted           Interview[]          @relation("InterviewInterviewer")
-  evaluation_templates_created   EvaluationTemplate[] @relation("EvaluationTemplateCreator")
-  evaluation_responses_submitted EvaluationResponse[] @relation("EvaluationResponseSubmitter")
+  assigned_selections            Selection[]            @relation("SelectionAssignee")
+  selection_history_changes      SelectionHistory[]     @relation("SelectionHistoryChangedBy")
+  interviews_conducted           Interview[]            @relation("InterviewInterviewer")
+  evaluation_templates_created   EvaluationTemplate[]   @relation("EvaluationTemplateCreator")
+  evaluation_responses_submitted EvaluationResponse[]   @relation("EvaluationResponseSubmitter")
   line_broadcasts_sent           LineBroadcast[]
-  call_logs_recorded             CallLog[]            @relation("CallLogStaff")
+  call_logs_recorded             CallLog[]              @relation("CallLogStaff")
+  column_preference              StaffColumnPreference?
 
   @@index([email], map: "staff_email_idx")
   @@index([google_id], map: "staff_google_id_idx")
+}
+
+/// 応募者一覧の表示列カスタマイズ(FR099)。担当者ごとに1件。
+model StaffColumnPreference {
+  id         String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  staff_id   String   @unique @db.Uuid
+  // 表示する列キーを表示順に並べたJSON配列(例: ["email","school"])。
+  // 含まれない列は非表示として扱う。
+  columns    Json
+  updated_at DateTime @updatedAt
+
+  staff Staff @relation(fields: [staff_id], references: [id], onDelete: Cascade)
 }
 
 /// セッション管理テーブル。
@@ -148,9 +161,9 @@ model Tag {
   color      String @db.VarChar(7)
   created_by String @db.Uuid
 
-  creator          Staff           @relation(fields: [created_by], references: [id])
-  applicant_tags   ApplicantTag[]
-  line_broadcasts  LineBroadcast[]
+  creator         Staff           @relation(fields: [created_by], references: [id])
+  applicant_tags  ApplicantTag[]
+  line_broadcasts LineBroadcast[]
 }
 
 /// 学校マスター。
