@@ -18,6 +18,7 @@ import { canViewAnalytics, restrictedPositionType } from "@/lib/permissions";
 import {
   getFunnelData,
   getMediaBreakdown,
+  getQrCodeBreakdown,
   getSchoolBreakdown,
   getOfferAndAcceptanceSelections,
   parseFromDate,
@@ -36,12 +37,14 @@ export default async function AnalyticsPage({ searchParams }: PageProps<"/analyt
   const toRaw = typeof params.to === "string" ? params.to : undefined;
   const filters = { positionType, from: parseFromDate(fromRaw), to: parseToDate(toRaw) };
 
-  const [funnel, mediaBreakdown, schoolBreakdown, offerSelections] = await Promise.all([
-    getFunnelData(filters),
-    getMediaBreakdown(filters),
-    getSchoolBreakdown(filters),
-    getOfferAndAcceptanceSelections(filters),
-  ]);
+  const [funnel, mediaBreakdown, qrCodeBreakdown, schoolBreakdown, offerSelections] =
+    await Promise.all([
+      getFunnelData(filters),
+      getMediaBreakdown(filters),
+      getQrCodeBreakdown(filters),
+      getSchoolBreakdown(filters),
+      getOfferAndAcceptanceSelections(filters),
+    ]);
 
   const maxFunnelCount = Math.max(1, ...funnel.map((f) => f.count));
   const maxMediaCount = Math.max(1, ...mediaBreakdown.map((m) => m.count));
@@ -152,7 +155,32 @@ export default async function AnalyticsPage({ searchParams }: PageProps<"/analyt
                 <span className="w-10 shrink-0 text-right text-sm font-medium underline">
                   {media.count}
                 </span>
+                <span className="w-14 shrink-0 text-right text-xs text-muted-foreground">
+                  {media.acceptanceRate === null ? "—" : `承諾${media.acceptanceRate}%`}
+                </span>
               </Link>
+            ))}
+          </CardContent>
+        </Card>
+
+        <Card className="border-border">
+          <CardHeader>
+            <CardTitle className="text-sm">QRコード別流入数・承諾率(FR042)</CardTitle>
+          </CardHeader>
+          <CardContent className="flex flex-col gap-2">
+            {qrCodeBreakdown.length === 0 && (
+              <p className="text-sm text-muted-foreground">QRコード経由の流入データがまだありません</p>
+            )}
+            {qrCodeBreakdown.map((qrCode) => (
+              <div key={qrCode.id} className="flex items-center justify-between text-sm">
+                <span className="truncate">{qrCode.label}</span>
+                <div className="flex shrink-0 items-center gap-2">
+                  <Badge variant="secondary">流入{qrCode.entryCount}名</Badge>
+                  <Badge variant="outline">
+                    {qrCode.acceptanceRate === null ? "—" : `承諾${qrCode.acceptanceRate}%`}
+                  </Badge>
+                </div>
+              </div>
             ))}
           </CardContent>
         </Card>
