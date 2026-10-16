@@ -111,3 +111,29 @@ export async function setResult(selectionId: string, result: SelectionResult) {
 
   revalidatePath("/selections");
 }
+
+/** FR097: 複数の応募者に対して選考結果を一括登録する。 */
+export async function bulkSetResult(selectionIds: string[], result: SelectionResult) {
+  const staff = await getCurrentStaff();
+  if (!staff) throw new Error("ログインが必要です");
+  assertCanManage(staff);
+  if (selectionIds.length === 0) throw new Error("対象を選択してください");
+
+  await prisma.selection.updateMany({
+    where: { id: { in: selectionIds } },
+    data: { result },
+  });
+  await Promise.all(
+    selectionIds.map((selectionId) =>
+      recordAuditLog({
+        staffId: staff.id,
+        action: "status_change",
+        targetType: "Selection",
+        targetId: selectionId,
+        afterValue: { result },
+      })
+    )
+  );
+
+  revalidatePath("/selections");
+}
