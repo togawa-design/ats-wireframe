@@ -55,8 +55,12 @@ export async function advanceStage(selectionId: string) {
   revalidatePath("/selections");
 }
 
-/** カンバン表示でのドラッグ&ドロップによる任意ステージへの移動(FR011)。 */
-export async function moveToStage(selectionId: string, toStageId: string) {
+/**
+ * カンバン表示でのドラッグ&ドロップによる任意ステージへの移動(FR011)。
+ * 通常の次のステージ以外へのスキップ移動の場合、呼び出し側(kanban-board.tsx)が
+ * 理由の入力を促し、`note`として渡す(FR096)。SelectionHistoryに記録し監査可能にする。
+ */
+export async function moveToStage(selectionId: string, toStageId: string, note?: string) {
   const staff = await getCurrentStaff();
   if (!staff) throw new Error("ログインが必要です");
   assertCanManage(staff);
@@ -77,6 +81,7 @@ export async function moveToStage(selectionId: string, toStageId: string) {
         from_stage_id: selection.current_stage_id,
         to_stage_id: toStageId,
         changed_by: staff.id,
+        note: note || null,
       },
     }),
   ]);
@@ -86,7 +91,7 @@ export async function moveToStage(selectionId: string, toStageId: string) {
     targetType: "Selection",
     targetId: selectionId,
     beforeValue: { stage_id: selection.current_stage_id },
-    afterValue: { stage_id: toStageId },
+    afterValue: note ? { stage_id: toStageId, note } : { stage_id: toStageId },
   });
 
   revalidatePath("/selections");
