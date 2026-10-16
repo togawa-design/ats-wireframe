@@ -73,22 +73,77 @@ export async function getFunnelData(filters: AnalyticsFilters = {}) {
   });
 }
 
-/** FR051/FR102: 媒体別の流入数(ドリルダウン用にmedia_idも返す)。 */
+/** 流入元(媒体・QRコード)ごとの流入数・承諾率(FR042)を集計するヘルパー。 */
+function summarizeAcceptance(
+  currentStages: ({ stage_type: string } | null)[]
+): { count: number; acceptanceRate: number | null } {
+  const count = currentStages.length;
+  if (count === 0) return { count: 0, acceptanceRate: null };
+  const accepted = currentStages.filter((stage) => stage?.stage_type === "acceptance").length;
+  return { count, acceptanceRate: Math.round((accepted / count) * 1000) / 10 };
+}
+
+/** FR051/FR102/FR042: 媒体別の流入数・承諾率(ドリルダウン用にmedia_idも返す)。 */
 export async function getMediaBreakdown(filters: AnalyticsFilters = {}) {
-  const [mediaList, grouped] = await Promise.all([
+  const [mediaList, sources] = await Promise.all([
     prisma.media.findMany({ orderBy: { name: "asc" } }),
-    prisma.applicantSource.groupBy({
-      by: ["media_id"],
-      where: { applicant: applicantWhere(filters) },
-      _count: { _all: true },
+    prisma.applicantSource.findMany({
+      where: { media_id: { not: null }, applicant: applicantWhere(filters) },
+      select: {
+        media_id: true,
+        applicant: { select: { selection: { select: { current_stage: true } } } },
+      },
     }),
   ]);
-  const countByMedia = new Map(grouped.map((g) => [g.media_id, g._count._all]));
-  return mediaList.map((media) => ({
-    id: media.id,
-    name: media.name,
-    count: countByMedia.get(media.id) ?? 0,
-  }));
+
+  const byMedia = new Map<string, ({ stage_type: string } | null)[]>();
+  for (const source of sources) {
+    const mediaId = source.media_id as string;
+    const list = byMedia.get(mediaId) ?? [];
+    list.push(source.applicant.selection?.current_stage ?? null);
+    byMedia.set(mediaId, list);
+  }
+
+  return mediaList.map((media) => {
+    const { count, acceptanceRate } = summarizeAcceptance(byMedia.get(media.id) ?? []);
+    return { id: media.id, name: media.name, count, acceptanceRate };
+  });
+}
+
+/** FR042: QRコード別の流入数・承諾率(データがある分のみ、流入数が多い順)。 */
+export async function getQrCodeBreakdown(filters: AnalyticsFilters = {}) {
+  const [qrCodes, sources] = await Promise.all([
+    prisma.qRCode.findMany(),
+    prisma.applicantSource.findMany({
+      where: { qr_code_id: { not: null }, applicant: applicantWhere(filters) },
+      select: {
+        qr_code_id: true,
+        applicant: { select: { selection: { select: { current_stage: true } } } },
+      },
+    }),
+  ]);
+
+  const byQrCode = new Map<string, ({ stage_type: string } | null)[]>();
+  for (const source of sources) {
+    const qrCodeId = source.qr_code_id as string;
+    const list = byQrCode.get(qrCodeId) ?? [];
+    list.push(source.applicant.selection?.current_stage ?? null);
+    byQrCode.set(qrCodeId, list);
+  }
+
+  return qrCodes
+    .map((qrCode) => {
+      const { count, acceptanceRate } = summarizeAcceptance(byQrCode.get(qrCode.id) ?? []);
+      return {
+        id: qrCode.id,
+        label: qrCode.label,
+        scanCount: qrCode.scan_count,
+        entryCount: count,
+        acceptanceRate,
+      };
+    })
+    .filter((qrCode) => qrCode.entryCount > 0)
+    .sort((a, b) => b.entryCount - a.entryCount);
 }
 
 /** FR051/FR102: 学校別の流入数(データがある学校のみ、多い順。ドリルダウン用にschool_idも返す)。 */

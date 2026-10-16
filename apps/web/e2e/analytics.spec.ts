@@ -18,6 +18,10 @@ test("分析ページでファネルが表示され、CSVエクスポートが�
   await expect(page.getByRole("heading", { name: "分析・レポート" })).toBeVisible();
   await expect(page.getByText("エントリー")).toBeVisible();
 
+  // FR042: QRコード別流入数・承諾率のカードが表示される(QRコード経由の登録導線は
+  // まだ無いため空状態メッセージを確認する)
+  await expect(page.getByText("QRコード別流入数・承諾率(FR042)")).toBeVisible();
+
   // FR102: ファネルの数値から学生一覧へドリルダウンできる
   const entryLink = page.getByRole("link").filter({ hasText: "エントリー" });
   await expect(entryLink.locator("span").nth(1)).not.toHaveText("0");

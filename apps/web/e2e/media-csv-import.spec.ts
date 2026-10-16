@@ -35,4 +35,10 @@ test("CSVをアップロードすると自動マッピングされ、応募者�
   const applicantRow = page.getByRole("row").filter({ hasText: email });
   await expect(applicantRow).toBeVisible();
   await expect(applicantRow.getByText("テスト 太郎")).toBeVisible();
+
+  // FR042: 媒体別流入数に、まだ承諾段階に到達していないため承諾率0%が表示される
+  await page.goto("/analytics");
+  const mediaLink = page.getByRole("link").filter({ hasText: mediaName });
+  await expect(mediaLink).toBeVisible();
+  await expect(mediaLink.getByText("承諾0%")).toBeVisible();
 });

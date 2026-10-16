@@ -6,6 +6,7 @@ import { prisma } from "@/lib/prisma";
 import {
   getFunnelData,
   getMediaBreakdown,
+  getQrCodeBreakdown,
   getSchoolBreakdown,
   getOfferAndAcceptanceSelections,
   getAllApplicantsForExport,
@@ -61,23 +62,64 @@ describe("getFunnelData", () => {
   });
 });
 
+function sourceWithStage(stageType: string | null) {
+  return {
+    applicant: {
+      selection: stageType ? { current_stage: { stage_type: stageType } } : null,
+    },
+  };
+}
+
 describe("getMediaBreakdown", () => {
-  it("媒体ごとの流入数を集計する(流入0件の媒体も含み、ドリルダウン用にidも返す)", async () => {
+  it("媒体ごとの流入数・承諾率を集計する(流入0件の媒体も含み、ドリルダウン用にidも返す)", async () => {
     prismaMock.media.findMany.mockResolvedValue([
       { id: "m1", name: "マイナビ" },
       { id: "m2", name: "OfferBox" },
     ] as never);
-    // groupByはオーバーロードが多くvitest-mock-extendedの型推論が効かないため、
-    // Mock型にキャストしてmockResolvedValueを呼ぶ。
-    (prismaMock.applicantSource.groupBy as unknown as Mock).mockResolvedValue([
-      { media_id: "m1", _count: { _all: 5 } },
-    ]);
+    prismaMock.applicantSource.findMany.mockResolvedValue([
+      { media_id: "m1", ...sourceWithStage("acceptance") },
+      { media_id: "m1", ...sourceWithStage("screening") },
+      { media_id: "m1", ...sourceWithStage(null) },
+      { media_id: "m1", ...sourceWithStage(null) },
+      { media_id: "m1", ...sourceWithStage(null) },
+    ] as never);
 
     const result = await getMediaBreakdown();
 
     expect(result).toEqual([
-      { id: "m1", name: "マイナビ", count: 5 },
-      { id: "m2", name: "OfferBox", count: 0 },
+      { id: "m1", name: "マイナビ", count: 5, acceptanceRate: 20 },
+      { id: "m2", name: "OfferBox", count: 0, acceptanceRate: null },
+    ]);
+  });
+});
+
+describe("getQrCodeBreakdown", () => {
+  it("流入が1件も無いQRコードは除外する", async () => {
+    prismaMock.qRCode.findMany.mockResolvedValue([
+      { id: "qr1", label: "説明会チラシ", scan_count: 10 },
+    ] as never);
+    prismaMock.applicantSource.findMany.mockResolvedValue([] as never);
+
+    expect(await getQrCodeBreakdown()).toEqual([]);
+  });
+
+  it("QRコードごとの流入数・承諾率を流入数の多い順に並べる", async () => {
+    prismaMock.qRCode.findMany.mockResolvedValue([
+      { id: "qr1", label: "説明会チラシ", scan_count: 10 },
+      { id: "qr2", label: "求人サイト掲載", scan_count: 20 },
+    ] as never);
+    prismaMock.applicantSource.findMany.mockResolvedValue([
+      { qr_code_id: "qr1", ...sourceWithStage("acceptance") },
+      { qr_code_id: "qr2", ...sourceWithStage("acceptance") },
+      { qr_code_id: "qr2", ...sourceWithStage(null) },
+      { qr_code_id: "qr2", ...sourceWithStage(null) },
+    ] as never);
+
+    const result = await getQrCodeBreakdown();
+
+    expect(result).toEqual([
+      { id: "qr2", label: "求人サイト掲載", scanCount: 20, entryCount: 3, acceptanceRate: 33.3 },
+      { id: "qr1", label: "説明会チラシ", scanCount: 10, entryCount: 1, acceptanceRate: 100 },
     ]);
   });
 });
@@ -155,13 +197,16 @@ describe("FR095: 職種区分によるアクセス制限", () => {
 
   it("getMediaBreakdownは指定した職種区分でApplicantSourceを絞り込む", async () => {
     prismaMock.media.findMany.mockResolvedValue([] as never);
-    (prismaMock.applicantSource.groupBy as unknown as Mock).mockResolvedValue([]);
+    prismaMock.applicantSource.findMany.mockResolvedValue([] as never);
 
     await getMediaBreakdown({ positionType: "sogo" });
 
-    expect(prismaMock.applicantSource.groupBy).toHaveBeenCalledWith(
+    expect(prismaMock.applicantSource.findMany).toHaveBeenCalledWith(
       expect.objectContaining({
-        where: { applicant: { OR: [{ position_type: "sogo" }, { position_type: null }] } },
+        where: {
+          media_id: { not: null },
+          applicant: { OR: [{ position_type: "sogo" }, { position_type: null }] },
+        },
       })
     );
   });
