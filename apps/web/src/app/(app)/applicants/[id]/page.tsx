@@ -50,7 +50,15 @@ export default async function ApplicantDetailPage({ params }: PageProps<"/applic
     include: {
       school: true,
       tags: { include: { tag: true } },
-      selection: { include: { current_stage: true } },
+      selection: {
+        include: {
+          current_stage: true,
+          history: {
+            orderBy: { changed_at: "desc" },
+            include: { from_stage: true, to_stage: true, staff: true },
+          },
+        },
+      },
       line_messages: { orderBy: { sent_at: "asc" } },
       call_logs: { orderBy: { called_at: "desc" }, include: { staff: true } },
     },
@@ -117,6 +125,43 @@ export default async function ApplicantDetailPage({ params }: PageProps<"/applic
           />
         </CardContent>
       </Card>
+
+      {applicant.selection && (
+        <Card className="border-border">
+          <CardHeader>
+            <CardTitle className="text-sm">選考履歴(FR096)</CardTitle>
+          </CardHeader>
+          <CardContent className="flex flex-col gap-2">
+            {applicant.selection.history.length === 0 && (
+              <p className="text-sm text-muted-foreground">まだ選考履歴はありません</p>
+            )}
+            {applicant.selection.history.map((entry) => (
+              <div
+                key={entry.id}
+                className="flex flex-col gap-1 border-b border-border pb-3 text-sm last:border-0 last:pb-0"
+              >
+                <div className="flex flex-wrap items-center gap-2">
+                  <span className="text-xs text-muted-foreground">
+                    {new Intl.DateTimeFormat("ja-JP", {
+                      dateStyle: "short",
+                      timeStyle: "short",
+                    }).format(entry.changed_at)}
+                  </span>
+                  <span>
+                    {entry.from_stage?.name ?? "(登録時)"} → {entry.to_stage.name}
+                  </span>
+                  <span className="text-xs text-muted-foreground">{entry.staff.name}</span>
+                </div>
+                {entry.note && (
+                  <p className="whitespace-pre-wrap text-xs text-muted-foreground">
+                    スキップ理由: {entry.note}
+                  </p>
+                )}
+              </div>
+            ))}
+          </CardContent>
+        </Card>
+      )}
 
       <Card className="border-border">
         <CardHeader>

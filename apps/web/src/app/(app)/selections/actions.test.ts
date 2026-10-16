@@ -134,6 +134,7 @@ describe("moveToStage", () => {
         from_stage_id: "stage-1",
         to_stage_id: "stage-3",
         changed_by: "staff-1",
+        note: null,
       },
     });
     expect(recordAuditLog).toHaveBeenCalledWith({
@@ -143,6 +144,38 @@ describe("moveToStage", () => {
       targetId: "selection-1",
       beforeValue: { stage_id: "stage-1" },
       afterValue: { stage_id: "stage-3" },
+    });
+  });
+
+  it("スキップ理由(note)が渡されれば履歴と監査ログの両方に記録する(FR096)", async () => {
+    vi.mocked(getCurrentStaff).mockResolvedValue(mockStaff);
+    prismaMock.selection.findUniqueOrThrow.mockResolvedValue({
+      id: "selection-1",
+      current_stage_id: "stage-1",
+    } as never);
+    prismaMock.selectionStage.findUniqueOrThrow.mockResolvedValue({
+      id: "stage-3",
+      stage_type: "screening",
+    } as never);
+
+    await moveToStage("selection-1", "stage-3", "本人都合により一次面接を省略");
+
+    expect(prismaMock.selectionHistory.create).toHaveBeenCalledWith({
+      data: {
+        selection_id: "selection-1",
+        from_stage_id: "stage-1",
+        to_stage_id: "stage-3",
+        changed_by: "staff-1",
+        note: "本人都合により一次面接を省略",
+      },
+    });
+    expect(recordAuditLog).toHaveBeenCalledWith({
+      staffId: "staff-1",
+      action: "status_change",
+      targetType: "Selection",
+      targetId: "selection-1",
+      beforeValue: { stage_id: "stage-1" },
+      afterValue: { stage_id: "stage-3", note: "本人都合により一次面接を省略" },
     });
   });
 

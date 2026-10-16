@@ -15,7 +15,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { moveToStage } from "./actions";
 
-type Stage = { id: string; name: string };
+type Stage = { id: string; name: string; order: number };
 type SelectionCard = {
   id: string;
   applicantName: string;
@@ -101,9 +101,24 @@ export function KanbanBoard({
     const card = cards.find((c) => c.id === cardId);
     if (!card || card.stageId === toStageId) return;
 
+    // FR096: 1つ先以外のステージへ飛ばす(スキップする)移動は、監査のため理由の
+    // 入力を促す。キャンセルした場合は移動自体を取りやめる。
+    const fromStage = stages.find((s) => s.id === card.stageId);
+    const toStage = stages.find((s) => s.id === toStageId);
+    const isForwardSkip = !!fromStage && !!toStage && toStage.order > fromStage.order + 1;
+
+    let note: string | undefined;
+    if (isForwardSkip) {
+      const reason = window.prompt(
+        `${fromStage!.name}の次のステージを飛ばして${toStage!.name}へ移動します。理由を入力してください(任意)`
+      );
+      if (reason === null) return;
+      note = reason || undefined;
+    }
+
     setCards((prev) => prev.map((c) => (c.id === cardId ? { ...c, stageId: toStageId } : c)));
     startTransition(() => {
-      moveToStage(cardId, toStageId);
+      moveToStage(cardId, toStageId, note);
     });
   }
 
