@@ -16,6 +16,7 @@ import { uploadApplicantDocument } from "./actions";
 import { LineSendForm } from "./line-send-form";
 import { createCallLog } from "./call-log-actions";
 import { CallStatusSelect, CALL_STATUS_LABELS } from "./call-status-select";
+import { updateApplicantTags } from "./tag-actions";
 
 const APPLICANT_TYPE_LABELS: Record<string, string> = {
   new_grad: "新卒",
@@ -45,24 +46,27 @@ export default async function ApplicantDetailPage({ params }: PageProps<"/applic
     conditions.push({ OR: [{ position_type: positionType }, { position_type: null }] });
   }
 
-  const applicant = await prisma.applicant.findFirst({
-    where: { AND: conditions },
-    include: {
-      school: true,
-      tags: { include: { tag: true } },
-      selection: {
-        include: {
-          current_stage: true,
-          history: {
-            orderBy: { changed_at: "desc" },
-            include: { from_stage: true, to_stage: true, staff: true },
+  const [applicant, allTags] = await Promise.all([
+    prisma.applicant.findFirst({
+      where: { AND: conditions },
+      include: {
+        school: true,
+        tags: { include: { tag: true } },
+        selection: {
+          include: {
+            current_stage: true,
+            history: {
+              orderBy: { changed_at: "desc" },
+              include: { from_stage: true, to_stage: true, staff: true },
+            },
           },
         },
+        line_messages: { orderBy: { sent_at: "asc" } },
+        call_logs: { orderBy: { called_at: "desc" }, include: { staff: true } },
       },
-      line_messages: { orderBy: { sent_at: "asc" } },
-      call_logs: { orderBy: { called_at: "desc" }, include: { staff: true } },
-    },
-  });
+    }),
+    prisma.tag.findMany({ orderBy: { name: "asc" } }),
+  ]);
   if (!applicant) notFound();
 
   return (
@@ -110,7 +114,37 @@ export default async function ApplicantDetailPage({ params }: PageProps<"/applic
           <InfoRow
             label="タグ"
             value={
-              applicant.tags.length === 0 ? (
+              canEdit ? (
+                allTags.length === 0 ? (
+                  "—"
+                ) : (
+                  <form
+                    action={updateApplicantTags.bind(null, applicant.id)}
+                    className="flex flex-col gap-2"
+                  >
+                    <div className="flex flex-wrap gap-3">
+                      {allTags.map((tag) => (
+                        <label key={tag.id} className="flex items-center gap-1.5 text-sm">
+                          <input
+                            type="checkbox"
+                            name="tag_ids"
+                            value={tag.id}
+                            defaultChecked={applicant.tags.some((t) => t.tag_id === tag.id)}
+                          />
+                          <Badge style={{ backgroundColor: tag.color, color: "#fff" }}>
+                            {tag.name}
+                          </Badge>
+                        </label>
+                      ))}
+                    </div>
+                    <div>
+                      <Button type="submit" variant="outline" size="sm">
+                        タグを更新
+                      </Button>
+                    </div>
+                  </form>
+                )
+              ) : applicant.tags.length === 0 ? (
                 "—"
               ) : (
                 <div className="flex flex-wrap gap-1">

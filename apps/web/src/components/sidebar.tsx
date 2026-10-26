@@ -43,7 +43,7 @@ const SECTIONS: NavSection[] = [
         roles: ["admin", "recruiter"],
       },
       { icon: "📝", label: "アンケート" },
-      { icon: "🎛️", label: "リッチメニュー" },
+      { href: "/masters/rich-menus", icon: "🎛️", label: "リッチメニュー" },
       { icon: "🔄", label: "自動化シナリオ" },
     ],
   },
