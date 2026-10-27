@@ -39,3 +39,14 @@ export async function uploadLineMessageImage(
   const path = `line-messages/${applicantId}/${Date.now()}.${ext}`;
   return uploadBuffer(path, buffer, contentType);
 }
+
+/** リッチメニュー画像をFirebase Storageに保管し、公開URLを返す(FR034、管理画面でのプレビュー用)。 */
+export async function uploadRichMenuImage(
+  richMenuId: string,
+  buffer: Buffer,
+  contentType: string
+): Promise<string> {
+  const ext = contentType.includes("png") ? "png" : "jpg";
+  const path = `rich-menus/${richMenuId}/${Date.now()}.${ext}`;
+  return uploadBuffer(path, buffer, contentType);
+}

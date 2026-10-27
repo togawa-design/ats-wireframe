@@ -164,6 +164,48 @@ model Tag {
   creator         Staff           @relation(fields: [created_by], references: [id])
   applicant_tags  ApplicantTag[]
   line_broadcasts LineBroadcast[]
+  rich_menu_rules RichMenuRule[]
+}
+
+enum RichMenuStatus {
+  draft
+  published
+
+  @@map("rich_menu_status")
+}
+
+/// LINEリッチメニュー(FR034)。公開(published)になったものだけがFR035の自動切替対象になる。
+model RichMenu {
+  id                String         @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name              String         @db.VarChar(100)
+  // LINE側で発行されるリッチメニューID。公開(LINEへの登録)が完了すると設定される。
+  line_rich_menu_id String?        @db.VarChar(100)
+  chat_bar_text     String         @db.VarChar(14)
+  image_url         String?        @db.VarChar(500)
+  // エリア分割パターンのプリセットキー(one/two/four/six)。
+  layout            String         @db.VarChar(20)
+  // プリセットの各エリアに対応するアクション定義: [{actionType, label, uri?, text?}]
+  areas             Json
+  status            RichMenuStatus @default(draft)
+  // 複数のルールが同時に一致した場合、priorityが大きい方を優先する。
+  priority          Int            @default(0)
+  created_at        DateTime       @default(now())
+  updated_at        DateTime       @updatedAt
+
+  rules RichMenuRule[]
+}
+
+/// リッチメニューのタグ連動自動切替ルール(FR035)。応募者がtag_idのタグを持つ場合、
+/// rich_menu_id(のうちpriorityが最も高いもの)がLINE上でそのユーザーに紐付けられる。
+model RichMenuRule {
+  id           String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  rich_menu_id String @db.Uuid
+  tag_id       String @db.Uuid
+
+  rich_menu RichMenu @relation(fields: [rich_menu_id], references: [id], onDelete: Cascade)
+  tag       Tag      @relation(fields: [tag_id], references: [id], onDelete: Cascade)
+
+  @@unique([rich_menu_id, tag_id])
 }
 
 /// 学校マスター。
