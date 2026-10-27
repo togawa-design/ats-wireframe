@@ -142,7 +142,11 @@
 
 パブリックIP(`ipv4Enabled: true`、許可ネットワーク未登録)の扱いは未着手。Cloud SQL Auth Proxy/Connector経由であれば許可ネットワーク登録は不要なため、本番の接続方式確定後に見直す。
 
-Firebase Storageのバージョニング設定は未確認。
+**この対応範囲の限界**: 上記のPITR/バックアップで戻せるのは**Cloud SQL(`fujiarte-ats-db`)のデータのみ**。以下は対象外であり、別途対策が必要:
+- Firebase Authのユーザー情報(本システムはStaffのログインにFirebase Authを使用)
+- Firebase Storage上のファイル(応募書類等)。バケット`fujiarte-ats.firebasestorage.app`のオブジェクトバージョニングは**無効**(2026-10-27確認、`gcloud storage buckets list`の`versioning.enabled`が空)。誤削除・上書きからの復旧手段が現状無い
+
+**削除保護の副作用に関する注意**: 今後、Cloud SQLインスタンスの作り直し・移行・リージョン変更を行う際は、**先に`--no-deletion-protection`で削除保護を外す手順が必要**になる。該当する計画を立てる際はこの一言を計画書に含めること。
 
 ### 重要な発見: 本番DBにATS本体のスキーマが存在しない
 
@@ -158,6 +162,7 @@ Firebase Storageのバージョニング設定は未確認。
 | 認証失敗/permission-deniedのログ記録 | 未実装 | 高 |
 | A1〜A10アラート | 全て未実装 | kanshi側の基盤整備待ち |
 | Cloud SQL PITR/バックアップ | **対応済み(2026-10-27)** | - |
+| Firebase Storageのオブジェクトバージョニング | 無効(2026-10-27確認)。応募書類の誤削除・上書きからの復旧手段なし | 高 |
 | パブリックIPの扱い(許可ネットワーク/Connector方式) | 未着手 | 中 |
 | 本番実行基盤の確定(Cloud Run vs App Hosting) | 未確定 | 中 |
 | ATS本体(apps/web)の本番マイグレーション未実施 | 未着手(§9参照) | 本番投入前に要対応 |
