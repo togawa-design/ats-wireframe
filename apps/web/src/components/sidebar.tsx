@@ -42,7 +42,7 @@ const SECTIONS: NavSection[] = [
         label: "メッセージ送信",
         roles: ["admin", "recruiter"],
       },
-      { icon: "📝", label: "アンケート" },
+      { href: "/masters/surveys", icon: "📝", label: "アンケート" },
       { href: "/masters/rich-menus", icon: "🎛️", label: "リッチメニュー" },
       { icon: "🔄", label: "自動化シナリオ" },
     ],

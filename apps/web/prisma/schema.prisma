@@ -335,14 +335,16 @@ model Applicant {
   created_at                DateTime      @default(now())
   updated_at                DateTime      @updatedAt
 
-  school         School?                 @relation(fields: [school_id], references: [id])
-  sources        ApplicantSource[]       @relation("ApplicantSources")
-  primary_source ApplicantSource?        @relation("ApplicantPrimarySource", fields: [primary_source_id], references: [id])
-  tags           ApplicantTag[]
-  line_tokens    LineRegistrationToken[]
-  selection      Selection?
-  line_messages  LineMessage[]
-  call_logs      CallLog[]
+  school            School?                 @relation(fields: [school_id], references: [id])
+  sources           ApplicantSource[]       @relation("ApplicantSources")
+  primary_source    ApplicantSource?        @relation("ApplicantPrimarySource", fields: [primary_source_id], references: [id])
+  tags              ApplicantTag[]
+  line_tokens       LineRegistrationToken[]
+  selection         Selection?
+  line_messages     LineMessage[]
+  call_logs         CallLog[]
+  survey_recipients SurveyRecipient[]
+  survey_responses  SurveyResponse[]
 
   @@index([email], map: "applicant_email_idx")
   @@index([sf_contact_id], map: "applicant_sf_idx")
@@ -586,4 +588,58 @@ model LineBroadcast {
   messages LineMessage[]
 
   @@index([sent_at(sort: Desc)], map: "linebroadcast_sent_idx")
+}
+
+// ===== LINEアンケート(FR036) =====
+
+enum SurveyStatus {
+  draft
+  published
+
+  @@map("survey_status")
+}
+
+/// LINEアンケート(FR036)。LIFF経由で応募者本人が回答する。
+/// 質問はJSONで保持する([{id, type: "text"|"single_choice"|"multi_choice", label, options?}])。
+model Survey {
+  id          String       @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  title       String       @db.VarChar(200)
+  description String?
+  questions   Json
+  status      SurveyStatus @default(draft)
+  created_at  DateTime     @default(now())
+  updated_at  DateTime     @updatedAt
+
+  recipients SurveyRecipient[]
+  responses  SurveyResponse[]
+}
+
+/// アンケートの送信先台帳。送信に成功した応募者だけを記録し、
+/// responseが無い行が「未回答者」(リマインド対象)になる。
+model SurveyRecipient {
+  id           String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  survey_id    String    @db.Uuid
+  applicant_id String    @db.Uuid
+  sent_at      DateTime  @default(now())
+  reminded_at  DateTime?
+
+  survey    Survey    @relation(fields: [survey_id], references: [id], onDelete: Cascade)
+  applicant Applicant @relation(fields: [applicant_id], references: [id], onDelete: Cascade)
+
+  @@unique([survey_id, applicant_id])
+}
+
+/// アンケート回答。1応募者につき1アンケート1件(再回答は上書き)。
+model SurveyResponse {
+  id           String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  survey_id    String   @db.Uuid
+  applicant_id String   @db.Uuid
+  // [{questionId, value: string | string[]}]
+  answers      Json
+  submitted_at DateTime @default(now())
+
+  survey    Survey    @relation(fields: [survey_id], references: [id], onDelete: Cascade)
+  applicant Applicant @relation(fields: [applicant_id], references: [id], onDelete: Cascade)
+
+  @@unique([survey_id, applicant_id])
 }
